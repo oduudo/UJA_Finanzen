@@ -694,6 +694,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -737,6 +749,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -860,6 +880,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -903,6 +935,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -1416,6 +1456,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));
             $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_depotname_name_search', 'id', 'name', null);
@@ -1449,6 +1501,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));

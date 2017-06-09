@@ -180,6 +180,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -248,6 +260,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -756,6 +776,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -799,6 +831,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -922,6 +962,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -965,6 +1017,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -1595,6 +1655,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $this->dataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $this->dataset->AddField($field, false);
         }
     
         protected function DoPrepare() {
@@ -1631,7 +1703,13 @@
                 new FilterColumn($this->dataset, 'wpperm', 'wpperm', $this->RenderText('Wpperm')),
                 new FilterColumn($this->dataset, 'f100id', 'f100id', $this->RenderText('F100id')),
                 new FilterColumn($this->dataset, 'portf', 'portf', $this->RenderText('Portf')),
-                new FilterColumn($this->dataset, 'start', 'start', $this->RenderText('Start'))
+                new FilterColumn($this->dataset, 'start', 'start', $this->RenderText('Start')),
+                new FilterColumn($this->dataset, 'invest', 'invest', $this->RenderText('Invest')),
+                new FilterColumn($this->dataset, 'wert', 'wert', $this->RenderText('Wert')),
+                new FilterColumn($this->dataset, 'dividende', 'dividende', $this->RenderText('Dividende')),
+                new FilterColumn($this->dataset, 'kosten', 'kosten', $this->RenderText('Kosten')),
+                new FilterColumn($this->dataset, 'gewinn', 'gewinn', $this->RenderText('Gewinn')),
+                new FilterColumn($this->dataset, 'gewinn_prozent', 'gewinn_prozent', $this->RenderText('Gewinn Prozent'))
             );
         }
     
@@ -1644,7 +1722,13 @@
                 ->addColumn($columns['wpperm'])
                 ->addColumn($columns['f100id'])
                 ->addColumn($columns['portf'])
-                ->addColumn($columns['start']);
+                ->addColumn($columns['start'])
+                ->addColumn($columns['invest'])
+                ->addColumn($columns['wert'])
+                ->addColumn($columns['dividende'])
+                ->addColumn($columns['kosten'])
+                ->addColumn($columns['gewinn'])
+                ->addColumn($columns['gewinn_prozent']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -1821,6 +1905,114 @@
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
             );
+            
+            $main_editor = new TextEdit('invest_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['invest'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('wert_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['wert'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('dividende_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['dividende'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('kosten_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['kosten'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('gewinn_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['gewinn'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('gewinn_prozent_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['gewinn_prozent'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
         }
     
         protected function AddOperationsColumns(Grid $grid)
@@ -1946,6 +2138,84 @@
             $column->SetDescription($this->RenderText(''));
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
+            
+            //
+            // View column for invest field
+            //
+            $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for dividende field
+            //
+            $column = new NumberViewColumn('dividende', 'dividende', 'Dividende', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for kosten field
+            //
+            $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for gewinn field
+            //
+            $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for gewinn_prozent field
+            //
+            $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
         }
     
         protected function AddSingleRecordViewColumns(Grid $grid)
@@ -2000,6 +2270,66 @@
             //
             $column = new TextViewColumn('start', 'start', 'Start', $this->dataset);
             $column->SetOrderable(true);
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for invest field
+            //
+            $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for dividende field
+            //
+            $column = new NumberViewColumn('dividende', 'dividende', 'Dividende', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for kosten field
+            //
+            $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for gewinn field
+            //
+            $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for gewinn_prozent field
+            //
+            $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -2075,6 +2405,60 @@
             $editColumn = new CustomEditColumn('Start', 'start', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $this->RenderText($editColumn->GetCaption())));
             $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for invest field
+            //
+            $editor = new TextEdit('invest_edit');
+            $editColumn = new CustomEditColumn('Invest', 'invest', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for dividende field
+            //
+            $editor = new TextEdit('dividende_edit');
+            $editColumn = new CustomEditColumn('Dividende', 'dividende', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for kosten field
+            //
+            $editor = new TextEdit('kosten_edit');
+            $editColumn = new CustomEditColumn('Kosten', 'kosten', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for gewinn field
+            //
+            $editor = new TextEdit('gewinn_edit');
+            $editColumn = new CustomEditColumn('Gewinn', 'gewinn', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for gewinn_prozent field
+            //
+            $editor = new TextEdit('gewinn_prozent_edit');
+            $editColumn = new CustomEditColumn('Gewinn Prozent', 'gewinn_prozent', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
         }
@@ -2153,6 +2537,60 @@
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for invest field
+            //
+            $editor = new TextEdit('invest_edit');
+            $editColumn = new CustomEditColumn('Invest', 'invest', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for dividende field
+            //
+            $editor = new TextEdit('dividende_edit');
+            $editColumn = new CustomEditColumn('Dividende', 'dividende', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for kosten field
+            //
+            $editor = new TextEdit('kosten_edit');
+            $editColumn = new CustomEditColumn('Kosten', 'kosten', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for gewinn field
+            //
+            $editor = new TextEdit('gewinn_edit');
+            $editColumn = new CustomEditColumn('Gewinn', 'gewinn', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for gewinn_prozent field
+            //
+            $editor = new TextEdit('gewinn_prozent_edit');
+            $editColumn = new CustomEditColumn('Gewinn Prozent', 'gewinn_prozent', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
             $grid->SetShowAddButton(true && $this->GetSecurityInfo()->HasAddGrant());
         }
     
@@ -2209,6 +2647,66 @@
             $column = new TextViewColumn('start', 'start', 'Start', $this->dataset);
             $column->SetOrderable(true);
             $grid->AddPrintColumn($column);
+            
+            //
+            // View column for invest field
+            //
+            $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for dividende field
+            //
+            $column = new NumberViewColumn('dividende', 'dividende', 'Dividende', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for kosten field
+            //
+            $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for gewinn field
+            //
+            $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for gewinn_prozent field
+            //
+            $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
         }
     
         protected function AddExportColumns(Grid $grid)
@@ -2264,6 +2762,66 @@
             $column = new TextViewColumn('start', 'start', 'Start', $this->dataset);
             $column->SetOrderable(true);
             $grid->AddExportColumn($column);
+            
+            //
+            // View column for invest field
+            //
+            $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for dividende field
+            //
+            $column = new NumberViewColumn('dividende', 'dividende', 'Dividende', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for kosten field
+            //
+            $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for gewinn field
+            //
+            $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for gewinn_prozent field
+            //
+            $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
         }
     
         private function AddCompareColumns(Grid $grid)
@@ -2318,6 +2876,66 @@
             //
             $column = new TextViewColumn('start', 'start', 'Start', $this->dataset);
             $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for invest field
+            //
+            $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for dividende field
+            //
+            $column = new NumberViewColumn('dividende', 'dividende', 'Dividende', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for kosten field
+            //
+            $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for gewinn field
+            //
+            $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for gewinn_prozent field
+            //
+            $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
         }
     

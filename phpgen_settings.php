@@ -56,6 +56,8 @@ function GetPageInfos()
     $result[] = array('caption' => 'Anteile', 'short_caption' => 'Anteile', 'filename' => 'anteile.php', 'name' => 'anteile', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     $result[] = array('caption' => 'Depots', 'short_caption' => 'Depots', 'filename' => 'depots.php', 'name' => 'depots', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     $result[] = array('caption' => 'Kurse', 'short_caption' => 'Kurse', 'filename' => 'kurse.php', 'name' => 'kurse', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
+    $result[] = array('caption' => 'Transaktionen', 'short_caption' => 'Transaktionen', 'filename' => 'transaktionen.php', 'name' => 'transaktionen', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
+    $result[] = array('caption' => 'Login', 'short_caption' => 'Login', 'filename' => 'login.php', 'name' => 'login', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     return $result;
 }
 

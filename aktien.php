@@ -180,6 +180,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -248,6 +260,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -756,6 +776,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -799,6 +831,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -922,6 +962,18 @@
             $field = new StringField('start');
             $field->SetIsNotNull(true);
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
@@ -965,6 +1017,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -1696,6 +1756,14 @@
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Aktienid', 
@@ -1946,6 +2014,14 @@
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
             $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
+            $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
                 'Aktienid', 
@@ -2021,6 +2097,14 @@
             $field = new IntegerField('par20');
             $lookupDataset->AddField($field, false);
             $field = new IntegerField('kgv');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('kommentar');
             $lookupDataset->AddField($field, false);
             $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
             $editColumn = new LookUpEditColumn(
@@ -2398,6 +2482,14 @@
             $this->dataset->AddField($field, false);
             $field = new IntegerField('kgv');
             $this->dataset->AddField($field, false);
+            $field = new IntegerField('div_rendite');
+            $this->dataset->AddField($field, false);
+            $field = new IntegerField('dsr');
+            $this->dataset->AddField($field, false);
+            $field = new StringField('bewertung');
+            $this->dataset->AddField($field, false);
+            $field = new StringField('kommentar');
+            $this->dataset->AddField($field, false);
         }
     
         protected function DoPrepare() {
@@ -2439,7 +2531,11 @@
                 new FilterColumn($this->dataset, 'par5', 'par5', $this->RenderText('Par5')),
                 new FilterColumn($this->dataset, 'par10', 'par10', $this->RenderText('Par10')),
                 new FilterColumn($this->dataset, 'par20', 'par20', $this->RenderText('Par20')),
-                new FilterColumn($this->dataset, 'kgv', 'kgv', $this->RenderText('Kgv'))
+                new FilterColumn($this->dataset, 'kgv', 'kgv', $this->RenderText('Kgv')),
+                new FilterColumn($this->dataset, 'div_rendite', 'div_rendite', $this->RenderText('Div Rendite')),
+                new FilterColumn($this->dataset, 'dsr', 'dsr', $this->RenderText('Dsr')),
+                new FilterColumn($this->dataset, 'bewertung', 'bewertung', $this->RenderText('Bewertung')),
+                new FilterColumn($this->dataset, 'kommentar', 'kommentar', $this->RenderText('Kommentar'))
             );
         }
     
@@ -2457,7 +2553,11 @@
                 ->addColumn($columns['par5'])
                 ->addColumn($columns['par10'])
                 ->addColumn($columns['par20'])
-                ->addColumn($columns['kgv']);
+                ->addColumn($columns['kgv'])
+                ->addColumn($columns['div_rendite'])
+                ->addColumn($columns['dsr'])
+                ->addColumn($columns['bewertung'])
+                ->addColumn($columns['kommentar']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -2717,6 +2817,96 @@
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
             );
+            
+            $main_editor = new TextEdit('div_rendite_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['div_rendite'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('dsr_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['dsr'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new MultiValueSelect('bewertung');
+            $main_editor->addChoice($this->RenderText('\'\''), $this->RenderText('\'\''));
+            $main_editor->addChoice($this->RenderText('*'), $this->RenderText('*'));
+            $main_editor->addChoice($this->RenderText('**'), $this->RenderText('**'));
+            $main_editor->addChoice($this->RenderText('***'), $this->RenderText('***'));
+            $main_editor->addChoice($this->RenderText('****'), $this->RenderText('****'));
+            $main_editor->addChoice($this->RenderText('*****'), $this->RenderText('*****'));
+            
+            $text_editor = new TextEdit('bewertung');
+            
+            $filterBuilder->addColumn(
+                $columns['bewertung'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::CONTAINS => $text_editor,
+                    FilterConditionOperator::DOES_NOT_CONTAIN => $text_editor,
+                    FilterConditionOperator::BEGINS_WITH => $text_editor,
+                    FilterConditionOperator::ENDS_WITH => $text_editor,
+                    FilterConditionOperator::IS_LIKE => $text_editor,
+                    FilterConditionOperator::IS_NOT_LIKE => $text_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('kommentar');
+            
+            $filterBuilder->addColumn(
+                $columns['kommentar'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::CONTAINS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_CONTAIN => $main_editor,
+                    FilterConditionOperator::BEGINS_WITH => $main_editor,
+                    FilterConditionOperator::ENDS_WITH => $main_editor,
+                    FilterConditionOperator::IS_LIKE => $main_editor,
+                    FilterConditionOperator::IS_NOT_LIKE => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
         }
     
         protected function AddOperationsColumns(Grid $grid)
@@ -2920,6 +3110,54 @@
             $column->SetDescription($this->RenderText(''));
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
+            
+            //
+            // View column for div_rendite field
+            //
+            $column = new NumberViewColumn('div_rendite', 'div_rendite', 'Div Rendite', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for dsr field
+            //
+            $column = new NumberViewColumn('dsr', 'dsr', 'Dsr', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for bewertung field
+            //
+            $column = new TextViewColumn('bewertung', 'bewertung', 'Bewertung', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetMaxLength(75);
+            $column->SetFullTextWindowHandlerName('aktienGrid_kommentar_handler_list');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
         }
     
         protected function AddSingleRecordViewColumns(Grid $grid)
@@ -3027,6 +3265,42 @@
             $column->setNumberAfterDecimal(4);
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for div_rendite field
+            //
+            $column = new NumberViewColumn('div_rendite', 'div_rendite', 'Div Rendite', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for dsr field
+            //
+            $column = new NumberViewColumn('dsr', 'dsr', 'Dsr', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for bewertung field
+            //
+            $column = new TextViewColumn('bewertung', 'bewertung', 'Bewertung', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetMaxLength(75);
+            $column->SetFullTextWindowHandlerName('aktienGrid_kommentar_handler_view');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -3142,6 +3416,49 @@
             //
             $editor = new TextEdit('kgv_edit');
             $editColumn = new CustomEditColumn('Kgv', 'kgv', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for div_rendite field
+            //
+            $editor = new TextEdit('div_rendite_edit');
+            $editColumn = new CustomEditColumn('Div Rendite', 'div_rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for dsr field
+            //
+            $editor = new TextEdit('dsr_edit');
+            $editColumn = new CustomEditColumn('Dsr', 'dsr', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for bewertung field
+            //
+            $editor = new CheckBoxGroup('bewertung_edit');
+            $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
+            $editor->addChoice($this->RenderText('\'\''), $this->RenderText('\'\''));
+            $editor->addChoice($this->RenderText('*'), $this->RenderText('*'));
+            $editor->addChoice($this->RenderText('**'), $this->RenderText('**'));
+            $editor->addChoice($this->RenderText('***'), $this->RenderText('***'));
+            $editor->addChoice($this->RenderText('****'), $this->RenderText('****'));
+            $editor->addChoice($this->RenderText('*****'), $this->RenderText('*****'));
+            $editColumn = new CustomEditColumn('Bewertung', 'bewertung', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for kommentar field
+            //
+            $editor = new TextAreaEdit('kommentar_edit', 50, 8);
+            $editColumn = new CustomEditColumn('Kommentar', 'kommentar', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -3262,6 +3579,49 @@
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for div_rendite field
+            //
+            $editor = new TextEdit('div_rendite_edit');
+            $editColumn = new CustomEditColumn('Div Rendite', 'div_rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for dsr field
+            //
+            $editor = new TextEdit('dsr_edit');
+            $editColumn = new CustomEditColumn('Dsr', 'dsr', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for bewertung field
+            //
+            $editor = new CheckBoxGroup('bewertung_edit');
+            $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
+            $editor->addChoice($this->RenderText('\'\''), $this->RenderText('\'\''));
+            $editor->addChoice($this->RenderText('*'), $this->RenderText('*'));
+            $editor->addChoice($this->RenderText('**'), $this->RenderText('**'));
+            $editor->addChoice($this->RenderText('***'), $this->RenderText('***'));
+            $editor->addChoice($this->RenderText('****'), $this->RenderText('****'));
+            $editor->addChoice($this->RenderText('*****'), $this->RenderText('*****'));
+            $editColumn = new CustomEditColumn('Bewertung', 'bewertung', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for kommentar field
+            //
+            $editor = new TextAreaEdit('kommentar_edit', 50, 8);
+            $editColumn = new CustomEditColumn('Kommentar', 'kommentar', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
             $grid->SetShowAddButton(true && $this->GetSecurityInfo()->HasAddGrant());
         }
     
@@ -3371,6 +3731,42 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
+            
+            //
+            // View column for div_rendite field
+            //
+            $column = new NumberViewColumn('div_rendite', 'div_rendite', 'Div Rendite', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for dsr field
+            //
+            $column = new NumberViewColumn('dsr', 'dsr', 'Dsr', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for bewertung field
+            //
+            $column = new TextViewColumn('bewertung', 'bewertung', 'Bewertung', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetMaxLength(75);
+            $column->SetFullTextWindowHandlerName('aktienGrid_kommentar_handler_print');
+            $grid->AddPrintColumn($column);
         }
     
         protected function AddExportColumns(Grid $grid)
@@ -3479,6 +3875,42 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
+            
+            //
+            // View column for div_rendite field
+            //
+            $column = new NumberViewColumn('div_rendite', 'div_rendite', 'Div Rendite', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for dsr field
+            //
+            $column = new NumberViewColumn('dsr', 'dsr', 'Dsr', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for bewertung field
+            //
+            $column = new TextViewColumn('bewertung', 'bewertung', 'Bewertung', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetMaxLength(75);
+            $column->SetFullTextWindowHandlerName('aktienGrid_kommentar_handler_export');
+            $grid->AddExportColumn($column);
         }
     
         private function AddCompareColumns(Grid $grid)
@@ -3586,6 +4018,42 @@
             $column->setNumberAfterDecimal(4);
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for div_rendite field
+            //
+            $column = new NumberViewColumn('div_rendite', 'div_rendite', 'Div Rendite', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for dsr field
+            //
+            $column = new NumberViewColumn('dsr', 'dsr', 'Dsr', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(4);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for bewertung field
+            //
+            $column = new TextViewColumn('bewertung', 'bewertung', 'Bewertung', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetMaxLength(75);
+            $column->SetFullTextWindowHandlerName('aktienGrid_kommentar_handler_compare');
             $grid->AddCompareColumn($column);
         }
     
@@ -3713,6 +4181,37 @@
             $detailPage->SetFooter(GetPagesFooter());
             $detailPage->SetHttpHandlerName('aktien_kurse_handler');
             $handler = new PageHTTPHandler('aktien_kurse_handler', $detailPage);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $handler = new ShowTextBlobHandler($this->dataset, $this, 'aktienGrid_kommentar_handler_list', $column);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $handler = new ShowTextBlobHandler($this->dataset, $this, 'aktienGrid_kommentar_handler_print', $column);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $handler = new ShowTextBlobHandler($this->dataset, $this, 'aktienGrid_kommentar_handler_compare', $column);
+            GetApplication()->RegisterHTTPHandler($handler);
+            //
+            // View column for kommentar field
+            //
+            $column = new TextViewColumn('kommentar', 'kommentar', 'Kommentar', $this->dataset);
+            $column->SetOrderable(true);
+            $handler = new ShowTextBlobHandler($this->dataset, $this, 'aktienGrid_kommentar_handler_view', $column);
             GetApplication()->RegisterHTTPHandler($handler);
         }
        
