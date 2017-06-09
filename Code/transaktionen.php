@@ -58,6 +58,7 @@
             $this->dataset->AddField($field, false);
             $field = new IntegerField('wert');
             $this->dataset->AddField($field, false);
+            $this->dataset->AddLookupField('anteil', 'depots', new IntegerField('id', null, null, true), new StringField('name', 'anteil_name', 'anteil_name_depots'), 'anteil_name_depots');
         }
     
         protected function DoPrepare() {
@@ -94,7 +95,8 @@
                 new FilterColumn($this->dataset, 'anzahl', 'anzahl', $this->RenderText('Anzahl')),
                 new FilterColumn($this->dataset, 'preis', 'preis', $this->RenderText('Preis')),
                 new FilterColumn($this->dataset, 'kosten', 'kosten', $this->RenderText('Kosten')),
-                new FilterColumn($this->dataset, 'wert', 'wert', $this->RenderText('Wert'))
+                new FilterColumn($this->dataset, 'wert', 'wert', $this->RenderText('Wert')),
+                new FilterColumn($this->dataset, 'anteil', 'anteil_name', $this->RenderText('Anteil'))
             );
         }
     
@@ -104,18 +106,18 @@
                 ->addColumn($columns['id'])
                 ->addColumn($columns['datum'])
                 ->addColumn($columns['typ'])
-                ->addColumn($columns['wertpapier'])
                 ->addColumn($columns['anzahl'])
                 ->addColumn($columns['preis'])
                 ->addColumn($columns['kosten'])
                 ->addColumn($columns['wert'])
-                ->addColumn($columns['depot']);
+                ->addColumn($columns['anteil']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
         {
             $columnFilter
-                ->setOptionsFor('datum');
+                ->setOptionsFor('datum')
+                ->setOptionsFor('anteil');
         }
     
         protected function setupFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
@@ -256,6 +258,33 @@
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
             );
+            
+            $main_editor = new AutocompleteComboBox('anteil_edit', $this->CreateLinkBuilder());
+            $main_editor->setAllowClear(true);
+            $main_editor->setMinimumInputLength(0);
+            $main_editor->SetAllowNullValue(false);
+            $main_editor->SetHandlerName('filter_builder_anteil_name_search');
+            
+            $multi_value_select_editor = new RemoteMultiValueSelect('anteil', $this->CreateLinkBuilder());
+            $multi_value_select_editor->SetHandlerName('filter_builder_anteil_name_search');
+            
+            $filterBuilder->addColumn(
+                $columns['anteil'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IN => $multi_value_select_editor,
+                    FilterConditionOperator::NOT_IN => $multi_value_select_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
         }
     
         protected function AddOperationsColumns(Grid $grid)
@@ -384,6 +413,16 @@
             $column->SetDescription($this->RenderText(''));
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription($this->RenderText(''));
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
         }
     
         protected function AddSingleRecordViewColumns(Grid $grid)
@@ -452,6 +491,13 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddSingleRecordViewColumn($column);
         }
     
         protected function AddEditColumns(Grid $grid)
@@ -512,6 +558,54 @@
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for anteil field
+            //
+            $editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`depots`');
+            $field = new IntegerField('id', null, null, true);
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, true);
+            $field = new StringField('name');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('owner');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('wpperm');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('f100id');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('portf');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('start');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
+            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $editColumn = new LookUpEditColumn(
+                'Anteil', 
+                'anteil', 
+                $editor, 
+                $this->dataset, 'id', 'name', $lookupDataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
         }
     
         protected function AddInsertColumns(Grid $grid)
@@ -569,6 +663,54 @@
             //
             $editor = new TextEdit('wert_edit');
             $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for anteil field
+            //
+            $editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`depots`');
+            $field = new IntegerField('id', null, null, true);
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, true);
+            $field = new StringField('name');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('owner');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('wpperm');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('f100id');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('portf');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('start');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
+            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $editColumn = new LookUpEditColumn(
+                'Anteil', 
+                'anteil', 
+                $editor, 
+                $this->dataset, 'id', 'name', $lookupDataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -641,6 +783,13 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
         }
     
         protected function AddExportColumns(Grid $grid)
@@ -709,6 +858,13 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
         }
     
         private function AddCompareColumns(Grid $grid)
@@ -766,6 +922,13 @@
             $column->setNumberAfterDecimal(4);
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
+            $column->SetOrderable(true);
             $grid->AddCompareColumn($column);
         }
     
@@ -853,6 +1016,44 @@
     
         protected function doRegisterHandlers() {
             
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`depots`');
+            $field = new IntegerField('id', null, null, true);
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, true);
+            $field = new StringField('name');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('owner');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('wpperm');
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('f100id');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('portf');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new StringField('start');
+            $field->SetIsNotNull(true);
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('invest');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('wert');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('dividende');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('kosten');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn');
+            $lookupDataset->AddField($field, false);
+            $field = new IntegerField('gewinn_prozent');
+            $lookupDataset->AddField($field, false);
+            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteil_name_search', 'id', 'name', null);
+            GetApplication()->RegisterHTTPHandler($handler);
         }
        
         protected function doCustomRenderColumn($fieldName, $fieldData, $rowData, &$customText, &$handled)
