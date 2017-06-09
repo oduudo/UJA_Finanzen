@@ -1,58 +1,70 @@
 <?php
 
-include_once dirname(__FILE__) . '/' . 'datasource_security_info.php';
+include_once dirname(__FILE__) . '/' . 'permission_set.php';
 include_once dirname(__FILE__) . '/' . 'base_user_auth.php';
-include_once dirname(__FILE__) . '/' . 'user_identity_cookie_storage.php';
+include_once dirname(__FILE__) . '/' . 'user_identity_storage/user_identity_storage.php';
 
 class ServerSideUserAuthorization extends AbstractUserAuthorization
 {
     private $rolesSecurityInfo;
-    private $allRoles;
     private $guestUserName;
     private $allowGuestAccess;
     private $guestServerLogin;
     private $guestServerPassword;
-    
-    public function __construct($rolesSecurityInfo, $guestUserName, $allowGuestAccess, $guestServerLogin, $guestServerPassword)
+
+    /**
+     * @param UserIdentityStorage $identityStorage
+     * @param $rolesSecurityInfo
+     * @param string $guestUserName
+     * @param bool $allowGuestAccess
+     * @param string $guestServerLogin
+     * @param string $guestServerPassword
+     */
+    public function __construct(UserIdentityStorage $identityStorage, $rolesSecurityInfo, $guestUserName,
+                                $allowGuestAccess, $guestServerLogin, $guestServerPassword)
     {
+        parent::__construct($identityStorage);
         $this->rolesSecurityInfo = $rolesSecurityInfo;
-        $this->allRoles = new DataSourceSecurityInfo(true, true, true, true);
         $this->guestUserName = $guestUserName;
         $this->allowGuestAccess = $allowGuestAccess;
         $this->guestServerLogin = $guestServerLogin;
         $this->guestServerPassword = $guestServerPassword;
     }
-    
+
     public function GetCurrentUserId() { return null; }
-    
-    public function GetCurrentUser() { return GetCurrentUser(); }
+
     public function IsCurrentUserLoggedIn() { return $this->GetCurrentUser() != 'guest'; }
-    
+
     public function GetUserRoles($userName, $dataSourceName)
     {
-        return $this->allRoles;
+        if (($userName == $this->guestUserName) and (!$this->allowGuestAccess))
+            $result = new PermissionSet(false, false, false, false);
+        else
+            $result = new PermissionSet(true, true, true, true);
+
+        return $result;
     }
-    
+
     public function ApplyIdentityToConnectionOptions(&$connectionOptions)
     {
-        if ($this->GetCurrentUser() == $this->guestUserName)
-        {
-            if ($this->allowGuestAccess)
-            {
+        if ($this->GetCurrentUser() == $this->guestUserName) {
+            if ($this->allowGuestAccess) {
                 $connectionOptions['username'] = $this->guestServerLogin;
                 $connectionOptions['password'] = $this->guestServerPassword;
             }
-            else
-                RaiseError(GetCaptions()->GetMessageString('GuestAccessDenied'));
-        }
-        else
-        {
-            $connectionOptions['username'] = $this->GetCurrentUser();
-            $connectionOptions['password'] = $_COOKIE[UserIdentityCookieStorage::passwordCookie];
+        } else {
+            $identity = $this->getIdentityStorage()->getUserIdentity();
+            $connectionOptions['username'] = $identity->userName;
+            $connectionOptions['password'] = $identity->password;
         }
     }
 
     public function HasAdminGrant($userName)
+    {
+        return false;
+    }
+
+    public function HasAdminPanel($userName)
     {
         return false;
     }
@@ -76,30 +88,26 @@ class ServerSideIdentityCheckStrategy extends IdentityCheckStrategy
     }
 
     public function CheckUsernameAndEncryptedPassword($username, $password) {
-        return $this->CheckUsernameAndPassword($username, $password, $errorMessage);
+        return $this->CheckUsernameAndPassword($username, $password);
     }
 
     public function GetEncryptedPassword($plainPassword) {
         return $plainPassword;
     }
 
-    public function CheckUsernameAndPassword($username, $password, &$errorMessage)
+    public function CheckUsernameAndPassword($username, $password)
     {
         $this->connectionOptions['username'] = $username;
         $this->connectionOptions['password'] = $password;
-        
+
         $connection = $this->connectionFactory->CreateConnection($this->connectionOptions);
-        $connection->Connect();
-        if ($connection->Connected())
-        {
-            $errorMessage = null;
-            $connection->Disconnect();
-            return true;            
-        }
-        else
-        {   
-            $errorMessage = $connection->LastError();//'The username/password combination you entered was invalid.';
+        try {
+            $connection->Connect();
+        } catch (SMSQLException $e) {
             return false;
         }
+
+        $connection->Disconnect();
+        return true;
     }
 }

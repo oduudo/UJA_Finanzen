@@ -9,8 +9,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  */
 
+include_once dirname(__FILE__) . '/components/startup.php';
 include_once dirname(__FILE__) . '/' . 'authorization.php';
 include_once dirname(__FILE__) . '/' . 'components/security/user_management_request_handler.php';
+include_once dirname(__FILE__) . '/' . 'components/security/user_identity_storage/user_identity_session_storage.php';
 
 SetUpUserAuthorization();
-UserManagementRequestHandler::HandleRequest($_GET, CreateTableBasedGrantsManager(), GetIdentityCheckStrategy());
+
+$identityCheckStrategy = GetIdentityCheckStrategy();
+
+UserManagementRequestHandler::HandleRequest(
+    $_GET,
+    CreateTableBasedGrantManager(),
+    $identityCheckStrategy,
+    new UserIdentitySessionStorage($identityCheckStrategy)
+);

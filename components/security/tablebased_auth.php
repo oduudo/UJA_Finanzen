@@ -1,8 +1,7 @@
 <?php
 
-include_once dirname(__FILE__) . '/' . 'datasource_security_info.php';
-include_once dirname(__FILE__) . '/' . 'security_info.php';
-include_once dirname(__FILE__) . '/' . 'user_grants_manager.php';
+include_once dirname(__FILE__) . '/' . 'permission_set.php';
+include_once dirname(__FILE__) . '/' . 'grant_manager/user_grant_manager.php';
 //
 include_once dirname(__FILE__) . '/' . '../../database_engine/engine.php';
 include_once dirname(__FILE__) . '/' . '../common_utils.php';
@@ -19,16 +18,21 @@ class TableBasedUserAuthorization extends AbstractUserAuthorization {
      */
     private $dataset;
 
-    /** @var \UserGrantsManager */
+    /** @var \UserGrantManager */
     private $grantsManager;
 
+    private $cachedCurrentUserId;
+
     public function __construct(
+        UserIdentityStorage $identityStorage,
         ConnectionFactory $connectionFactory,
         $connectionOptions,
         $usersTable,
         $userNameFieldName,
         $userIdFieldName,
-        UserGrantsManager $grantsManager) {
+        UserGrantManager $grantsManager)
+    {
+        parent::__construct($identityStorage);
         $this->usersTable = $usersTable;
         $this->userIdFieldName = $userIdFieldName;
         $this->userNameFieldName = $userNameFieldName;
@@ -45,20 +49,22 @@ class TableBasedUserAuthorization extends AbstractUserAuthorization {
     }
 
     public function GetCurrentUserId() {
-        $result = null;
-        $this->dataset->AddFieldFilter(
-            $this->userNameFieldName,
-            new FieldFilter($this->GetCurrentUser(), '=', true));
-        $this->dataset->Open();
-        if ($this->dataset->Next())
-            $result = $this->dataset->GetFieldValueByName($this->userIdFieldName);
-        $this->dataset->Close();
-        $this->dataset->ClearFieldFilters();
-        return $result;
-    }
+        if (!$this->IsCurrentUserLoggedIn()) {
+            return null;
+        }
 
-    public function GetCurrentUser() {
-        return GetCurrentUser();
+        if (is_null($this->cachedCurrentUserId)) {
+            $this->dataset->AddFieldFilter(
+                $this->userNameFieldName,
+                new FieldFilter($this->GetCurrentUser(), '=', true));
+            $this->dataset->Open();
+            if ($this->dataset->Next())
+                $this->cachedCurrentUserId = $this->dataset->GetFieldValueByName($this->userIdFieldName);
+            $this->dataset->Close();
+            $this->dataset->ClearFieldFilters();
+        }
+
+        return $this->cachedCurrentUserId;
     }
 
     public function IsCurrentUserLoggedIn() {
@@ -71,6 +77,10 @@ class TableBasedUserAuthorization extends AbstractUserAuthorization {
 
     public function HasAdminGrant($userName) {
         return $this->grantsManager->HasAdminGrant($userName);
+    }
+
+    public function HasAdminPanel($userName) {
+        return $this->grantsManager->HasAdminPanel($userName);
     }
 
 }
@@ -114,23 +124,17 @@ class TableBasedIdentityCheckStrategy extends IdentityCheckStrategy {
         $this->CreateDataset($connectionFactory, $connectionOptions, $tableName, $userNameFieldName, $passwordFieldName);
     }
 
-    public function CheckUsernameAndPassword($username, $password, &$errorMessage) {
+    public function CheckUsernameAndPassword($username, $password) {
         $this->dataset->AddFieldFilter(
             $this->userNameFieldName,
             new FieldFilter($username, '=', true));
         $this->dataset->Open();
         if ($this->dataset->Next()) {
             $expectedPassword = $this->dataset->GetFieldValueByName($this->passwordFieldName);
-            if ($this->CheckPasswordEquals($password, $expectedPassword)) {
-                return true;
-            } else {
-                $errorMessage = 'The username/password combination you entered was invalid.';
-                return false;
-            }
-        } else {
-            $errorMessage = 'The username/password combination you entered was invalid.';
-            return false;
+            return $this->CheckPasswordEquals($password, $expectedPassword);
         }
+
+        return false;
     }
 
     public function CheckUsernameAndEncryptedPassword($username, $password) {

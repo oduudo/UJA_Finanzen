@@ -1,25 +1,23 @@
 <?php
 
-// require_once 'components/renderers/renderer.php';
-// require_once 'components/component.php';
-// require_once 'components/editors/editors.php';
-// require_once 'components/editors/multilevel_selection.php';
-// require_once 'components/filter_builder.php';
-// require_once 'components/utils/array_utils.php';
+include_once dirname(__FILE__) . '/../renderers/renderer.php';
+include_once dirname(__FILE__) . '/../component.php';
+include_once dirname(__FILE__) . '/../editors/editors.php';
+include_once dirname(__FILE__) . '/../editors/multilevel_selection.php';
+include_once dirname(__FILE__) . '/../editors/autocomplete.php';
+include_once dirname(__FILE__) . '/../editors/multivalue_select.php';
+include_once dirname(__FILE__) . '/../editors/checkboxgroup.php';
+include_once dirname(__FILE__) . '/../utils/array_utils.php';
 
-include_once dirname(__FILE__) . '/' . '../renderers/renderer.php';
-include_once dirname(__FILE__) . '/' . '../component.php';
-include_once dirname(__FILE__) . '/' . '../editors/editors.php';
-include_once dirname(__FILE__) . '/' . '../editors/multilevel_selection.php';
-include_once dirname(__FILE__) . '/' . '../filter_builder.php';
-include_once dirname(__FILE__) . '/' . '../utils/array_utils.php';
+include_once dirname(__FILE__) . '/action_list.php';
+include_once dirname(__FILE__) . '/grid_states/grid_states.php';
 
-include_once dirname(__FILE__) . '/' . 'quick_filter.php';
-include_once dirname(__FILE__) . '/' . 'grid_band.php';
-include_once dirname(__FILE__) . '/' . 'grid_state.php';
-include_once dirname(__FILE__) . '/' . 'commit_values_grid_state.php';
-include_once dirname(__FILE__) . '/' . 'commit_edited_values_grid_state.php';
-include_once dirname(__FILE__) . '/' . 'delete_selected_grid_state.php';
+include_once dirname(__FILE__) . '/layouts/form_layout.php';
+include_once dirname(__FILE__) . '/columns/view_column_group.php';
+
+include_once dirname(__FILE__) . '/filters/column_filter/column_filter.php';
+include_once dirname(__FILE__) . '/filters/filter_builder/filter_builder.php';
+include_once dirname(__FILE__) . '/filters/quick_filter.php';
 
 define('otAscending', 1);
 define('otDescending', 2);
@@ -32,27 +30,80 @@ $orderTypeCaptions = array(
     otAscending => 'a',
     otDescending => 'd');
 
+class SortColumn {
+
+    private $fieldName;
+
+    private $orderType;
+
+    function __construct($fieldName, $orderType) {
+        $this->fieldName = $fieldName;
+        $this->orderType = $orderType;
+    }
+
+    public function getFieldName() {
+        return $this->fieldName;
+    }
+
+    public function getSQLOrderType() {
+        return $this->orderType;
+    }
+
+    public function getShortOrderType() {
+        return $this->orderType == 'ASC' ? 'a' : 'd';
+    }
+
+    public function getOrderType() {
+        return $this->orderType;
+    }
+}
+
+class ViewMode
+{
+    const TABLE = 0;
+    const CARD = 1;
+
+    static function getDefaultMode()
+    {
+        return self::TABLE;
+    }
+
+    static function getList()
+    {
+        return array(
+            self::TABLE => 'TableViewMode',
+            self::CARD => 'CardViewMode'
+        );
+    }
+}
+
 class Grid {
     /** @var string */
     private $name;
 
     /** @var CustomEditColumn[] */
-    private $editColumns;
+    private $editColumns = array();
 
-    /** @var CustomViewColumn[] */
-    private $viewColumns;
+    /** @var AbstractViewColumn[] */
+    private $viewColumns = array();
 
-    /** @var CustomViewColumn[] */
-    private $printColumns;
+    /** @var AbstractViewColumn[] */
+    private $printColumns = array();
 
     /** @var CustomEditColumn[] */
-    private $insertColumns;
+    private $insertColumns = array();
 
-    /** @var CustomViewColumn[] */
-    private $exportColumns;
+    /** @var AbstractViewColumn[] */
+    private $exportColumns = array();
 
-    /** @var CustomViewColumn[] */
-    private $singleRecordViewColumns;
+    /** @var AbstractViewColumn[] */
+    private $singleRecordViewColumns = array();
+
+    /** @var AbstractViewColumn[] */
+    private $compareHeaderColumns = array();
+
+    /** @var AbstractViewColumn[] */
+    private $compareColumns = array();
 
     /** @var IDataset */
     private $dataset;
@@ -66,26 +117,59 @@ class Grid {
     /** @var bool */
     private $showAddButton;
 
-    /** @var bool */
-    private $showInlineAddButton;
+    /** @var array */
+    private $messages = array();
 
-    /** @var string */
-    private $message;
+    /** @var array */
+    private $errorMessages = array();
 
     /** @var bool */
-    private $allowDeleteSelected;
+    private $popFlashMessages = true;
+
+    /** @var bool */
+    private $allowDeleteSelected = false;
+
+    /** @var bool */
+    private $allowCompare = false;
+
+    /** @var bool */
+    private $allowAddMultipleRecords = true;
+
     //
     public $Width;
     public $Margin;
 
-    //
-    public $SearchControl;
-    public $UseFilter;
+    /**
+     * @var ColumnFilter
+     */
+    public $columnFilter;
+
+    /**
+     * @var FilterBuilder
+     */
+    private $filterBuilder;
+
+    /**
+     * @var QuickFilter
+     */
+    private $quickFilter;
+
     //
     private $orderColumnFieldName;
     private $orderType;
+
+    /** @var SortColumn[] */
+    private $sortedColumns;
+
+    /** @var SortColumn[] */
+    private $defaultSortedColumns;
+
+    /**
+     * @var ViewColumnGroup
+     */
+    private $viewColumnGroup;
+
     private $highlightRowAtHover;
-    private $errorMessage;
     //
     public $OnDisplayText;
     //
@@ -93,9 +177,10 @@ class Grid {
     private $defaultOrderType;
     private $useImagesForActions;
     //
-    /** @var GridBand[] */
-    private $bands;
-    private $defaultBand;
+
+    /** @var ActionList */
+    private $actions;
+
     //
     private $editClientValidationScript;
     private $insertClientValidationScript;
@@ -105,19 +190,17 @@ class Grid {
     private $editClientEditorValueChangedScript;
     private $insertClientEditorValueChangedScript;
 
-    private $enabledInlineEditing;
     private $internalName;
     private $showUpdateLink = true;
     private $useFixedHeader;
     private $showLineNumbers;
-    private $useModalInserting;
+    private $showKeyColumnsImagesInHeader;
     private $width;
 
-    /** @var FilterBuilderControl */
-    private $filterBuilder;
-
-    /** @var QuickFilter */
-    private $quickFilter;
+    private $enableRunTimeCustomization = true;
+    private $enableSortDialog = true;
+    private $viewMode;
+    private $cardCountInRow = array('lg' => 3, 'md' => 3, 'sm' => 2, 'xs' => 1);
 
     /** @var Aggregate[] */
     private $totals = array();
@@ -125,17 +208,11 @@ class Grid {
     /** @var bool */
     private $allowOrdering;
 
-    /** @var bool */
-    private $advancedSearchAvailable;
-
-    /** @var bool */
-    private $filterRowAvailable;
-
     /** @var Event */
     public $OnCustomRenderColumn;
 
     /** @var Event */
-    public $OnCustomDrawCell;
+    public $OnExtendedCustomDrawRow;
 
     /** @var Event */
     public $BeforeShowRecord;
@@ -162,7 +239,7 @@ class Grid {
     public $OnBeforeDataChange;
 
     /** @var Event */
-    public $OnCustomDrawCell_Simple;
+    public $OnCustomDrawRow;
 
     /** @var Event */
     public $OnCustomRenderTotal;
@@ -176,16 +253,34 @@ class Grid {
     /** @var Event */
     public $OnGetCustomTemplate;
 
+    /** @var Event */
+    public $OnCustomCompareColumn;
+
     /** @var DetailColumn[] */
     private $details;
 
     /** @var bool */
-    private $showFilterBuilder;
+    private $tableBordered;
 
-    function __construct($page, $dataset, $name) {
+    /** @var bool */
+    private $tableCondensed;
+
+    /** @var FormLayout */
+    private $viewFormLayout;
+
+    /** @var FormLayout */
+    private $insertFormLayout;
+
+    /** @var FormLayout */
+    private $editFormLayout;
+
+    /** @var boolean */
+    private $isMaster = false;
+
+    function __construct(Page $page, Dataset $dataset) {
         $this->page = $page;
         $this->dataset = $dataset;
-        $this->internalName = $name;
+        $this->internalName = $page->getPageId() . 'Grid';
         //
         $this->editColumns = array();
         $this->viewColumns = array();
@@ -194,14 +289,11 @@ class Grid {
         $this->exportColumns = array();
         $this->singleRecordViewColumns = array();
         $this->details = array();
-        //
-        $this->SearchControl = new NullComponent('Search');
-        $this->UseFilter = false;
-        //
+
         $this->showAddButton = false;
-        //
+
         $this->OnCustomRenderTotal = new Event();
-        $this->OnCustomDrawCell = new Event();
+        $this->OnExtendedCustomDrawRow = new Event();
         $this->BeforeShowRecord = new Event();
 
         $this->BeforeUpdateRecord = new Event();
@@ -211,9 +303,9 @@ class Grid {
         $this->AfterUpdateRecord = new Event();
         $this->AfterInsertRecord = new Event();
         $this->AfterDeleteRecord = new Event();
+        $this->OnCustomCompareColumn = new Event();
 
-
-        $this->OnCustomDrawCell_Simple = new Event();
+        $this->OnCustomDrawRow = new Event();
         $this->OnCustomRenderColumn = new Event();
         $this->OnBeforeDataChange = new Event();
         $this->OnDisplayText = new Event();
@@ -223,15 +315,15 @@ class Grid {
 
         //
         $this->SetState(OPERATION_VIEWALL);
-        $this->allowDeleteSelected = false;
         $this->highlightRowAtHover = false;
 
         $this->defaultOrderColumnFieldName = null;
         $this->defaultOrderType = null;
+        $this->sortedColumns = array();
+        $this->defaultSortedColumns = array();
 
-        $this->bands = array();
-        $this->defaultBand = new GridBand('defaultBand', 'defaultBand');
-        $this->bands[] = $this->defaultBand;
+        $this->actions = new ActionList();
+
         //
         $this->useImagesForActions = true;
         $this->SetWidth(null);
@@ -239,21 +331,24 @@ class Grid {
         $this->SetInsertClientValidationScript('');
 
         $this->name = 'grid';
-        $this->enabledInlineEditing = true;
         $this->useFixedHeader = false;
         $this->showLineNumbers = false;
-        $this->useModalInserting = false;
+        $this->showKeyColumnsImagesInHeader = true;
         $this->allowOrdering = true;
-        $this->filterBuilder = new FilterBuilderControl($this, $this->GetPage()->GetLocalizerCaptions());
-        $this->quickFilter = new QuickFilter(get_class($this->GetPage()), $this->GetPage(), $this->GetDataset());
-        $this->advancedSearchAvailable = true;
-        $this->filterRowAvailable = true;
-        $this->showFilterBuilder = true;
+
+        $this->viewMode = ViewMode::getDefaultMode();
+
+        $this->tableBordered = false;
+        $this->tableCondensed = false;
+
+        $this->filterBuilder = new FilterBuilder();
+        $this->columnFilter = new ColumnFilter();
+        $this->quickFilter = new QuickFilter();
     }
 
     /**
      * @param string $columnName
-     * @return \CustomViewColumn|null
+     * @return \AbstractViewColumn|null
      */
     private function FindViewColumnByName($columnName) {
         $columns = $this->GetViewColumns();
@@ -263,62 +358,6 @@ class Grid {
             }
         }
         return null;
-    }
-
-    public function UpdateSearchControls() {
-        /** @var AdvancedSearchControl $advancedSearch  */
-        $advancedSearch = $this->GetPage()->AdvancedSearchControl;
-        if ($advancedSearch != null) {
-
-            foreach ($advancedSearch->GetSearchColumns() as $searchColumn) {
-                $columnName = $searchColumn->GetFieldName();
-                $column = $this->FindViewColumnByName($columnName);
-                /** @var Field $field */
-                if ($column)
-                    $field = $this->dataset->GetFieldByName($column->GetName());
-                else
-                    $field = $this->dataset->GetFieldByName($columnName);
-
-                if ($field && $searchColumn) {
-                    if ($searchColumn instanceof LookupSearchColumn) {
-                        $this->filterBuilder->AddField(
-                            $searchColumn,
-                            $searchColumn->GetFieldName(),
-                            $searchColumn->GetCaption(),
-                            $field->GetEngFieldType(),
-                            'Typeahead',
-                            array(
-                                'handler' => $searchColumn->GetHandlerName()
-                            ));
-
-                        $searchColumnViewData['Value'] = $searchColumn->GetDisplayValue();
-                    } else if ($field instanceof DateTimeField || $field instanceof DateField) {
-                        $this->filterBuilder->AddField(
-                            $searchColumn,
-                            $searchColumn->GetFieldName(),
-                            $searchColumn->GetCaption(),
-                            $field->GetEngFieldType(), null, array(
-                                'fdow' => GetFirstDayOfWeek()
-                            ));
-                    } else {
-                        $this->filterBuilder->AddField(
-                            $searchColumn,
-                            $searchColumn->GetFieldName(),
-                            $searchColumn->GetCaption(),
-                            $field->GetEngFieldType(), null, null);
-                    }
-                }
-
-            }
-        }
-    }
-
-    public function GetQuickFilter() {
-        return $this->quickFilter;
-    }
-
-    public function GetFilterBuilder() {
-        return $this->filterBuilder;
     }
 
     public function GetTemplate($mode, $defaultTemplate) {
@@ -331,20 +370,20 @@ class Grid {
 
     #region Options
 
-    public function GetUseModalInserting() {
-        return $this->useModalInserting;
-    }
-
-    public function SetUseModalInserting($value) {
-        $this->useModalInserting = $value;
-    }
-
     public function GetShowLineNumbers() {
         return $this->showLineNumbers;
     }
 
     public function SetShowLineNumbers($showLineNumbers) {
         $this->showLineNumbers = $showLineNumbers;
+    }
+
+    public function GetShowKeyColumnsImagesInHeader() {
+        return $this->showKeyColumnsImagesInHeader;
+    }
+
+    public function SetShowKeyColumnsImagesInHeader($showKeyColumnsImagesInHeader) {
+        $this->showKeyColumnsImagesInHeader = $showKeyColumnsImagesInHeader;
     }
 
     public function GetUseFixedHeader() {
@@ -421,20 +460,36 @@ class Grid {
 
     #endregion
 
-    public function SetErrorMessage($value) {
-        $this->errorMessage = $value;
+    public function addErrorMessage($errorMessage, $displayTime) {
+        $this->errorMessages[] = array(
+            'message' => $errorMessage,
+            'displayTime' => $displayTime,
+        );
     }
 
-    public function GetErrorMessage() {
-        return $this->errorMessage;
+    public function getErrorMessages() {
+        return $this->errorMessages;
     }
 
-    public function SetGridMessage($value) {
-        $this->message = $value;
+    public function addMessage($message, $displayTime) {
+        $this->messages[] = array(
+            'message' => $message,
+            'displayTime' => $displayTime,
+        );
     }
 
-    public function GetGridMessage() {
-        return $this->message;
+    public function getMessages() {
+        return $this->messages;
+    }
+
+    public function getPopFlashMessages()
+    {
+        return $this->popFlashMessages;
+    }
+
+    public function setPopFlashMessages($popFlashMessages)
+    {
+        $this->popFlashMessages = $popFlashMessages;
     }
 
     /**
@@ -445,64 +500,24 @@ class Grid {
     }
 
     /**
-     * @return IDataset
+     * @return Dataset
      */
     function GetDataset() {
         return $this->dataset;
     }
 
-    function GetSingleRecordViewColumns() {
-        return $this->singleRecordViewColumns;
-    }
-
-    #region Bands
-
-    public function AddBand($bandName, $caption, $useConsolidatedHeader = false) {
-        $result = new GridBand($bandName, $caption, $useConsolidatedHeader);
-        $this->bands[] = $result;
-        return $result;
-    }
-
-    public function AddBandToBegin($bandName, $caption, $useConsolidatedHeader = false) {
-        $result = new GridBand($bandName, $caption, $useConsolidatedHeader);
-        $this->bands = array_merge(array($result), $this->bands);
-        return $result;
-    }
-
-    public function GetBandByName($name) {
-        foreach ($this->bands as $band)
-            if ($band->GetName() == $name)
-                return $band;
-        return null;
-    }
-
-    public function GetDefaultBand() {
-        return $this->defaultBand;
-    }
-
-    public function GetViewBands() {
-        return $this->bands;
+    /**
+     * @return ActionList
+     */
+    public function getActions()
+    {
+        return $this->actions;
     }
 
     #endregion
 
     function CreateLinkBuilder() {
         return $this->GetPage()->CreateLinkBuilder();
-    }
-
-    /**
-     * @param CustomViewColumn $column
-     * @return string
-     */
-    function GetVerticalLineBeforeWidth($column) {
-        if (is_subclass_of($column, 'CustomViewColumn'))
-            return $column->GetVerticalLine();
-        return null;
-    }
-
-    function AddVericalLine($style) {
-        if (count($this->viewColumns) > 0)
-            $this->viewColumns[count($this->viewColumns) - 1]->SetVerticalLine($style);
     }
 
     function AddSingleRecordViewColumn($column) {
@@ -514,7 +529,7 @@ class Grid {
     #region Columns
 
     /**
-     * @param CustomEditColumn|CustomViewColumn $column
+     * @param CustomEditColumn|AbstractViewColumn $column
      * @return void
      */
     private function DoAddColumn($column) {
@@ -525,7 +540,7 @@ class Grid {
         $this->details[] = $column;
     }
 
-    public function AddViewColumn($column, $bandName = null) {
+    public function AddViewColumn($column) {
         if ($column instanceof DetailColumn) {
             $this->AddDetail($column);
             $this->DoAddColumn($column);
@@ -534,11 +549,6 @@ class Grid {
 
         $this->viewColumns[] = $column;
         $this->DoAddColumn($column);
-
-        $band = $this->GetBandByName($bandName);
-        if (!isset($band))
-            $band = $this->GetDefaultBand();
-        $band->AddColumn($column);
 
         return $column;
     }
@@ -575,17 +585,189 @@ class Grid {
     }
 
     /**
-     * @return CustomViewColumn[]
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
      */
-    public function GetViewColumns() {
-        return $this->viewColumns;
+    public function GetViewColumns($includeInvisible = false) {
+        return $this->getViewBasedColumns($this->viewColumns, $includeInvisible);
     }
 
     /**
-     * @return array|CustomViewColumn[]
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
      */
-    public function GetPrintColumns() {
-        return $this->printColumns;
+    function GetSingleRecordViewColumns($includeInvisible = false) {
+        return $this->getViewBasedColumns($this->singleRecordViewColumns, $includeInvisible);
+    }
+
+    /**
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
+     */
+    public function GetExportColumns($includeInvisible = false) {
+        return $this->getViewBasedColumns($this->exportColumns, $includeInvisible);
+    }
+
+    /**
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
+     */
+    public function GetPrintColumns($includeInvisible = false) {
+        return $this->getViewBasedColumns($this->printColumns, $includeInvisible);
+    }
+
+    /**
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
+     */
+    public function getCompareColumns($includeInvisible = false)
+    {
+        return $this->getViewBasedColumns($this->compareColumns, $includeInvisible);
+    }
+
+    /**
+     * @param AbstractViewColumn[] $columns
+     * @param boolean $includeInvisible
+     * @return AbstractViewColumn[]
+     */
+    private function getViewBasedColumns($columns, $includeInvisible = false) {
+        $result = array();
+        foreach ($columns as $column) {
+            if ($includeInvisible || $column->getVisible()) {
+                $result[] = $column;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    public function getViewColumn($columnName) {
+        return $this->getViewBasedColumn($this->GetViewColumns(true), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    public function getSingleRecordViewColumn($columnName) {
+        return $this->getViewBasedColumn($this->GetSingleRecordViewColumns(true), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    public function getExportColumn($columnName) {
+        return $this->getViewBasedColumn($this->GetExportColumns(true), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    public function getPrintColumn($columnName) {
+        return $this->getViewBasedColumn($this->GetPrintColumns(true), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    public function getCompareColumn($columnName) {
+        return $this->getViewBasedColumn($this->GetCompareColumns(true), $columnName);
+    }
+
+    /**
+     * @param CustomEditColumn[] $columns
+     * @param string $columnName
+     * @return CustomEditColumn|null
+     */
+    private function getEditBasedColumn($columns, $columnName) {
+        foreach ($columns as $column) {
+            if ($column->GetName() == $columnName) {
+                return $column;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $columnName
+     * @return CustomEditColumn|null
+     */
+    public function getEditColumn($columnName) {
+        return $this->getEditBasedColumn($this->GetEditColumns(), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return CustomEditColumn|null
+     */
+    public function getInsertColumn($columnName) {
+        return $this->getEditBasedColumn($this->GetInsertColumns(), $columnName);
+    }
+
+    /**
+     * @param AbstractViewColumn[] $columns
+     * @param string $columnName
+     * @return AbstractViewColumn|null
+     */
+    private function getViewBasedColumn($columns, $columnName) {
+        foreach ($columns as $column) {
+            if ($this->GetColumnName($column) == $columnName) {
+                return $column;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param AbstractViewColumn[] $compareColumns
+     */
+    public function setCompareColumns($compareColumns)
+    {
+        $this->compareColumns = $compareColumns;
+    }
+
+    /**
+     * @param AbstractViewColumn $compareColumn
+     */
+    public function addCompareColumn(AbstractViewColumn $compareColumn)
+    {
+        $compareColumn->setGrid($this);
+        $this->compareColumns[] = $compareColumn;
+    }
+
+    /**
+     * @param AbstractViewColumn[] $compareHeaderColumns
+     *
+     * @return $this
+     */
+    public function setCompareHeaderColumns($compareHeaderColumns)
+    {
+        $this->compareHeaderColumns = $compareHeaderColumns;
+
+        return $this;
+    }
+
+    /**
+     * @param AbstractViewColumn $compareHeaderColumn
+     */
+    public function addCompareHeaderColumn(AbstractViewColumn $compareHeaderColumn)
+    {
+        $compareHeaderColumn->setGrid($this);
+        $this->compareHeaderColumns[] = $compareHeaderColumn;
+    }
+
+    /**
+     * @return AbstractViewColumn[]
+     */
+    public function getCompareHeaderColumns()
+    {
+        return $this->compareHeaderColumns;
     }
 
     /**
@@ -593,10 +775,6 @@ class Grid {
      */
     public function GetInsertColumns() {
         return $this->insertColumns;
-    }
-
-    public function GetExportColumns() {
-        return $this->exportColumns;
     }
 
     #endregion
@@ -609,54 +787,32 @@ class Grid {
         $renderer->RenderGrid($this);
     }
 
-    public function SetState($StateName) {
+    public function SetState($name)
+    {
+        $map = array(
+            OPERATION_VIEW => 'SingleRecordGridState',
+            OPERATION_PRINT_ONE => 'SingleRecordGridState',
+            OPERATION_PRINT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_EDIT => 'EditGridState',
+            OPERATION_VIEWALL => 'ViewAllGridState',
+            OPERATION_COMMIT => 'CommitEditedValuesGridState',
+            OPERATION_INSERT => 'InsertGridState',
+            OPERATION_COPY => 'CopyGridState',
+            OPERATION_COMMIT_INSERT => 'CommitInsertedValuesGridState',
+            OPERATION_DELETE => 'SingleRecordGridState',
+            OPERATION_COMMIT_DELETE => 'CommitDeleteGridState',
+            OPERATION_DELETE_SELECTED => 'DeleteSelectedGridState',
+            OPERATION_EXCEL_EXPORT_RECORD => 'SingleRecordGridState',
+            OPERATION_WORD_EXPORT_RECORD => 'SingleRecordGridState',
+            OPERATION_XML_EXPORT_RECORD => 'SingleRecordGridState',
+            OPERATION_CSV_EXPORT_RECORD => 'SingleRecordGridState',
+            OPERATION_PDF_EXPORT_RECORD => 'SingleRecordGridState',
+            OPERATION_COMPARE => 'SelectedRecordsGridState',
+        );
 
-        switch ($StateName) {
-            case OPERATION_VIEW :
-                $this->gridState = new ViewGridState($this);
-                break;
-            case OPERATION_PRINT_ONE :
-                $this->gridState = new ViewGridState($this);
-                break;
-            case OPERATION_EDIT :
-                $this->gridState = new EditGridState($this);
-                break;
-            case OPERATION_VIEWALL :
-                $this->gridState = new ViewAllGridState($this);
-                break;
-            case OPERATION_COMMIT :
-                $this->gridState = new CommitEditedValuesGridState($this);
-                break;
-            case OPERATION_INSERT:
-                $this->gridState = new InsertGridState($this);
-                break;
-            case OPERATION_COPY:
-                $this->gridState = new CopyGridState($this);
-                break;
-            case OPERATION_COMMIT_INSERT:
-                $this->gridState = new CommitNewValuesGridState($this);
-                break;
-            case OPERATION_DELETE:
-                $this->gridState = new DeleteGridState($this);
-                break;
-            case OPERATION_COMMIT_DELETE:
-                $this->gridState = new CommitDeleteGridState($this);
-                break;
-            case OPERATION_DELETE_SELECTED:
-                $this->gridState = new DeleteSelectedGridState($this);
-                break;
-            case OPERATION_AJAX_REQUERT_INLINE_EDIT:
-                $this->gridState = new OpenInlineEditorsGridState($this);
-                break;
-            case OPERATION_AJAX_REQUERT_INLINE_EDIT_COMMIT:
-                $this->gridState = new CommitInlineEditedValuesGridState($this);
-                break;
-            case OPERATION_AJAX_REQUERT_INLINE_INSERT:
-                $this->gridState = new OpenInlineInsertEditorsGridState($this);
-                break;
-            case OPERATION_AJAX_REQUERT_INLINE_INSERT_COMMIT:
-                $this->gridState = new CommitInlineInsertedValuesGridState($this);
-                break;
+        if (isset($map[$name])) {
+            $className = $map[$name];
+            $this->gridState = new $className($this);
         }
     }
 
@@ -667,33 +823,27 @@ class Grid {
         return $this->gridState;
     }
 
+    public function GetInsertPageAction() {
+        $linkBuilder = $this->CreateLinkBuilder();
+        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridInsertHandler());
+        return $linkBuilder->GetLink();
+    }
+
     public function GetEditPageAction() {
         $linkBuilder = $this->CreateLinkBuilder();
-        return $linkBuilder->GetLink();
-    }
-
-    public function GetOpenInsertModalDialogLink() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetModalGridEditingHandler());
-        $linkBuilder->AddParameter(ModalOperation::Param, ModalOperation::OpenModalInsertDialog);
-        return $linkBuilder->GetLink();
-    }
-
-    public function GetModalInsertPageAction() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetModalGridEditingHandler());
-        return $linkBuilder->GetLink();
-    }
-
-    public function GetModalEditPageAction() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetModalGridEditingHandler());
+        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridEditHandler());
         return $linkBuilder->GetLink();
     }
 
     public function GetReturnUrl() {
         $linkBuilder = $this->CreateLinkBuilder();
         $linkBuilder->AddParameter(OPERATION_PARAMNAME, 'return');
+        return $linkBuilder->GetLink();
+    }
+
+    public function GetInsertUrl() {
+        $linkBuilder = $this->CreateLinkBuilder();
+        $linkBuilder->AddParameter(OPERATION_PARAMNAME, OPERATION_INSERT);
         return $linkBuilder->GetLink();
     }
 
@@ -707,18 +857,66 @@ class Grid {
         $this->orderType = $value;
     }
 
-    public function SetDefaultOrdering($fieldName, $orderType) {
-        $this->defaultOrderColumnFieldName = $fieldName;
-        $this->defaultOrderType = $orderType;
+    public function setOrderBy($sortedColumns) {
+        $this->sortedColumns = $sortedColumns;
+    }
+
+    public function setOrderByParameter($sortedColumns) {
+        $newSortedColumns = array();
+        foreach ($sortedColumns as $value) {
+            $fieldName = urldecode(substr($value, 1, strlen($value) - 1));
+            $orderType = $value[0] == 'a' ? 'ASC' : 'DESC';
+            $newSortedColumns[] = new SortColumn($fieldName, $orderType);
+        }
+        $this->setOrderBy($newSortedColumns);
+    }
+
+    public function setDefaultOrdering($sortedColumns) {
+        $this->defaultSortedColumns = $sortedColumns;
+    }
+
+    public function getSortedColumns() {
+        return $this->sortedColumns;
     }
 
     private function ApplyDefaultOrder() {
-        $this->orderColumnFieldName = $this->defaultOrderColumnFieldName;
-        $this->orderType = $this->defaultOrderType;
+        $this->setOrderBy($this->defaultSortedColumns);
     }
 
-    public function GetOrderColumnFieldName() {
-        return $this->orderColumnFieldName;
+    /*
+     * @param string $fieldName
+     * return null|string
+     */
+    public function GetOrderTypeByFieldName($fieldName) {
+        foreach ($this->sortedColumns as $value) {
+            if ($value->getFieldName() == $fieldName) {
+                return $value->getOrderType();
+            }
+        }
+
+        return null;
+    }
+
+    public function getSortIndexByFieldName($fieldName)
+    {
+        foreach ($this->sortedColumns as $key => $value) {
+            if ($value->getFieldName() == $fieldName) {
+                return $key;
+            }
+        }
+
+        return null;
+    }
+
+    public function getSortOrderTypeByFieldName($fieldName)
+    {
+        foreach ($this->sortedColumns as $value) {
+            if ($value->getFieldName() == $fieldName) {
+                return $value->getOrderType();
+            }
+        }
+
+        return null;
     }
 
     public function SetOrderColumnFieldName($value) {
@@ -728,23 +926,58 @@ class Grid {
     private function ExtractOrderValues() {
         if (GetApplication()->IsGETValueSet('order')) {
             $orderValue = GetApplication()->GetGETValue('order');
-            $this->orderColumnFieldName = substr($orderValue, 1, strlen($orderValue) - 1);
-            $this->orderType = $orderValue[0] == 'a' ? otAscending : otDescending;
-            $this->SetSessionVariable($this->internalName . '_' . 'orderColumnFieldName', $this->orderColumnFieldName);
-            $this->SetSessionVariable($this->internalName . '_' . 'orderType', $this->orderType);
+            if (!is_array($orderValue)) {
+                $orderValue = array($orderValue);
+            }
+            $this->setOrderByParameter($orderValue);
+            $this->SetSessionVariable($this->internalName . '_sorting', $orderValue);
         } elseif (GetOperation() == 'resetorder') {
-            $this->UnSetSessionVariable($this->internalName . '_' . 'orderColumnFieldName');
-            $this->UnSetSessionVariable($this->internalName . '_' . 'orderType');
+            $this->UnSetSessionVariable($this->internalName . '_sorting');
             $this->ApplyDefaultOrder();
-        } elseif ($this->IsSessionVariableSet($this->internalName . '_' . 'orderColumnFieldName')) {
-            $this->orderColumnFieldName = $this->GetSessionVariable($this->internalName . '_' . 'orderColumnFieldName');
-            $this->orderType = $this->GetSessionVariable($this->internalName . '_' . 'orderType');
+        } elseif ($this->IsSessionVariableSet($this->internalName . '_orderColumnFieldName')) {
+            // TODO: this condition was added to support version 14.10.0.7 where sorting was realized by one column only.
+            // In that version field name and order type of sorted column saved to session in parameters .._orderColumnFieldName and.. _orderType respectively
+            // if these parameters were set we use it for sorting one time, deleted it from session and saved sorted columns by a new way.
+            $orderColumnFieldName = $this->GetSessionVariable($this->internalName . '_orderColumnFieldName');
+            $orderType = $this->GetSessionVariable($this->internalName . '_orderType');
+
+            $this->UnSetSessionVariable($this->internalName . '_orderColumnFieldName');
+            $this->UnSetSessionVariable($this->internalName . '_orderType');
+
+            $orderValue = array(substr($orderType, 0, 1) . $orderColumnFieldName);
+            $this->setOrderByParameter($orderValue);
+            $this->SetSessionVariable($this->internalName . '_sorting', $orderValue);
+        } elseif ($this->IsSessionVariableSet($this->internalName . '_sorting')) {
+            $sessionValue = $this->GetSessionVariable($this->internalName . '_sorting');
+            $this->setOrderByParameter($sessionValue);
         } else {
             $this->ApplyDefaultOrder();
         }
     }
 
     #endregion
+
+    public function ExtractViewMode() {
+        $sessionVariableKey = $this->GetId() . 'viewmode';
+        $getParam = ($this->isMaster() ? 'master_' : '') . 'viewmode';
+
+        if (GetApplication()->IsGETValueSet($getParam)) {
+            $this->viewMode = GetApplication()->GetGETValue($getParam) == ViewMode::CARD ? ViewMode::CARD : ViewMode::TABLE;
+            GetApplication()->SetSessionVariable($sessionVariableKey, $this->viewMode);
+        } elseif (GetApplication()->IsSessionVariableSet($sessionVariableKey)) {
+            $this->viewMode = GetApplication()->GetSessionVariable($sessionVariableKey);
+        }
+
+        if (!$this->isMaster()) {
+            $sessionVariableKey = $this->GetId() . 'cardcountinrow';
+            if (GetApplication()->IsGETValueSet('cardcountinrow')) {
+                $this->setCardCountInRow(GetApplication()->GetGETValue('cardcountinrow'));
+                GetApplication()->SetSessionVariable($sessionVariableKey, $this->cardCountInRow);
+            } elseif (GetApplication()->IsSessionVariableSet($sessionVariableKey)) {
+                $this->SetCardCountInRow(GetApplication()->GetSessionVariable($sessionVariableKey));
+            }
+        }
+    }
 
     #region Buttons
 
@@ -756,25 +989,7 @@ class Grid {
         return $this->showAddButton;
     }
 
-    public function SetShowInlineAddButton($value) {
-        $this->showInlineAddButton = $value;
-    }
-
-    public function GetShowInlineAddButton() {
-        return $this->showInlineAddButton;
-    }
-
     function GetPrintRecordLink() {
-        $result = $this->CreateLinkBuilder();
-        return $result->GetLink();
-    }
-
-    function GetInlineEditRequestsAddress() {
-        $result = $this->CreateLinkBuilder();
-        return $result->GetLink();
-    }
-
-    function GetDeleteSelectedLink() {
         $result = $this->CreateLinkBuilder();
         return $result->GetLink();
     }
@@ -785,16 +1000,12 @@ class Grid {
         return $result->GetLink();
     }
 
-    function GetUpdateLink() {
-        return $this->CreateLinkBuilder()->GetLink();
+    function SetShowUpdateLink($value) {
+        $this->showUpdateLink = $value;
     }
 
     function GetShowUpdateLink() {
         return $this->showUpdateLink;
-    }
-
-    function SetShowUpdateLink($value) {
-        $this->showUpdateLink = $value;
     }
 
     function SetAllowDeleteSelected($value) {
@@ -805,19 +1016,278 @@ class Grid {
         return $this->allowDeleteSelected;
     }
 
+    /**
+     * @param bool $allowCompare
+     *
+     * @return $this
+     */
+    public function setAllowCompare($allowCompare)
+    {
+        $this->allowCompare = $allowCompare;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowCompare()
+    {
+        return $this->allowCompare;
+    }
+
+    /**
+     * @param bool $allowAddMultipleRecords
+     */
+    public function setAllowAddMultipleRecords($allowAddMultipleRecords)
+    {
+        $this->allowAddMultipleRecords = $allowAddMultipleRecords;
+    }
+
+    /**
+     * @param bool $allowAddMultipleRecords
+     */
+    public function getAllowAddMultipleRecords()
+    {
+        return $this->allowAddMultipleRecords;
+    }
+
     #endregion
 
     function ProcessMessages() {
         $this->ExtractOrderValues();
-        $this->SearchControl->ProcessMessages();
-        $filterApplied = $this->filterBuilder->ProcessMessages();
-        $this->quickFilter->ProcessMessages();
-        $this->gridState->ProcessMessages();
-        if ($filterApplied) {
-            $link = $this->GetPage()->CreateLinkBuilder();
-            header('Location: ' . $link->GetLink());
-            exit();
+
+        if (!$this->getPage()->isInline()) {
+            $this->ExtractViewMode();
         }
+
+        $this->gridState->ProcessMessages();
+
+        if ($this->getPopFlashMessages()) {
+            $this->restoreFlashMessageFromSession();
+        }
+    }
+
+    public function processFilters()
+    {
+        $this->dataset->Connect();
+        $masterConnection = $this->dataset->getConnectionFactory()->getMasterConnection();
+        $sourceSelect = $this->dataset->getSelectCommand();
+        $superGlobals = new SuperGlobals();
+        $captions = $this->GetPage()->GetLocalizerCaptions();
+
+        $isSubmitted = false;
+
+        $this->columnFilter->createFilterComponent(
+            $masterConnection,
+            $sourceSelect,
+            $captions
+        );
+
+        $isSubmitted = $isSubmitted || $this->processFilterBuilder(
+            $this->filterBuilder,
+            $superGlobals
+        );
+        $this->applyFilterComponent(
+            $sourceSelect,
+            $this->filterBuilder->getFilterComponent()
+        );
+
+        $isSubmitted = $isSubmitted || $this->processQuickFilter(
+            $this->quickFilter,
+            $superGlobals
+        );
+
+        $this->applyFilterComponent(
+            $sourceSelect,
+            $this->quickFilter->getFilterComponent()
+        );
+
+        $isSubmitted = $isSubmitted || $this->processColumnFilter(
+            $this->columnFilter,
+            $masterConnection,
+            $sourceSelect,
+            $superGlobals
+        );
+
+        $this->applyFilterComponent(
+            $sourceSelect,
+            $this->columnFilter->getFilterComponent()
+        );
+
+        return $isSubmitted;
+    }
+
+    public function clearFilters()
+    {
+        $superGlobals = new SuperGlobals();
+        $superGlobals->UnSetSessionVariable($this->getId() . 'filter_builder');
+        $superGlobals->UnSetSessionVariable($this->getId() . 'column_filter');
+        $superGlobals->UnSetSessionVariable($this->getId() . 'quick_filter');
+    }
+
+    private function processFilterBuilder(
+        FilterBuilder $filterBuilder,
+        SuperGlobals $superGlobals)
+    {
+        $id = 'filter_builder';
+        $filterData = $this->getFilterDataFromGlobals($superGlobals, $id);
+        if (is_null($filterData)) {
+            return false;
+        }
+
+        $filterBuilder->setFilterComponent(FilterGroup::deserialize(
+            new FixedKeysArray($filterBuilder->getColumns()),
+            $filterData
+        ));
+
+        $superGlobals->setSessionVariable(
+            $this->getId() . $id,
+            $filterBuilder->serialize()
+        );
+
+        return $superGlobals->isPostValueSet($id);
+    }
+
+    private function processColumnFilter(
+        ColumnFilter $columnFilter,
+        EngConnection $connection,
+        BaseSelectCommand $sourceSelect,
+        SuperGlobals $superGlobals)
+    {
+        $id = 'column_filter';
+        $captions = $this->GetPage()->GetLocalizerCaptions();
+
+        $filterData = $this->getColumnFilterData($id, $superGlobals);
+
+        $columnFilter->restoreEnabledComponents(
+            $connection,
+            $sourceSelect,
+            $captions,
+            $filterData
+        );
+
+        $superGlobals->setSessionVariable(
+            $this->getId() . $id,
+            array_merge($columnFilter->serializeEnabledComponents(), $filterData)
+        );
+
+        return $superGlobals->isPostValueSet($id);
+    }
+
+    private function getColumnFilterData($id, SuperGlobals $superGlobals)
+    {
+        $prevData = array_merge(array(
+            'children' => array(),
+            'order' => array(),
+        ), $superGlobals->getSessionVariableDef(
+            $this->getId() . $id,
+            array()
+        ));
+
+        try {
+            $nextData = $superGlobals->isPostValueSet($id)
+                ? SystemUtils::FromJSON($superGlobals->getPostValue($id), true)
+                : $prevData;
+        } catch (Exception $e) {
+            $nextData = null;
+        }
+
+        if (is_null($nextData)) {
+            return array();
+        }
+
+        $disabledChildren = array();
+        $nextData['order'] = $prevData['order'];
+        foreach ($nextData['children'] as $columnName => $enabledOptions) {
+            if (count($enabledOptions) > 0) {
+                if (!in_array($columnName, $prevData['order'])) {
+                    $nextData['order'][] = $columnName;
+                }
+            } else {
+                $disabledChildren[] = $columnName;
+            }
+        }
+
+        $nextData['order'] = array_diff($nextData['order'], $disabledChildren);
+
+        return $nextData;
+    }
+
+    private function processQuickFilter(
+        QuickFilter $quickFilter,
+        SuperGlobals $superGlobals)
+    {
+        $id = 'quick_filter';
+        $filterValue = $superGlobals->isGetValueSet($id)
+            ? $superGlobals->getGetValue($id)
+            : $superGlobals->getSessionVariableDef($this->getId() . $id);
+
+        $filterFieldsParam = 'quick_filter_fields';
+        if ($superGlobals->isGetValueSet($filterFieldsParam)) {
+            $filterFields = $superGlobals->getGetValue($filterFieldsParam);
+        } elseif (!$superGlobals->isGetValueSet($id) && ($superGlobals->IsSessionVariableSet($this->getId() . $filterFieldsParam) )) {
+            $filterFields = $superGlobals->getSessionVariable($this->getId() . $filterFieldsParam);
+        } else {
+            $filterFields = array();
+        }
+
+        if (!is_array($filterFields)) {
+            $filterFields = array();
+        }
+
+        $filterOperatorParam = 'quick_filter_operator';
+        $filterOperator = $superGlobals->isGetValueSet($filterOperatorParam)
+            ? $superGlobals->getGetValue($filterOperatorParam)
+            : $superGlobals->getSessionVariableDef($this->getId() . $filterOperatorParam, FilterConditionOperator::IS_LIKE);
+
+        $quickFilter->setValue($filterValue);
+        $quickFilter->setSelectedFieldNames($filterFields);
+        $quickFilter->setOperator($filterOperator);
+        $quickFilter->Apply();
+
+        $superGlobals->setSessionVariable($this->getId() . $id, $filterValue);
+        $superGlobals->setSessionVariable($this->getId() . $filterFieldsParam, $filterFields);
+        $superGlobals->setSessionVariable($this->getId() . $filterOperatorParam, $filterOperator);
+
+        return false;
+    }
+
+    private function applyFilterComponent(
+        BaseSelectCommand $sourceSelect,
+        FilterComponentInterface $filterComponent)
+    {
+        if ($filterComponent->isEnabled() && !$filterComponent->isCommandFilterEmpty()) {
+            $sourceSelect->AddCompositeFilter($filterComponent->getCommandFilter());
+        }
+    }
+
+    private function getFilterDataFromGlobals(SuperGlobals $superGlobals, $id, $default = null)
+    {
+        return $superGlobals->isPostValueSet($id)
+            ? SystemUtils::FromJSON($superGlobals->getPostValue($id), true)
+            : $superGlobals->getSessionVariableDef($this->getId() . $id, $default);
+    }
+
+    private function restoreFlashMessageFromSession() {
+        $session = ArrayWrapper::createSessionWrapperForDirectory();
+        $id = get_class($this->getPage()) . '_messages';
+
+        if ($session->isValueSet($id)) {
+            foreach ($session->getValue($id, array()) as $item) {
+                $this->addMessage($item['message'], $item['displayTime']);
+            }
+
+            $session->unsetValue($id);
+        }
+    }
+
+    public function addFlashMessage($message, $displayTime) {
+        $session = ArrayWrapper::createSessionWrapperForDirectory();
+        $id = get_class($this->getPage()) . '_messages';
+        $messages = $session->getValue($id, array());
+        $messages[] = array('message' => $message, 'displayTime' => $displayTime);
+        $session->setValue($id, $messages);
     }
 
     #region Utils
@@ -850,29 +1320,21 @@ class Grid {
         $this->name = $value;
     }
 
-    public function SetEnabledInlineEditing($value) {
-        $this->enabledInlineEditing = $value;
-    }
-
-    public function GetEnabledInlineEditing() {
-        return $this->enabledInlineEditing;
-    }
-
     #region Totals
 
     public function HasTotals() {
         return count($this->totals) > 0;
     }
 
-    public function SetTotal(CustomViewColumn $column, Aggregate $aggregate) {
-        $this->totals[$column->GetName()] = $aggregate;
+    public function SetTotal($columnName, Aggregate $aggregate) {
+        $this->totals[$columnName] = $aggregate;
     }
 
     /**
-     * @param CustomViewColumn $column
+     * @param AbstractViewColumn $column
      * @return Aggregate
      */
-    public function GetAggregateFor(CustomViewColumn $column) {
+    public function GetAggregateFor(AbstractViewColumn $column) {
         return ArrayUtils::GetArrayValueDef($this->totals, $column->GetName());
     }
 
@@ -945,6 +1407,14 @@ class Grid {
         return $this->GetPage()->GetHiddenGetParameters();
     }
 
+    /**
+     * @return DetailColumn[]
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
     public function GetHasDetails() {
         return count($this->details) > 0;
     }
@@ -955,22 +1425,36 @@ class Grid {
         return $show;
     }
 
-    private function GetColumnName(CustomViewColumn $column) {
-        $dataset = $this->GetDataset();
-        return $dataset->IsLookupField($column->GetName()) ?
-            $dataset->IsLookupFieldNameByDisplayFieldName($column->GetName()) :
-            $column->GetName();
+    public function GetColumnName(AbstractViewColumn $column) {
+        return $column->GetName();
     }
 
-    public function RenderColumn(Renderer $renderer, CustomViewColumn $column) {
+    public function RenderColumn(Renderer $renderer, AbstractViewColumn $column) {
+        return $this->renderCell($renderer, $column, $this->GetDataset()->GetFieldValues());
+    }
+
+    public function renderCell(Renderer $renderer, AbstractViewColumn $column, $rowValues) {
         $handled = false;
-        $rowValues = $this->GetDataset()->GetFieldValues();
-        $result = '';
+        $defaultRenderingResult = $renderer->Render($column);
+        $result = $defaultRenderingResult;
         $this->OnCustomRenderColumn->Fire(array(
             $this->GetColumnName($column),
-            $column->GetData(),
+            $column->GetValue(),
             $rowValues, &$result, &$handled));
-        $result = $handled ? $result : $renderer->Render($column);
+        $result = $handled ? $result : $defaultRenderingResult;
+        return $result;
+    }
+
+    public function renderExportCell(Renderer $renderer, AbstractViewColumn $column, $rowValues, $exportType) {
+        $handled = false;
+        $defaultRenderingResult = $renderer->Render($column);
+        $result = $defaultRenderingResult;
+        $this->OnCustomRenderExportColumn->Fire(array(
+            $exportType,
+            $this->GetColumnName($column),
+            $column->GetValue(),
+            $rowValues, &$result, &$handled));
+        $result = $handled ? $result : $defaultRenderingResult;
         return $result;
     }
 
@@ -981,7 +1465,7 @@ class Grid {
         $cellItalicAttr = array();
         $cellBoldAttr = array();
 
-        $grid->OnCustomDrawCell_Simple->Fire(array($rowData, &$cellFontColor, &$cellFontSize, &$cellBgColor, &$cellItalicAttr, &$cellBoldAttr));
+        $grid->OnCustomDrawRow->Fire(array($rowData, &$cellFontColor, &$cellFontSize, &$cellBgColor, &$cellItalicAttr, &$cellBoldAttr));
 
         $result = array();
         $fieldNames = array_unique(array_merge(
@@ -1013,69 +1497,102 @@ class Grid {
         return $result;
     }
 
-    public function GetRowStylesByColumn($rowValues) {
+    public function GetRowStylesByColumn($rowValues, &$cellClasses) {
         $result = array();
         $cellCssStyles = array();
         $rowCssStyle = '';
-        $this->OnCustomDrawCell->Fire(array($rowValues, &$cellCssStyles, &$rowCssStyle));
+        $rowClasses = '';
+        $this->OnExtendedCustomDrawRow->Fire(array($rowValues, &$cellCssStyles, &$rowCssStyle, &$rowClasses, &$cellClasses));
         $cellCssStyles_Simple = $this->GetStylesForColumn($this, $rowValues);
         $cellCssStyles = array_merge($cellCssStyles_Simple, $cellCssStyles);
 
-        foreach ($this->GetViewBands() as $band) {
-            foreach ($band->GetColumns() as $column) {
-                $columnName = $this->GetColumnName($column);
+        foreach ($this->GetViewColumns() as $column) {
+            $columnName = $this->GetColumnName($column);
 
-                if (array_key_exists($columnName, $cellCssStyles)) {
-                    $styleBuilder = new StyleBuilder();
-                    $styleBuilder->AddStyleString($rowCssStyle);
-                    $styleBuilder->AddStyleString($cellCssStyles[$columnName]);
-                    $result[$columnName] = $styleBuilder->GetStyleString();
-                } else
-                    $result[$columnName] = $rowCssStyle;
+            if (array_key_exists($columnName, $cellCssStyles)) {
+                $styleBuilder = new StyleBuilder();
+                $styleBuilder->AddStyleString($rowCssStyle);
+                $styleBuilder->AddStyleString($cellCssStyles[$columnName]);
+                $result[$columnName] = $styleBuilder->GetStyleString();
+            } else
+                $result[$columnName] = $rowCssStyle;
+            if (!(array_key_exists($columnName, $cellClasses))) {
+               $cellClasses[$columnName] = '';
             }
         }
+
         return $result;
     }
 
-    private function GetRowStyles($rowValues) {
+    private function GetRowStyles($rowValues, &$rowStyle, &$rowClasses) {
         $cellCssStyles = '';
-        $rowCssStyle = '';
-        $this->OnCustomDrawCell->Fire(array($rowValues, &$cellCssStyles, &$rowCssStyle));
-
-        return $rowCssStyle;
+        $cellClasses = array();
+        $this->OnExtendedCustomDrawRow->Fire(array($rowValues, &$cellCssStyles, &$rowStyle, &$rowClasses, &$cellClasses));
     }
 
     private function GetRowsViewData(Renderer $renderer) {
         $result = array();
         $dataset = $this->GetDataset();
 
+        $editColumnNames = array_map(
+            create_function('$c', 'return $c->GetName();'),
+            array_filter(
+                $this->GetEditColumns(),
+                create_function('$c', 'return $c->getAllowListCellEdit();')
+            )
+        );
+
         $dataset->Open();
         $lineNumber = $this->GetStartLineNumber();
         while ($dataset->Next()) {
+
             if (!$this->IsShowCurrentRecord())
                 continue;
 
+            $primaryKeys = $dataset->GetPrimaryKeyValues();
             $rowViewData = array();
-            $rowStyle = $this->GetRowStyles($this->GetDataset()->GetFieldValues());
-            $rowStyleByColumns = $this->GetRowStylesByColumn($this->GetDataset()->GetFieldValues());
 
-            foreach ($this->GetViewBands() as $band) {
-                foreach ($band->GetColumns() as $column) {
+            $rowStyle = '';
+            $rowClasses = '';
+            $this->GetRowStyles($this->GetDataset()->GetFieldValues(), $rowStyle, $rowClasses);
 
-                    $columnName = $dataset->IsLookupField($column->GetName()) ?
-                        $dataset->IsLookupFieldNameByDisplayFieldName($column->GetName()) :
-                        $column->GetName();
+            $cellClasses = array();
+            $rowStyleByColumns = $this->GetRowStylesByColumn($this->GetDataset()->GetFieldValues(), $cellClasses);
+            $hasEditGrant = $this->allowDisplayEditButtonOnViewForm();
 
-                    $columnRenderResult = $this->RenderColumn($renderer, $column);
+            foreach ($this->GetViewColumns() as $column) {
 
-                    $rowViewData[$columnName] = array(
-                        'ColumnName' => $column->GetName(),
-                        'Data' => $columnRenderResult,
-                        'FieldName' => $columnName,
-                        'Classes' => $column->GetGridColumnClass(),
-                        'Style' => $rowStyleByColumns[$columnName]
-                    );
-                }
+                $columnName = $column->GetName();
+
+                $columnRenderResult = $this->RenderColumn($renderer, $column);
+
+                $rowViewData[$columnName] = array(
+                    'ColumnName' => $columnName,
+                    'ColumnCaption' => $column->GetCaption(),
+                    'Data' => $columnRenderResult,
+                    'Value' => $column->getValue(),
+                    'FieldName' => $columnName,
+                    'Classes' => $column->GetGridColumnClass(),
+                    'CellClasses' => $this->getEffectiveCellClasses($column->GetGridColumnClass(), $cellClasses[$columnName]),
+                    'Style' => $rowStyleByColumns[$columnName],
+                    'EditUrl' => $hasEditGrant && in_array($columnName, $editColumnNames)
+                        ? $this->getColumnEditUrl($primaryKeys, $column)
+                        : null,
+                );
+            }
+
+            $actionsRowViewData = array();
+
+            foreach ($this->getActions()->getOperations() as $operation) {
+                $operationName = $dataset->IsLookupField($operation->GetName()) ?
+                    $dataset->IsLookupFieldNameByDisplayFieldName($operation->GetName()) :
+                    $operation->GetName();
+
+                $actionsRowViewData[$operationName] = array(
+                    'IconClass' => $operation->GetIconClassByOperationName(),
+                    'OperationName' => $operationName,
+                    'Data' => $operation->GetValue()
+                );
             }
 
             $detailsViewData = array();
@@ -1085,9 +1602,11 @@ class Grid {
 
             $result[] = array(
                 'DataCells' => $rowViewData,
+                'ActionsDataCells' => $actionsRowViewData,
                 'LineNumber' => $lineNumber,
                 'PrimaryKeys' => $dataset->GetPrimaryKeyValues(),
                 'Style' => $rowStyle,
+                'Classes' => $rowClasses,
                 'Details' => array(
                     'Items' => $detailsViewData,
                     'JSON' => htmlspecialchars(SystemUtils::ToJSON($detailsViewData))
@@ -1095,28 +1614,40 @@ class Grid {
             );
             $lineNumber++;
         }
-        //$dataset->Close();
         return $result;
     }
 
-    private function GetTotalDataForColumn(CustomViewColumn $column, $totalValues) {
+    private function getEffectiveCellClasses($columnClasses, $cellClasses) {
+        $result = '';
+        if ($this->GetViewMode() === ViewMode::TABLE) {
+            StringUtils::AddStr($result, $columnClasses, ' ');
+        }
+        StringUtils::AddStr($result, $cellClasses, ' ');
+        return $result;
+    }
+
+    private function GetTotalDataForColumn(AbstractViewColumn $column, $totalValues) {
 
         if (isset($totalValues[$column->GetName()])) {
             $aggregate = $this->GetAggregateFor($column)->AsString();
 
             $totalValue = $totalValues[$column->GetName()];
-            if (is_numeric($totalValue))
-                $totalValue = number_format((double)$totalValue, 2);
-
-            $result = StringUtils::Format('%s = %s', $aggregate, $totalValue);
 
             $customTotalValue = '';
             $handled = false;
-            $this->OnCustomRenderTotal->Fire(array($totalValue, $aggregate, $column->GetName(), &$customTotalValue, &$handled));
-            if ($handled)
-                $result = $customTotalValue;
+            $this->OnCustomRenderTotal->Fire(array(
+                $totalValue,
+                $aggregate,
+                $column->GetName(),
+                &$customTotalValue,
+                &$handled
+            ));
 
-            return $result;
+            if ($handled) {
+                return $customTotalValue;
+            }
+
+            return StringUtils::Format('%s = %s', $aggregate, $totalValue);
         }
         return '';
     }
@@ -1125,12 +1656,12 @@ class Grid {
         if ($this->HasTotals()) {
             $result = array();
             $totalValues = $this->GetTotalValues();
-            foreach ($this->GetViewBands() as $band) {
-                foreach ($band->GetColumns() as $column) {
-                    $result[] = array(
-                        'Value' => $this->GetTotalDataForColumn($column, $totalValues)
-                    );
-                }
+            foreach ($this->GetViewColumns() as $column) {
+                $result[] = array(
+                    'Classes' => $column->GetGridColumnClass(),
+                    'Caption' => $column->getCaption(),
+                    'Value' => $this->GetTotalDataForColumn($column, $totalValues)
+                );
             }
             return $result;
         }
@@ -1150,172 +1681,17 @@ class Grid {
     private function GetAdditionalAttributes() {
         $result = new AttributesBuilder();
         if ($this->GetShowLineNumbers()) {
-            $result->AddAttrValue('start-line-number', $this->GetStartLineNumber());
+            $result->AddAttrValue('data-start-line-number', $this->GetStartLineNumber());
         }
-        $result->AddAttrValue('data-delete-selected-action', $this->GetDeleteSelectedLink(), true);
-        $result->AddAttrValue('data-grid-quick-filter-value', $this->GetQuickFilter()->GetValue(), true);
+
         return $result->GetAsString();
     }
 
-    public function GetFilterRowViewData() {
-        $result = array();
-        $result['Columns'] = array();
-
-        $advancedSearch = $this->GetPage()->AdvancedSearchControl;
-
-        $bands = $this->GetViewBands();
-        $isActionButtonPositionLeft = $bands[0]->GetName() == 'actions';
-
-        if ($advancedSearch && $this->GetFilterRowAvailable()) {
-            foreach ($this->GetViewBands() as $band) {
-                foreach ($band->GetColumns() as $column) {
-                    $searchColumnViewData = null;
-
-                    $columnName = $this->GetDataset()->IsLookupField($column->GetName()) ?
-                        $this->GetDataset()->IsLookupFieldNameByDisplayFieldName($column->GetName()) :
-                        $column->GetName();
-
-                    $searchColumn = null;
-                    if ($column instanceof CustomDatasetFieldViewColumn ||
-                        $column instanceof CustomFormatValueViewColumnDecorator ||
-                        $column instanceof ImageViewColumn)
-                    {
-                        $searchColumn = $advancedSearch->FindSearchColumnByName($columnName);
-                    }
-
-                    if ($searchColumn) {
-
-                        $searchColumnViewData = array();
-
-                        $searchColumnViewData['FieldName'] = $columnName;
-                        $searchColumnViewData['Value'] = $searchColumn->GetValue();
-
-                        $searchColumnViewData['Attributes'] = '';
-                        if ($column instanceof DateTimeViewColumn) {
-                            $searchColumnViewData['Attributes'] =
-                                'data-calendar="true" ' .
-                                    'data-picker-first-day-of-week="' . GetFirstDayOfWeek() . '" ';
-                        } else if ($searchColumn instanceof LookupSearchColumn) {
-                            $searchColumnViewData['Attributes'] =
-                                'data-pg-typeahead="true" ' .
-                                    'data-pg-typeahead-handler="' . $searchColumn->GetHandlerName() . '" ' .
-                                    'data-post-value="' . $searchColumn->GetValue() . '"';
-
-                            $searchColumnViewData['Value'] = $searchColumn->GetDisplayValue();
-                        }
-
-
-                        if ($searchColumn->IsFilterActive()) {
-                            $searchColumnViewData['CurrentOperator'] =
-                                SearchFilterOperator::GetOperatorByName($searchColumn->GetFilterIndex())
-                                    ->GetViewData($this->GetPage()->GetLocalizerCaptions());
-                        } else {
-                            $defaultFilter = 'CONTAINS';
-                            $availableFilterTypes = array_keys($searchColumn->GetAvailableFilterTypes());
-                            if (count($availableFilterTypes) > 0) {
-                                $defaultFilter = $availableFilterTypes[0];
-                            }
-                            $searchColumnViewData['CurrentOperator'] =
-                                SearchFilterOperator::GetOperatorByName($defaultFilter)
-                                    ->GetViewData($this->GetPage()->GetLocalizerCaptions());
-                        }
-                        $searchColumnViewData['Operators'] = $searchColumn->GetAvailableFilterTypesViewData();
-                    }
-                    $result['Columns'][$column->GetName()] = $searchColumnViewData;
-                }
-            }
-
-            $result['TimerInterval'] = $advancedSearch->getTimerInterval();
-
-
-            $tempArray = array();
-            $resetButtonPlacementColumnName = null;
-            foreach ($this->GetViewBands() as $band) {
-                foreach ($band->GetColumns() as $column) {
-                    $searchColumnViewData = null;
-
-                    $columnName = $this->GetDataset()->IsLookupField($column->GetName()) ?
-                        $this->GetDataset()->IsLookupFieldNameByDisplayFieldName($column->GetName()) :
-                        $column->GetName();
-
-                    $searchColumn = null;
-                    if ($column instanceof CustomDatasetFieldViewColumn || $column instanceof CustomFormatValueViewColumnDecorator || $column instanceof ImageViewColumn) {
-                        $searchColumn = $advancedSearch->FindSearchColumnByName($columnName);
-                    }
-
-                    if ($searchColumn) {
-                        $tempArray[] = array('Name' => $columnName, 'IsPlacement' => false);
-                    } else {
-                        $tempArray[] = array('Name' => $columnName, 'IsPlacement' => true);
-                    }
-                }
-            }
-
-            $resetButtonPlacementFound = false;
-            for ($i = 0; $i < count($tempArray); $i++) {
-                if (!$tempArray[$i]['IsPlacement'] && $i > 0) {
-                    $result['Columns'][$tempArray[$i - 1]['Name']]['ResetButtonPlacement'] = true;
-                    $result['Columns'][$tempArray[$i - 1]['Name']]['ResetButtonAlignment'] = $isActionButtonPositionLeft ? 'right' : 'left';
-
-                    $resetButtonPlacementFound = true;
-                    break;
-                } else if (!$tempArray[$i]['IsPlacement']) {
-                    break;
-                }
-            }
-
-            if (!$resetButtonPlacementFound) {
-                for ($i = count($tempArray) - 1; $i >= 0; $i--) {
-                    if (!($tempArray[$i]['IsPlacement']) && $i < (count($tempArray) - 1)) {
-                        $result['Columns'][$tempArray[$i + 1]['Name']]['ResetButtonPlacement'] = true;
-                        $result['Columns'][$tempArray[$i + 1]['Name']]['ResetButtonAlignment'] = $isActionButtonPositionLeft ? 'right' : 'left';
-                        $resetButtonPlacementFound = true;
-                        break;
-                    } else if (!$tempArray[$i]['IsPlacement']) {
-                        break;
-                    }
-                }
-            }
-
-        }
-        return $result;
-    }
-
-    public function GetAdvancedSearchAvailable() {
-        return $this->advancedSearchAvailable;
-    }
-
-    function SetFilterRowAvailable($value) {
-        $this->filterRowAvailable = $value;
-    }
-
-    function GetFilterRowAvailable() {
-        return $this->filterRowAvailable;
-    }
-
-
-    public function SetAdvancedSearchAvailable($value) {
-        $this->advancedSearchAvailable = $value;
-    }
-
-    private function GetGridStyles() {
-        $result = new StyleBuilder();
-
-
-        if ($this->GetWidth()) {
-            $result->Add('width', $this->GetWidth());
-        }
-
-        return $result->GetStyleString();
-    }
-
     private function RequestFilterFromUser() {
-        return
-            $this->GetPage()->OpenAdvancedSearchByDefault() &&
-            (
-                ($this->GetPage()->AdvancedSearchControl && !$this->GetPage()->AdvancedSearchControl->HasCondition()) &&
-                ($this->GetFilterBuilder() && $this->GetFilterBuilder()->IsEmpty())
-            );
+        return $this->GetPage()->isFilterConditionRequired()
+            && $this->getFilterBuilder()->isCommandFilterEmpty()
+            && $this->getColumnFilter()->isCommandFilterEmpty()
+            && $this->getQuickFilter()->isCommandFilterEmpty();
     }
 
     private function GetHiddenValuesJson() {
@@ -1323,129 +1699,153 @@ class Grid {
     }
 
     public function GetViewData(Renderer $renderer) {
-        $bandsViewData = array();
-        foreach ($this->GetViewBands() as $band) {
-            $bandsViewData[] = $band->GetViewData();
-        }
+        $actionsViewData = $this->getActions()->getViewData();
 
         $rows = array();
-        $emptyGridMessage = $this->GetPage()->GetLocalizerCaptions()->GetMessageString('NoDataToDisplay');
+        $parentPage = $this->GetPage();
+        $emptyGridMessage = $parentPage->GetLocalizerCaptions()->GetMessageString('NoDataToDisplay');
         if ($this->RequestFilterFromUser()) {
-            $emptyGridMessage = $this->GetPage()->GetLocalizerCaptions()->GetMessageString('CreateFilterConditionFirst');
+            $emptyGridMessage = $parentPage->GetLocalizerCaptions()->GetMessageString('CreateFilterConditionFirst');
         } else {
             $rows = $this->GetRowsViewData($renderer);
         }
 
+        $sortableColumns = array();
+        $sortableColumnsForJSON = array();
+        $viewColumnGroup = $this->getViewColumnGroup();
+        $columns = $viewColumnGroup->getLeafs();
+        foreach($columns as $column) {
+            if ($column->ShowOrderingControl()) {
+                $sortableColumn = array(
+                    'name' => $column->getFieldName(),
+                    'index' => $column->getSortIndex(),
+                    'caption' => $column->getCaption(),
+                );
+                $sortableColumns[$column->getFieldName()] = $sortableColumn;
+                $sortableColumnsForJSON[$column->getName()] = array_merge($sortableColumn, array(
+                    'caption' => StringUtils::ConvertTextToEncoding($column->getCaption(), $parentPage->getContentEncoding(), 'UTF-8')
+                ));
+            }
+        }
+
         return array(
-            'Id' => $this->GetId(),
-            'Styles' => $this->GetGridStyles(),
+            'SortableColumns' => $sortableColumns,
+            'SortableColumnsJSON' => SystemUtils::ToJSON($sortableColumnsForJSON),
+
+            'Id' => $this->GetId() . '_' . uniqid(),
+            'SelectionId' => $this->getSelectionId(),
+            'MaxWidth' => $this->GetWidth(),
             'Classes' => $this->GetGridClasses(),
             'Attributes' => $this->GetAdditionalAttributes(),
-
             'HiddenValuesJson' => $this->GetHiddenValuesJson(),
-
             'EmptyGridMessage' => $emptyGridMessage,
 
-            // Filter builder
-            'FilterBuilder' => $this->GetShowFilterBuilder() ?
-                $this->GetFilterBuilder()->GetViewData() :
-                null,
+            'FilterBuilder' => $this->filterBuilder,
+            'QuickFilter' => $this->quickFilter,
+            'ColumnFilter' => $this->columnFilter,
 
-            // Filter row
-            'FilterRow' => $this->GetFilterRowViewData(),
-            'AllowFilterRow' =>
-            (($this->GetPage()->AdvancedSearchControl != null) ? true : false) &&
-                $this->GetPage()->GetFilterRowAvailable(),
-
-            // Quick filter
-            'QuickFilter' => $this->GetQuickFilter()->GetViewData(),
-            'AllowQuickFilter' => $this->GetPage()->GetSimpleSearchAvailable() && $this->UseFilter,
+            'AllowDeleteSelected' => $this->GetAllowDeleteSelected(),
+            'AllowCompare' => $this->GetAllowCompare(),
+            'AllowPrintSelected' => $this->GetPage()->getAllowPrintSelectedRecords(),
+            'AllowSelect' => $this->getAllowSelect(),
 
             // Action panel
             'ActionsPanelAvailable' =>
-            ($this->GetPage()->GetSimpleSearchAvailable() && $this->UseFilter) ||
                 ($this->GetShowAddButton()) ||
-                ($this->GetShowInlineAddButton()) ||
+                ($this->GetAllowCompare()) ||
                 ($this->GetAllowDeleteSelected()) ||
                 ($this->GetShowUpdateLink()),
 
             'Links' => array(
-                'ModalInsertDialog' => $this->GetOpenInsertModalDialogLink(),
-                'InlineEditRequest' => $this->GetInlineEditRequestsAddress(),
+                'ModalInsertDialog' => $this->GetInsertPageAction(),
                 'SimpleAddNewRow' => $this->GetAddRecordLink(),
-                'Refresh' => $this->GetUpdateLink()
+                'Refresh' => $parentPage->GetLink(),
             ),
 
             'ActionsPanel' => array(
-                'InlineAdd' => $this->GetShowInlineAddButton(),
-                'AddNewButton' => $this->GetShowAddButton() ? ($this->GetUseModalInserting() ? 'modal' : 'simple') : null,
+                'AddNewButton' => $this->GetShowAddButton() ? (
+                    $parentPage->GetEnableModalGridInsert()
+                        ? 'modal'
+                        : ($parentPage->GetEnableInlineGridInsert() ? 'inline' : 'simple')
+                ) : null,
                 'RefreshButton' => $this->GetShowUpdateLink(),
-                'DeleteSelectedButton' => $this->GetAllowDeleteSelected()
             ),
 
             'ColumnCount' => count($this->GetViewColumns()) +
-                ($this->GetAllowDeleteSelected() ? 1 : 0) +
+                ($this->getAllowSelect() ? 1 : 0) +
                 ($this->GetShowLineNumbers() ? 1 : 0) +
-                ($this->GetHasDetails() ? 1 : 0),
-            'Bands' => $bandsViewData,
+                ($this->GetHasDetails() ? 1 : 0) +
+                ($actionsViewData ? 1 : 0),
+            'ColumnGroup' => $viewColumnGroup,
+            'Actions' => $actionsViewData,
+            'AddNewChoices' => $parentPage->getAddNewChoices(),
 
             'HasDetails' => $this->GetHasDetails(),
-            'UseInlineEdit' => $this->GetEnabledInlineEditing(),
             'HighlightRowAtHover' => $this->GetHighlightRowAtHover(),
 
-            'AllowDeleteSelected' => $this->GetAllowDeleteSelected(),
 
             'ShowLineNumbers' => $this->GetShowLineNumbers(),
 
             'Rows' => $rows,
             'Totals' => $this->GetTotalsViewData(),
 
-            'GridMessage' => $this->GetGridMessage() == '' ? null : $this->GetGridMessage(),
-            'ErrorMessage' => $this->GetErrorMessage() == '' ? null : $this->GetErrorMessage()
+            'Messages' => $this->getMessages(),
+            'ErrorMessages' => $this->getErrorMessages(),
+
+            'DataSortPriority' => $this->getSortedColumns(),
+
+            'EnableRunTimeCustomization' => $this->enableRunTimeCustomization,
+            'EnableSortDialog' => !$this->isMaster() && $this->enableSortDialog,
+            'ViewModeList' => ViewMode::getList(),
+            'ViewMode' => $this->GetViewMode(),
+            'CardCountInRow' => $this->GetCardCountInRow(),
+            'CardClasses' => $this->getCardClasses(),
+
+            'TableIsBordered' => $this->isTableBordered(),
+            'TableIsCondensed' => $this->isTableCondensed()
         );
     }
 
-    private function GetEditColumnViewData(Renderer $renderer) {
-        $columnViewDatas = array();
-        foreach ($this->GetEditColumns() as $column) {
-            $columnViewDatas[$column->GetFieldName()] = array(
-                'FieldName' => $column->GetFieldName(),
-                'Value' => $column->GetValue(),
-                'Editor' => $renderer->Render($column),
-                'Caption' => $column->GetCaption(),
-                'Required' => $column->DisplayAsRequired(),
-                'UseSetNull' => $column->GetShowSetToNullCheckBox(),
-                'UseSetDefault' => $column->GetAllowSetToDefault(),
-                'IsValueNull' => $column->IsValueNull(),
-                'IsValueSetToDefault' => $column->IsValueSetToDefault(),
-                'SetNullCheckBoxName' => $column->GetFieldName() . '_null',
-                'SetDefaultCheckBoxName' => $column->GetFieldName() . '_def'
-            );
-        }
-        return $columnViewDatas;
+    private function getAllowSelect() {
+        return !$this->isMaster() && ($this->GetAllowCompare() || $this->GetAllowDeleteSelected() || $this->GetPage()->getAllowPrintSelectedRecords());
     }
 
-    public function GetInsertColumnViewData(Renderer $renderer) {
-        $columnViewDatas = array();
-        foreach ($this->GetInsertColumns() as $column) {
-            $columnViewDatas[$column->GetFieldName()] = array(
-                'FieldName' => $column->GetFieldName(),
-                'Editor' => $renderer->Render($column),
-                'Caption' => $column->GetCaption(),
-                'Required' => $column->DisplayAsRequired(),
-                'UseSetNull' => $column->GetShowSetToNullCheckBox(),
-                'UseSetDefault' => $column->GetAllowSetToDefault(),
-                'IsValueNull' => $column->IsValueNull(),
-                'IsValueSetToDefault' => $column->IsValueSetToDefault(),
-                'SetNullCheckBoxName' => $column->GetFieldName() . '_null',
-                'SetDefaultCheckBoxName' => $column->GetFieldName() . '_def'
+    public function GetInsertViewData() {
+        $detailViewData = array();
+        foreach ($this->details as $detail) {
+            $detailViewData[] = array(
+                'Caption' => $detail->GetCaption()
             );
         }
-        return $columnViewDatas;
+
+        return array(
+            'FormId' => 'Form' . uniqid(),
+            'FormAction' => $this->GetInsertPageAction(),
+            'FormLayout' => $this->getInsertFormLayout(),
+            'ClientOnLoadScript' => $this->GetInsertClientFormLoadedScript(),
+            'ClientValidationScript' => $this->GetInsertClientValidationScript(),
+            'ClientValueChangedScript' => $this->GetInsertClientEditorValueChangedScript(),
+            'CancelUrl' => $this->GetReturnUrl(),
+            'InsertUrl' => $this->GetInsertUrl(),
+            'Title' => $this->resolveFormTitle(
+                $this->GetPage()->GetLocalizerCaptions()->GetMessageString('AddNewRecord'),
+                $this->GetPage()->GetInsertFormTitle(),
+                $this->getFormColumnsReplacements($this->GetInsertColumns())
+            ),
+            'Details' => $detailViewData,
+            'Messages' => $this->getMessages(),
+            'ErrorMessages' => $this->getErrorMessages(),
+            'AllowAddMultipleRecords' => $this->allowAddMultipleRecords,
+        );
     }
 
-    public function GetInsertViewData(Renderer $renderer) {
+    public function GetInlineInsertViewData() {
+        return array_merge($this->GetInsertViewData(), array(
+            'FormLayout' => $this->getInlineInsertFormLayout(),
+        ));
+    }
 
+    public function GetEditViewData() {
         $detailViewData = array();
         foreach ($this->details as $detail) {
             $linkBuilder = $this->CreateLinkBuilder();
@@ -1453,134 +1853,293 @@ class Grid {
 
             $detailViewData[] = array(
                 'Link' => $linkBuilder->GetLink(),
+                'SeparatedPageLink' => $detail->GetSeparateViewLink(),
                 'Caption' => $detail->GetCaption()
             );
         }
 
         return array(
-            'OnLoadScript' => $this->GetInsertClientFormLoadedScript(),
-            'Details' => $detailViewData,
-            'ErrorMessage' => $this->GetErrorMessage(),
+            'FormId' => 'Form' . uniqid(),
             'FormAction' => $this->GetEditPageAction(),
-            'Title' => $this->GetPage()->GetShortCaption(),
-            'Columns' => $this->GetInsertColumnViewData($renderer),
+            'FormLayout' => $this->getEditFormLayout(),
+            'ClientOnLoadScript' => $this->GetEditClientFormLoadedScript(),
+            'ClientValidationScript' => $this->GetEditClientValidationScript(),
+            'ClientValueChangedScript' => $this->GetEditClientEditorValueChangedScript(),
             'CancelUrl' => $this->GetReturnUrl(),
-            'ClientValidationScript' => $this->GetInsertClientValidationScript()
+            'InsertUrl' => $this->GetInsertUrl(),
+            'Details' => $detailViewData,
+            'Title' => $this->resolveFormTitle(
+                $this->GetPage()->GetLocalizerCaptions()->GetMessageString('Edit'),
+                $this->GetPage()->GetEditFormTitle(),
+                $this->getFormColumnsReplacements($this->GetEditColumns())
+            ),
+            'Messages' => $this->getMessages(),
+            'ErrorMessages' => $this->getErrorMessages(),
+            'AllowAddMultipleRecords' => false,
         );
     }
 
-    public function GetModalInsertViewData(Renderer $renderer) {
-        $result = $this->GetInsertViewData($renderer);
-        $result['FormAction'] = $this->GetModalInsertPageAction();
-        return $result;
+    public function GetInlineEditViewData() {
+        return array_merge($this->GetEditViewData(), array(
+            'FormLayout' => $this->getInlineEditFormLayout(),
+        ));
     }
 
-    public function GetEditViewData(Renderer $renderer) {
-        $detailViewData = array();
-        foreach ($this->details as $detail) {
-            $linkBuilder = $this->CreateLinkBuilder();
-            $detail->DecorateLinkForPostMasterRecord($linkBuilder);
-
-            $detailViewData[] = array(
-                'Link' => $linkBuilder->GetLink(),
-                'Caption' => $detail->GetCaption()
-            );
-        }
-
-        return array(
-            'OnLoadScript' => $this->GetEditClientFormLoadedScript(),
-            'Details' => $detailViewData,
-            'Title' => $this->GetPage()->GetShortCaption(),
-            'FormAction' => $this->GetEditPageAction(),
-            'ErrorMessage' => $this->GetErrorMessage(),
-            'CancelUrl' => $this->GetReturnUrl(),
-            'Columns' => $this->GetEditColumnViewData($renderer)
-        );
-    }
-
-    public function GetModalEditViewData(Renderer $renderer) {
-        $result = $this->GetEditViewData($renderer);
-        $result['FormAction'] = $this->GetModalEditPageAction();
-        return $result;
-    }
-
-
-    public function GetViewSingleRowColumnViewData(Renderer $renderer) {
+    public function GetExportSingleRowColumnViewData(Renderer $renderer, $exportType) {
         $Row = array();
-
         $rowValues = $this->GetDataset()->GetFieldValues();
-        foreach ($this->GetSingleRecordViewColumns() as $Column) {
-            $columnName = $this->GetDataset()->IsLookupField($Column->GetName()) ?
-                $this->GetDataset()->IsLookupFieldNameByDisplayFieldName($Column->GetName()) :
-                $Column->GetName();
-
-            $columnRenderResult = '';
-            $customRenderColumnHandled = false;
-
-            $this->OnCustomRenderColumn->Fire(array(
-                $columnName,
-                $Column->GetData(),
-                $rowValues,
-                &$columnRenderResult, &$customRenderColumnHandled
-            ));
-
-            $columnRenderResult = $customRenderColumnHandled ?
-                $columnRenderResult :
-                $renderer->Render($Column);
+        foreach ($this->GetExportColumns() as $Column) {
+            $columnName = $this->GetColumnName($Column);
+            $columnRenderResult = $this->renderExportCell($renderer, $Column, $rowValues, $exportType);
 
             $Row[$columnName] = array(
                 'Caption' => $Column->GetCaption(),
+                'Value' => $Column->getValue(),
                 'DisplayValue' => $columnRenderResult
             );
         }
+
         return $Row;
     }
 
-    public function GetViewSingleRowViewData(Renderer $renderer) {
+    public function GetExportSingleRowViewData(Renderer $renderer, $exportType)
+    {
+        $this->GetDataset()->Open();
 
+        if ($this->GetDataset()->Next()) {
+            $primaryKeyMap = $this->GetDataset()->GetPrimaryKeyValuesMap();
+            $titleReplacements = array();
+            foreach ($this->GetExportColumns() as $column) {
+                $titleReplacements['%' . $this->GetColumnName($column) . '%'] = $column->getValue();
+            }
+
+            return array(
+                'Title' => $this->resolveFormTitle($this->GetPage()->GetTitle(), $this->GetPage()->GetViewFormTitle(), $titleReplacements),
+                'PrimaryKeyMap' => $primaryKeyMap,
+                'Row' => $this->GetExportSingleRowColumnViewData($renderer, $exportType)
+            );
+
+        } else {
+            RaiseCannotRetrieveSingleRecordError();
+            return null;
+        }
+    }
+
+    public function GetViewSingleRowViewData()
+    {
         $detailViewData = array();
         $this->GetDataset()->Open();
         $linkBuilder = null;
         if ($this->GetDataset()->Next()) {
+            $primaryKeys = $this->GetDataset()->GetPrimaryKeyValues();
+
             $linkBuilder = $this->CreateLinkBuilder();
             $linkBuilder->AddParameter(OPERATION_PARAMNAME, OPERATION_PRINT_ONE);
-
-            $keyValues = $this->GetDataset()->GetPrimaryKeyValues();
-            for ($i = 0; $i < count($keyValues); $i++)
-                $linkBuilder->AddParameter("pk$i", $keyValues[$i]);
+            foreach ($primaryKeys as $i => $value) {
+                $linkBuilder->AddParameter("pk$i", $value);
+            }
 
             $primaryKeyMap = $this->GetDataset()->GetPrimaryKeyValuesMap();
-
             foreach ($this->details as $detail) {
-
                 $detailViewData[] = array(
                     'Link' => $detail->GetSeparateViewLink(),
                     'Caption' => $detail->GetCaption()
                 );
             }
 
+            $layout = $this->getViewFormLayout();
+            $cellEditUrls = array();
+
+            if ($this->allowDisplayEditButtonOnViewForm()) {
+                $editColumnNames = array_map(
+                    create_function('$c', 'return $c->GetName();'),
+                    array_filter(
+                        $this->GetEditColumns(),
+                        create_function('$c', 'return $c->getAllowSingleViewCellEdit();')
+                    )
+                );
+
+                $viewColumns = $layout->getColumns();
+                foreach (array_intersect(array_keys($viewColumns), $editColumnNames) as $name) {
+                    $cellEditUrls[$name] = $this->getColumnEditUrl($primaryKeys, $viewColumns[$name]);
+                }
+            }
+
             return array(
                 'Details' => $detailViewData,
+                'HasEditGrant' => $this->allowDisplayEditButtonOnViewForm(),
                 'CancelUrl' => $this->GetReturnUrl(),
-                'PrintOneRecord' => $this->GetPage()->GetPrinterFriendlyAvailable(),
+                'EditUrl' => $this->GetEditCurrentRecordLink($primaryKeys),
+                'PrintOneRecord' => $this->GetPage()->GetPrintOneRecordAvailable(),
                 'PrintRecordLink' => $linkBuilder->GetLink(),
-                'Title' => $this->GetPage()->GetShortCaption(),
+                'ExportButtons' => $this->GetPage()->getExportOneRecordButtonsViewData($primaryKeys),
+                'Title' => $this->resolveFormTitle(
+                    $this->GetPage()->GetLocalizerCaptions()->GetMessageString('View'),
+                    $this->GetPage()->GetViewFormTitle(),
+                    $this->getViewColumnsReplacements($this->GetSingleRecordViewColumns())
+                ),
+                'CellEditUrls' => $cellEditUrls,
                 'PrimaryKeyMap' => $primaryKeyMap,
-                'Row' => $this->GetViewSingleRowColumnViewData($renderer)
+                'FormLayout' => $layout,
+                'Columns' => new FixedKeysArray($layout->getColumns()),
             );
 
         } else {
-            RaiseError('Cannot retrieve single record. Check the primary key fields.');
+            RaiseCannotRetrieveSingleRecordError();
             return null;
         }
     }
 
-    public function SetShowFilterBuilder($value) {
-        return $this->showFilterBuilder = $value;
+    /**
+     * @return array
+     */
+    public function getCompareViewData(Renderer $renderer)
+    {
+        $columns = array(
+            'DataColumns' => $this->getCompareColumns(),
+            'HeaderColumns' => $this->getCompareHeaderColumns(),
+        );
+
+        $records = array();
+        $primaryKeyValues = array();
+        $columnsDiff = array();
+        $dataset = $this->GetDataset();
+        $dataset->Open();
+        $primaryKeyFields = $dataset->getPrimaryKeyFields();
+        $isDiffers = false;
+
+        if (!is_null(ArrayWrapper::createGetWrapper()->getValue('keys'))) {
+            while ($dataset->Next()) {
+                $recordKeys = array();
+
+                foreach ($primaryKeyFields as $fieldName) {
+                    $recordKeys[] = $dataset->GetFieldValueByName($fieldName);
+                }
+
+                $recordViewData = array(
+                    'Keys' => $recordKeys,
+                    'DataColumns' => array(),
+                    'HeaderColumns' => array(),
+                );
+
+                foreach ($columns as $key => $typeColumns) {
+                    foreach ($typeColumns as $column) {
+                        $columnName = $column->GetName();
+                        $columnRenderResult = $this->RenderColumn($renderer, $column);
+
+                        $recordViewData[$key][$columnName] = array(
+                            'ColumnName' => $columnName,
+                            'Data' => $columnRenderResult,
+                            'Value' => $column->getValue(),
+                            'FieldName' => $columnName,
+                        );
+                    }
+                }
+
+                $records[] = $recordViewData;
+                $primaryKeyValues[] = $recordKeys;
+            }
+
+            foreach ($records as $recordIndex => &$record) {
+                $builder = $this->CreateLinkBuilder();
+                $builder->AddParameter(OPERATION_PARAMNAME, OPERATION_COMPARE);
+
+                foreach ($primaryKeyValues as $primaryKeyIndex => $keyValues) {
+                    if ($primaryKeyIndex !== $recordIndex) {
+                        foreach ($keyValues as $valueIndex => $value) {
+                            $builder->AddParameter("keys[$primaryKeyIndex][$valueIndex]", $value);
+                        }
+                    }
+                }
+
+                $record['RemoveLink'] = $builder->getLink();
+            }
+
+            if (count($records) > 0) {
+                foreach ($columns['DataColumns'] as $column) {
+                    $columnName = $column->getName();
+                    $isSame = true;
+
+                    $value = $records[0]['DataColumns'][$columnName]['Value'];
+                    for ($i = 1; $i < count($records); $i++) {
+                        if ($value != $records[$i]['DataColumns'][$columnName]['Value']) {
+                            $isSame = false;
+                        }
+
+                        $this->OnCustomCompareColumn->Fire(array(
+                            $columnName,
+                            $value,
+                            $records[$i]['DataColumns'][$columnName]['Value'],
+                            &$isSame,
+                        ));
+
+                        if (!$isSame) {
+                            $isDiffers = true;
+                            break;
+                        }
+                    }
+
+                    $columnsDiff[$columnName] = !$isSame;
+                }
+            }
+        }
+
+        return array(
+            'columns' => $columns,
+            'columnsDiff'  => $columnsDiff,
+            'isDiffers' => $isDiffers,
+            'records' => $records,
+            'SelectionId' => $this->getSelectionId(),
+        );
     }
 
-    public function GetShowFilterBuilder() {
-        return $this->showFilterBuilder && $this->GetAdvancedSearchAvailable() && $this->GetPage()->GetAdvancedSearchAvailable();
+    private function getViewColumnsReplacements($columns)
+    {
+        $replacements = array();
+
+        foreach ($columns as $column) {
+            $replacements['%' . $this->GetColumnName($column) . '%'] = $column->getValue();
+        }
+
+        return $replacements;
+    }
+
+    private function getFormColumnsReplacements($columns)
+    {
+        $replacements = array();
+
+        foreach ($columns as $column) {
+            $column->SetControlValuesFromDataset();
+            $replacements['%' . $column->GetFieldName() . '%'] = $column->GetEditControl()->GetDisplayValue();
+        }
+
+        return $replacements;
+    }
+
+    private function resolveFormTitle($defaultTitle, $title, $replacements)
+    {
+        $title = is_null($title) ? $defaultTitle : $title;
+
+        return str_replace(array_keys($replacements), array_values($replacements), $title);
+    }
+
+    /**
+     * @return boolean
+     */
+    private function allowDisplayEditButtonOnViewForm() {
+        return
+            $this->actions->hasEditOperation() &&
+            $this->hasEditColumns() &&
+            $this->hasEditPermission();
+    }
+
+    private function hasEditColumns() {
+        return count($this->editColumns) > 0;
+    }
+
+    private function hasEditPermission() {
+        return
+            $this->GetPage()->GetSecurityInfo()->HasEditGrant() && $this->GetPage()->hasRLSEditGrant($this->GetDataset());
     }
 
     public function GetDetailLinksViewData() {
@@ -1589,15 +2148,25 @@ class Grid {
             $result[] = array(
                 'Caption' => $detail->GetCaption(),
                 'Link' => $detail->GetSeparateViewLink(),
-                'Name' => $detail->GetSeparatePageHandlerName(),
+                'Name' => $detail->GetPageHandlerName(),
             );
         }
         return $result;
     }
 
+    public function GetDetailsViewData()
+    {
+        $result = array();
+        foreach ($this->details as $detail) {
+            $result[] = $detail->GetViewData();
+        }
+
+        return $result;
+    }
+
     public function FindDetail($detailEditHandlerName) {
         foreach ($this->details as $detail) {
-            if ($detail->GetSeparatePageHandlerName() == $detailEditHandlerName)
+            if ($detail->GetPageHandlerName() == $detailEditHandlerName)
                 return $detail;
         }
         return null;
@@ -1612,19 +2181,19 @@ class Grid {
     }
 
     public function GetEditCurrentRecordLink($primaryKeyValues) {
-        $result = $this->CreateLinkBuilder();
-        $result->AddParameter(OPERATION_PARAMNAME, OPERATION_EDIT);
-        $result->AddParameters($this->GetLinkParametersForPrimaryKey($primaryKeyValues));
-        return $result->GetLink();
+        $linkBuilder = $this->CreateLinkBuilder();
+        $linkBuilder->AddParameter(OPERATION_PARAMNAME, OPERATION_EDIT);
+        $linkBuilder->AddParameters($this->GetLinkParametersForPrimaryKey($primaryKeyValues));
+        return $linkBuilder->GetLink();
     }
 
     private function GetGridClasses() {
         $result = '';
 
-        StringUtils::AddStr($result, 'stripped', ' ');
+        StringUtils::AddStr($result, 'table-striped', ' ');
 
         if ($this->GetHighlightRowAtHover()) {
-            StringUtils::AddStr($result, 'row-hover-highlight', ' ');
+            StringUtils::AddStr($result, 'table-hover', ' ');
         }
 
         if ($this->GetUseFixedHeader()) {
@@ -1633,5 +2202,367 @@ class Grid {
 
         return $result;
     }
-}
 
+    public function SetViewMode($value) {
+        $this->viewMode = $value;
+    }
+
+    public function GetViewMode() {
+        return $this->viewMode;
+    }
+
+    public function setEnableRunTimeCustomization($value)
+    {
+        $this->enableRunTimeCustomization = (bool) $value;
+    }
+
+    public function getEnableRunTimeCustomization()
+    {
+        return $this->enableRunTimeCustomization;
+    }
+
+    public function setEnableSortDialog($value)
+    {
+        $this->enableSortDialog = (bool) $value;
+    }
+
+    public function SetCardCountInRow($value) {
+        if (is_array($value)) {
+            $this->cardCountInRow = $value;
+        } else {
+            $this->cardCountInRow = array(
+                'lg' => $value,
+                'md' => $value,
+                'sm' => $value,
+                'xs' => $value,
+            );
+        }
+    }
+
+    public function GetCardCountInRow() {
+        return $this->cardCountInRow;
+    }
+
+    public function GetAvailableCardCountInRow() {
+        return array('1', '2', '3', '4', '6');
+    }
+
+    public function getAvailableScreenSizes()
+    {
+        return array('lg', 'md', 'sm', 'xs');
+    }
+
+    private function getCardClasses() {
+        $result = array();
+
+        $previousCount = 3;
+        foreach ($this->getAvailableScreenSizes() as $size) {
+            $count = (isset($this->cardCountInRow[$size]) && ($this->cardCountInRow[$size] > 0))
+                ? $this->cardCountInRow[$size]
+                : $previousCount;
+
+            $previousCount = $count;
+
+            $result[] = "col-$size-" . ceil(12 / $count);
+        }
+
+        return implode(' ', $result);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isTableBordered()
+    {
+        return $this->tableBordered;
+    }
+
+    /**
+     * @param boolean $value
+     */
+    public function setTableBordered($value)
+    {
+        $this->tableBordered = $value;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isTableCondensed()
+    {
+        return $this->tableCondensed;
+    }
+
+    /**
+     * @param boolean $value
+     */
+    public function setTableCondensed($value)
+    {
+        $this->tableCondensed = $value;
+    }
+
+    /**
+     * @param ColumnFilter $columnFilter
+     *
+     * @return $this
+     */
+    public function setColumnFilter(ColumnFilter $columnFilter)
+    {
+        $this->columnFilter = $columnFilter;
+
+        return $this;
+    }
+
+    /**
+     * @return ColumnFilter
+     */
+    public function getColumnFilter()
+    {
+        return $this->columnFilter;
+    }
+
+    /**
+     * @param FilterBuilder $filterBuilder
+     *
+     * @return $this
+     */
+    public function setFilterBuilder(FilterBuilder $filterBuilder)
+    {
+        $this->filterBuilder = $filterBuilder;
+
+        return $this;
+    }
+
+    /**
+     * @return FilterBuilder
+     */
+    public function getFilterBuilder()
+    {
+        return $this->filterBuilder;
+    }
+
+    /**
+     * @param QuickFilter $quickFilter
+     *
+     * @return $this
+     */
+    public function setQuickFilter(QuickFilter $quickFilter)
+    {
+        $this->quickFilter = $quickFilter;
+
+        return $this;
+    }
+
+    /**
+     * @return QuickFilter
+     */
+    public function getQuickFilter()
+    {
+        return $this->quickFilter;
+    }
+
+    /**
+     * @param ViewColumnGroup $viewColumnGroup
+     */
+    public function setViewColumnGroup(ViewColumnGroup $viewColumnGroup)
+    {
+        $this->viewColumnGroup = $viewColumnGroup;
+    }
+
+    /**
+     * @return ViewColumnGroup
+     */
+    public function getViewColumnGroup()
+    {
+        $columns = $this->GetViewColumns();
+        $columnNames = array_map(
+            create_function('$l', 'return $l->getName();'),
+            $this->viewColumnGroup->getLeafs()
+        );
+
+        foreach ($columns as $column) {
+            if (!in_array($column->getName(), $columnNames)) {
+                $this->viewColumnGroup->add($column);
+            }
+        }
+
+        return $this->viewColumnGroup;
+    }
+
+    public function getColumnEditUrl($primaryKeys, $column)
+    {
+        $linkBuilder = $this->GetPage()->CreateLinkBuilder();
+        $linkBuilder->AddParameter('hname', $this->GetPage()->GetGridEditHandler());
+        $linkBuilder->AddParameter('column', $column->GetName());
+        foreach ($primaryKeys as $key => $value) {
+            $linkBuilder->AddParameter("pk$key", $value);
+        }
+
+
+        return $linkBuilder->GetLink();
+    }
+
+    /**
+     * @param FormLayout $layout
+     */
+    public function setViewFormLayout(FormLayout $layout)
+    {
+        $this->viewFormLayout = $layout;
+    }
+
+    /**
+     * @return FormLayout
+     */
+    public function getViewFormLayout()
+    {
+        return $this->fillFormLayout($this->viewFormLayout, $this->GetSingleRecordViewColumns());
+    }
+
+    /**
+     * @param FormLayout $layout
+     */
+    public function setInsertFormLayout(FormLayout $layout)
+    {
+        $this->insertFormLayout = $layout;
+    }
+
+    /**
+     * @return FormLayout
+     */
+    public function getInsertFormLayout()
+    {
+        return $this->fillFormLayout($this->insertFormLayout, $this->GetInsertColumns());
+    }
+
+    /**
+     * @param FormLayout $layout
+     */
+    public function setEditFormLayout(FormLayout $layout)
+    {
+        $this->editFormLayout = $layout;
+    }
+
+    /**
+     * @return FormLayout
+     */
+    public function getEditFormLayout()
+    {
+        return $this->fillFormLayout($this->editFormLayout, $this->GetEditColumns());
+    }
+
+    /**
+     * @param FormLayout $layout
+     */
+    public function setInlineInsertFormLayout(FormLayout $layout)
+    {
+        $this->inlineInsertFormLayout = $layout;
+    }
+
+    /**
+     * @param FormLayout $layout
+     */
+    public function setInlineEditFormLayout(FormLayout $layout)
+    {
+        $this->inlineEditFormLayout = $layout;
+    }
+
+    /**
+     * @return FormLayout
+     */
+    public function getInlineInsertFormLayout()
+    {
+        return $this->fillInlineFormLayout($this->inlineInsertFormLayout, $this->GetInsertColumns());
+    }
+
+    /**
+     * @return FormLayout
+     */
+    public function getInlineEditFormLayout()
+    {
+        return $this->fillInlineFormLayout($this->inlineEditFormLayout, $this->GetEditColumns());
+    }
+
+    /**
+     * @param FormLayout        $layout
+     * @param ColumnInterface[] $columns
+     *
+     * @return FormLayout
+     */
+    private function fillFormLayout(FormLayout $layout, $columns)
+    {
+        $columnNames = $layout->getColumnNames();
+        $group = $layout->addGroup();
+
+        foreach ($columns as $column) {
+            if (!in_array($column->GetName(), $columnNames)) {
+                $group->addRow()->addCol($column);
+            }
+        }
+
+        return $layout;
+    }
+
+    private function fillInlineFormLayout(FormLayout $layout, $columns)
+    {
+        if ($this->GetViewMode() === ViewMode::CARD) {
+            return $this->fillFormLayout($layout, $columns);
+        }
+
+        $columnNames = $layout->getColumnNames();
+
+        if (count($columnNames) > 0) {
+            return $this->fillFormLayout($layout, $columns);
+        }
+
+        $groups = array(
+            $layout->addGroup(null, 6),
+            $layout->addGroup(null, 6)
+        );
+
+        foreach ($columns as $i => $column) {
+            $groups[$i%2]->addRow()->addCol($column);
+        }
+
+        return $layout;
+    }
+
+    /**
+     * @param ColumnInterface[] $columns
+     *
+     * @return array
+     */
+    static public function getNamedColumns($columns)
+    {
+        $namedColumns = array();
+
+        foreach ($columns as $column) {
+            $namedColumns[$column->getName()] = $column;
+        }
+
+        return $namedColumns;
+    }
+
+    /**
+     * @param bool $isMaster
+     *
+     * @return $this
+     */
+    public function setIsMaster($isMaster)
+    {
+        $this->isMaster = $isMaster;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMaster()
+    {
+        return $this->isMaster;
+    }
+
+    private function getSelectionId()
+    {
+        return $this->GetId() . '_' . $this->getPage()->getViewId();
+    }
+}

@@ -6,86 +6,147 @@
 include_once dirname(__FILE__) . '/' . 'renderer.php';
 include_once dirname(__FILE__) . '/' . '../utils/query_utils.php';
 
-
-class PrintRenderer extends Renderer
+abstract class AbstractPrintRenderer extends Renderer
 {
-    function RenderPageNavigator($PageNavigator)
-    { }
-
-    function RenderDetailPageEdit($DetailPage)
+    public function RenderPageNavigator($PageNavigator)
     {
-        $Grid = $this->Render($DetailPage->GetGrid());
-        $masterGrid = $this->Render($DetailPage->GetMasterGrid());
-
-        $this->DisplayTemplate('print/detail_page.tpl',
-            array('Page' => $DetailPage),
-            array(
-                'Grid' => $Grid,
-                'MasterGrid' => $masterGrid
-            ));
     }
 
-    function RenderPage(Page $Page)
+    protected function doRenderPage(Page $Page, $pageMode, $templatePath)
     {
         $this->SetHTTPContentTypeByPage($Page);
         $Page->BeforePageRender->Fire(array(&$Page));
         set_time_limit(0);
-
         $Grid = $this->Render($Page->GetGrid());
-        $this->DisplayTemplate('print/page.tpl',
+
+        $customParams = array();
+        $template = $Page->GetCustomTemplate(PagePart::PrintLayout, $pageMode, $templatePath, $customParams);
+
+        $this->DisplayTemplate($template,
             array('Page' => $Page),
-            array('Grid' => $Grid));
+            array_merge($customParams,
+                array(
+                    'Grid' => $Grid
+                )
+            )
+        );
     }
 
-    protected function GetCustomRenderedViewColumn(CustomViewColumn $column, $rowValues)
+    protected function doRenderGrid(Grid $Grid, $pageMode, $templatePath, $customParams = array())
+    {
+        $Rows = array();
+
+        while ($Grid->GetDataset()->Next()) {
+            $rowValues = $Grid->GetDataset()->GetCurrentFieldValues();
+            $Rows[] = Q::ToArray(Q::Select($Grid->GetPrintColumns(),
+                Q::L('$c => $_1->RenderViewColumn($c, $_2)', $this, $rowValues)));
+        }
+
+        $template = $Grid->GetPage()->GetCustomTemplate(PagePart::Grid, $pageMode, $templatePath, $customParams);
+
+        $this->DisplayTemplate($template,
+            array(
+                'Grid' => $Grid
+                ),
+            array_merge($customParams,
+                array(
+                    'Columns' => $Grid->GetPrintColumns(),
+                    'Rows' => $Rows,
+                )
+            )
+        );
+    }
+
+    protected function GetCustomRenderedViewColumn(AbstractViewColumn $column, $rowValues)
     {
         $result = '';
         $handled = false;
         $column->GetGrid()->OnCustomRenderPrintColumn->Fire(array(
-            $this->GetFriendlyColumnName($column), $column->GetData(), $rowValues, &$result, &$handled)
+            $this->GetFriendlyColumnName($column), $column->GetValue(), $rowValues, &$result, &$handled)
         );
-        
+
         if ($handled)
             return $result;
         else
             return null;
     }
 
-    function RenderGrid(Grid $Grid)
+    protected function ChildPagesAvailable()
     {
-        $Rows = array();
+        return false;
+    }
 
+    protected function InteractionAvailable()
+    {
+        return false;
+    }
+
+    protected function ShowHtmlNullValue()
+    {
+        return true;
+    }
+}
+
+class PrintRenderer extends AbstractPrintRenderer
+{
+    public function RenderDetailPage(DetailPage $DetailPage)
+    {
+        $Grid = $this->Render($DetailPage->GetGrid());
+        $masterGrid = $this->Render($DetailPage->GetMasterGrid());
+
+        $customParams = array();
+        $template = $DetailPage->GetParentPage()->GetCustomTemplate(PagePart::PrintLayout, PageMode::PrintDetailPage, 'print/detail_page.tpl', $customParams);
+
+        $this->DisplayTemplate($template,
+            array('Page' => $DetailPage),
+            array_merge($customParams,
+                array(
+                    'Grid' => $Grid,
+                    'MasterGrid' => $masterGrid
+                )
+            )
+        );
+    }
+
+    public function RenderPage(Page $Page)
+    {
+        $this->doRenderPage($Page, PageMode::PrintAll, 'print/page.tpl');
+    }
+
+    public function RenderGrid(Grid $Grid)
+    {
         $Grid->GetDataset()->Open();
 
-        while($Grid->GetDataset()->Next())
-        {
-            $rowValues = $Grid->GetDataset()->GetCurrentFieldValues();
-            $Rows[] = Q::ToArray(Q::Select($Grid->GetPrintColumns(),
-                Q::L('$c => $_1->RenderViewColumn($c, $_2)', $this, $rowValues)));
-        }
         $totals = array();
-        if ($Grid->HasTotals())
-        {
+        if ($Grid->HasTotals()) {
             $totalValues = $Grid->GetTotalValues();
-            foreach($Grid->GetPrintColumns() as $column)
+            foreach($Grid->GetPrintColumns() as $column) {
                 $totals[] = $column->GetTotalPresentationData(
                     ArrayUtils::GetArrayValueDef($totalValues, $column->GetName(), null));
+            }
         }
 
-
-        $this->DisplayTemplate('print/grid.tpl',
-            array(
-                'Grid' => $Grid
-                ),
-            array(
-                'Columns' => $Grid->GetPrintColumns(),
-                'Rows' => $Rows,
-                'Totals' => $totals
-            ));
+        $this->doRenderGrid($Grid, PageMode::PrintAll, 'print/grid.tpl', array(
+            'Totals' => $totals,
+        ));
     }
-    
-    protected function ChildPagesAvailable() 
-    { 
-        return false; 
+}
+
+class PrintOneRecordRenderer extends AbstractPrintRenderer
+{
+    function RenderDetailPage(DetailPage $page)
+    {
+        $this->RenderPage($page);
+    }
+
+    function RenderPage(Page $Page)
+    {
+        $this->doRenderPage($Page, PageMode::PrintOneRecord, 'print/page.tpl');
+    }
+
+    function RenderGrid(Grid $Grid)
+    {
+        $Grid->GetDataset()->Open();
+        $this->doRenderGrid($Grid, PageMode::PrintOneRecord, 'view/print_grid.tpl');
     }
 }

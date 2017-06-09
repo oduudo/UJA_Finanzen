@@ -1,10 +1,22 @@
 <?php
 
-include_once dirname(__FILE__) . '/' . 'datasource_security_info.php';
+include_once dirname(__FILE__) . '/' . 'permission_set.php';
 include_once dirname(__FILE__) . '/' . '../utils/hash_utils.php';
+include_once dirname(__FILE__) . '/' . 'user_identity_storage/user_identity_storage.php';
 
 abstract class AbstractUserAuthorization
 {
+    /** @var UserIdentityStorage  */
+    private $identityStorage;
+
+    public function __construct(UserIdentityStorage $identityStorage = null) {
+        $this->identityStorage = $identityStorage;
+    }
+
+    public function getIdentityStorage() {
+        return $this->identityStorage;
+    }
+
     /**
      * @return int
      */
@@ -13,7 +25,15 @@ abstract class AbstractUserAuthorization
     /**
      * @return string|null
      */
-    public abstract function GetCurrentUser();
+    public function GetCurrentUser()
+    {
+        $identity = $this->identityStorage->getUserIdentity();
+        if (is_null($identity)) {
+            return 'guest';
+        }
+
+        return $identity->userName;
+    }
 
     /**
      * @return bool
@@ -23,7 +43,7 @@ abstract class AbstractUserAuthorization
     /**
      * @param string $userName
      * @param string $dataSourceName
-     * @return IDataSourceSecurityInfo
+     * @return IPermissionSet
      */
     public abstract function GetUserRoles($userName, $dataSourceName);
 
@@ -32,6 +52,12 @@ abstract class AbstractUserAuthorization
      * @return bool
      */
     public abstract function HasAdminGrant($userName);
+
+    /**
+     * @param string $userName
+     * @return bool
+     */
+    public abstract function HasAdminPanel($userName);
 
     /**
      * @param array $connectionOptions see GetGlobalConnectionOptions
@@ -43,24 +69,29 @@ class NullUserAuthorization extends AbstractUserAuthorization
 {
     public function GetCurrentUser()
     {
-        return null; 
+        return null;
     }
-    
+
     public function GetUserRoles($userName, $dataSourceName)
     {
-        return new AdminDataSourceSecurityInfo();
-    } 
-    
-    public function IsCurrentUserLoggedIn() { 
-        return false; 
+        return new AdminPermissionSet();
+    }
+
+    public function IsCurrentUserLoggedIn() {
+        return false;
     }
 
     public function GetCurrentUserId()
     {
-        return 0; 
-    }    
+        return 0;
+    }
 
     public function HasAdminGrant($userName)
+    {
+        return false;
+    }
+
+    public function HasAdminPanel($userName)
     {
         return false;
     }
@@ -75,10 +106,9 @@ abstract class IdentityCheckStrategy
     /**
      * @param string $username
      * @param string $password
-     * @param string $errorMessage
      * @return bool
      */
-    public abstract function CheckUsernameAndPassword($username, $password, &$errorMessage);
+    public abstract function CheckUsernameAndPassword($username, $password);
 
     public abstract function CheckUsernameAndEncryptedPassword($username, $password);
 

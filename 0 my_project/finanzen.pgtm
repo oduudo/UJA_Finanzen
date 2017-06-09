@@ -1,0 +1,1664 @@
+<Project version="16.9.0.5" localizationFileName="C:\Program Files (x86)\SQL Maestro Group\PHP Generator for MySQL Professional\lang.de.php" phpDriver="1" outputPath="C:\Users\udojanzen\Coding\UJA Finanzen\uja_finanzen_entwicklung" copySystemFiles="false" outputFilesExtension="php" colorSchemeName="facebook">
+  <ConnectionOptions host="localhost" port="3306" login="uja" password="\.W_]ZGM\OGKZ?0~" database="uja_finanzen" client_encoding="utf8">
+    <ssh_secure secure="true" host="udojanzen.de" port="4022" login="uja" password="N_#M__&gt;IS?K]ZNOH^?O]NP~~" authentication_mode="0"/>
+    <http_tunnel tunneling="false" url="">
+      <http_proxy_server use_proxy="false" port="8080"/>
+      <http_authentication/>
+    </http_tunnel>
+  </ConnectionOptions>
+  <ScriptConnectionOptions host="localhost" port="3306" login="uja" password="\.W_]ZGM\OGKZ?0~" database="uja_finanzen" client_encoding="utf8">
+    <ssh_secure secure="true" host="udojanzen.de" port="4022" login="uja" password="N_#M__&gt;IS?K]ZNOH^?O]NP~~" authentication_mode="0"/>
+    <http_tunnel tunneling="false" url="">
+      <http_proxy_server use_proxy="false" port="8080"/>
+      <http_authentication/>
+    </http_tunnel>
+  </ScriptConnectionOptions>
+  <DataSources>
+    <DataSource name="aktien"/>
+    <DataSource name="anteile"/>
+    <DataSource name="depots"/>
+    <DataSource name="kurse"/>
+    <DataSource name="transaktionen"/>
+    <DataSource name="login"/>
+  </DataSources>
+  <Presentation disableMagicQuotesRuntime="false" showEnvironmentVariables="false" showExecutedQueries="true" showPHPErrorsAndWarnings="false">
+    <Pages>
+      <Page type="table" tableName="aktien" numberByDataSource="0" fileName="aktien" caption="Aktien" shortCaption="Aktien" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true" gridWidth="1200" gridWidthUnits="px">
+        <BeforeGridText>
+Inline Description        </BeforeGridText>
+        <DetailedDescription>
+Detailed Description        </DetailedDescription>
+        <homePageDescription>
+Homepage Description        </homePageDescription>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="name" caption="Name" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="wkn" caption="Wkn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="6"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="isin" caption="Isin" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="branche" caption="Branche" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="f100id" caption="F100id" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par1" caption="Par1" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par3" caption="Par3" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par5" caption="Par5" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par10" caption="Par10" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par20" caption="Par20" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kgv" caption="Kgv" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="div_rendite" caption="Div Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="dsr" caption="Dsr" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="bewertung" caption="Bewertung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589055">
+            <ViewProperties type="text"/>
+            <EditProperties type="checkBoxGroup" displayMode="0">
+              <Values>
+                <Value name="''" caption="''"/>
+                <Value name="*" caption="*"/>
+                <Value name="**" caption="**"/>
+                <Value name="***" caption="***"/>
+                <Value name="****" caption="****"/>
+                <Value name="*****" caption="*****"/>
+              </Values>
+            </EditProperties>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kommentar" caption="Kommentar" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text" maxLength="75"/>
+            <EditProperties type="textArea" columnCount="50" rowCount="8" placeholder=""/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </View>
+          <Edit>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="wkn"/>
+            <Column fieldName="isin"/>
+            <Column fieldName="branche"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="par1"/>
+            <Column fieldName="par3"/>
+            <Column fieldName="par5"/>
+            <Column fieldName="par10"/>
+            <Column fieldName="par20"/>
+            <Column fieldName="kgv"/>
+            <Column fieldName="div_rendite"/>
+            <Column fieldName="dsr"/>
+            <Column fieldName="bewertung"/>
+            <Column fieldName="kommentar"/>
+          </Compare>
+        </Columns>
+        <Details>
+          <Detail caption="Anteile">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="depotname" caption="Depotname" selectedFilterOperators="1589247">
+                  <Lookup tableName="depots" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aktienname" caption="Aktienname" selectedFilterOperators="1589247">
+                  <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Compare>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="id" foreginColumnName="aktienname"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
+          <Detail caption="Kurse">
+            <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+                  <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
+                  <ViewProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s"/>
+                  <EditProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s" firstDayOfWeek="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="kurs"/>
+                </Compare>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="id" foreginColumnName="aktienid"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
+        </Details>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true" gridWidth="1200" gridWidthUnits="px">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="depotname" caption="Depotname" selectedFilterOperators="1589247">
+            <Lookup tableName="depots" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="comboBox"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aktienname" caption="Aktienname" selectedFilterOperators="1589247">
+            <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="comboBox"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </View>
+          <Edit>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id"/>
+            <Column fieldName="depotname"/>
+            <Column fieldName="aktienname"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="kurs"/>
+            <Column fieldName="steigerung"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="rendite"/>
+          </Compare>
+        </Columns>
+        <Details>
+          <Detail caption="Transaktionen">
+            <Page type="table" tableName="transaktionen" numberByDataSource="1" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="anteil" caption="Anteil" canSetNull="true" selectedFilterOperators="1573119">
+                  <Lookup tableName="anteile" linkFieldName="id" displayFieldName="depotname" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="datum" caption="Datum" canSetNull="true" selectedFilterOperators="2031871">
+                  <ViewProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1"/>
+                  <EditProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1" firstDayOfWeek="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="typ" caption="Typ" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589055">
+                  <ViewProperties type="text"/>
+                  <EditProperties type="checkBoxGroup" displayMode="0">
+                    <Values>
+                      <Value name="Kauf" caption="Kauf"/>
+                      <Value name="Verkauf" caption="Verkauf"/>
+                    </Values>
+                  </EditProperties>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="anteil"/>
+                  <Column fieldName="datum"/>
+                  <Column fieldName="typ"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="wert"/>
+                </Compare>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="depotname" foreginColumnName="anteil"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
+        </Details>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="depots" numberByDataSource="0" fileName="depots" caption="Depots" shortCaption="Depots" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true" gridWidth="1200" gridWidthUnits="px">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="name" caption="Name" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="owner" caption="Owner" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="wpperm" caption="Wpperm" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="f100id" caption="F100id" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="64"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="portf" caption="Portf" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="64"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="start" caption="Start" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="dividende" caption="Dividende" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="gewinn_prozent" caption="Gewinn Prozent" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </View>
+          <Edit>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id"/>
+            <Column fieldName="name"/>
+            <Column fieldName="owner"/>
+            <Column fieldName="wpperm"/>
+            <Column fieldName="f100id"/>
+            <Column fieldName="portf"/>
+            <Column fieldName="start"/>
+            <Column fieldName="invest"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="gewinn"/>
+            <Column fieldName="gewinn_prozent"/>
+          </Compare>
+        </Columns>
+        <Details>
+          <Detail caption="Anteile">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="depotname" caption="Depotname" selectedFilterOperators="1589247">
+                  <Lookup tableName="depots" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aktienname" caption="Aktienname" selectedFilterOperators="1589247">
+                  <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id"/>
+                  <Column fieldName="depotname"/>
+                  <Column fieldName="aktienname"/>
+                  <Column fieldName="anzahl"/>
+                  <Column fieldName="preis"/>
+                  <Column fieldName="kosten"/>
+                  <Column fieldName="invest"/>
+                  <Column fieldName="kurs"/>
+                  <Column fieldName="steigerung"/>
+                  <Column fieldName="gewinn"/>
+                  <Column fieldName="rendite"/>
+                </Compare>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="id" foreginColumnName="depotname"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
+        </Details>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true" gridWidth="1200" gridWidthUnits="px">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+            <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
+            <ViewProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s"/>
+            <EditProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s" firstDayOfWeek="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </View>
+          <Edit>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="kurs"/>
+          </Compare>
+        </Columns>
+        <Details/>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="datum" caption="Datum" canSetNull="true" selectedFilterOperators="2031871">
+            <ViewProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1"/>
+            <EditProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1" firstDayOfWeek="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="typ" caption="Typ" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589055">
+            <ViewProperties type="text"/>
+            <EditProperties type="checkBoxGroup" displayMode="0">
+              <Values>
+                <Value name="Kauf" caption="Kauf"/>
+                <Value name="Verkauf" caption="Verkauf"/>
+              </Values>
+            </EditProperties>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="4" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="anteil" caption="Anteil" canSetNull="true" selectedFilterOperators="1573119">
+            <Lookup tableName="depots" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="comboBox"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </View>
+          <Edit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="datum"/>
+            <Column fieldName="typ"/>
+            <Column fieldName="anzahl"/>
+            <Column fieldName="preis"/>
+            <Column fieldName="kosten"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="anteil"/>
+          </Compare>
+        </Columns>
+        <Details/>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="login" numberByDataSource="0" fileName="login" caption="Login" shortCaption="Login" addSeparator="false" horizontalFilterCondition="" openAdvancedSearchAtFirst="false" recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="login" caption="Login" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="30"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="password_sha1" caption="Password Sha1" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="40"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </View>
+          <Edit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="login"/>
+            <Column fieldName="password_sha1"/>
+          </Compare>
+        </Columns>
+        <Details/>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+    </Pages>
+    <UserAuthorization/>
+    <UserGrants enableGuestAccess="false">
+      <UserPageGrants/>
+    </UserGrants>
+    <Header/>
+    <Footer/>
+    <PHPOptions/>
+    <Groups>
+      <Group caption="No group"/>
+    </Groups>
+  </Presentation>
+  <UserCSS/>
+  <UserJS/>
+  <ExcludedPaths/>
+  <DefaultPageProperties recordsPerPage="50" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportToExcelAvailable2="5" exportToWordAvailable2="5" exportToXmlAvailable2="5" exportToCsvAvailable2="5" exportToPdfAvailable2="5" printerFriendlyAvailable2="5" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" borderedTable="true" condensedTable="true"/>
+  <DefaultDataFormats numberAfterDecimal="4" DecimalSeparator="," ThousandSeparator="." DateTimeFormat="Y-m-d H:i:s" DateFormat="dd.mm.YY" firstDayOfWeek="1"/>
+</Project>

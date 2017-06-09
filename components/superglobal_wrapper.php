@@ -25,15 +25,15 @@ class SuperGlobals
     // TODO make a decorator
     private function RemoveContextFromName($name)
     {
-        return StringUtils::IsNullOrEmpty($this->context) ? 
+        return StringUtils::IsNullOrEmpty($this->context) ?
             $name :
             StringUtils::Replace($this->context . '_', '', $name);
     }
 
     private function IsNameInContext($name)
     {
-        return StringUtils::IsNullOrEmpty($this->context) ? 
-            true : 
+        return StringUtils::IsNullOrEmpty($this->context) ?
+            true :
             StringUtils::StartsWith($name, $this->context . '_');
     }
 
@@ -41,8 +41,13 @@ class SuperGlobals
     {
         return StringUtils::IsNullOrEmpty($this->context) ? $name : ($this->context . '_' . $name);
     }
-    
-    private function GetArrayByInputMethod($method)
+
+    /**
+     * @param int $method
+     * @returns array
+     * @throws Exception
+     */
+    protected function &GetArrayByInputMethod($method)
     {
         switch ($method)
         {
@@ -75,25 +80,32 @@ class SuperGlobals
 
     public function IsInputValueSet($name, $method)
     {
-        $inputArray = $this->GetArrayByInputMethod($method);
+        $inputArray = &$this->GetArrayByInputMethod($method);
         return isset($inputArray[$this->GetNameInContext($name)]);
     }
 
     public function GetInputValue($name, $method)
     {
-        $inputArray = $this->GetArrayByInputMethod($method);
-        return $this->RefineInputValue($inputArray[$this->GetNameInContext($name)]);
+        $inputArray = &$this->GetArrayByInputMethod($method);
+
+        if (isset($inputArray[$this->GetNameInContext($name)])) {
+            $value = $inputArray[$this->GetNameInContext($name)];
+        } else {
+            $value = null;
+        }
+
+        return $this->RefineInputValue($value);
     }
 
     public function SetInputValue($name, $value, $method)
     {
-        $inputArray = $this->GetArrayByInputMethod($method);
+        $inputArray = &$this->GetArrayByInputMethod($method);
         $inputArray[$this->GetNameInContext($name)] = $value;
     }
 
     public function UnSetInputValue($name, $method)
     {
-        $inputArray = $this->GetArrayByInputMethod($method);
+        $inputArray = &$this->GetArrayByInputMethod($method);
         unset($inputArray[$this->GetNameInContext($name)]);
     }
 
@@ -129,13 +141,13 @@ class SuperGlobals
 
     public function GetInputVariablesIf($predicate, $inputMethod)
     {
-        $inputArray = $this->GetArrayByInputMethod($inputMethod);
+        $inputArray = &$this->GetArrayByInputMethod($inputMethod);
         $result = array();
         foreach($inputArray as $name => $value)
             if ($this->IsNameInContext($name) && $predicate($this->RemoveContextFromName($name)))
                 $result[$this->RemoveContextFromName($name)] = $value;
         return $result;
-    }    
+    }
 
     public function GetPostVariablesIf($predicate)
     {
@@ -146,23 +158,42 @@ class SuperGlobals
 
     public function IsSessionVariableSet($name)
     {
-        return isset($_SESSION[$this->GetNameInContext($name)]);
+        $inputArray = &$this->GetArrayByInputMethod(InputMethod::Session);
+        return isset($inputArray[$this->GetNameInContext($name)]);
     }
 
     public function GetSessionVariable($name)
     {
-        return $_SESSION[$this->GetNameInContext($name)];
+        return $this->GetInputValue($name, InputMethod::Session);
+    }
+
+    public function GetSessionVariableDef($name, $defaultValue = null)
+    {
+        if (!$this->IsSessionVariableSet($name)) {
+            return $defaultValue;
+        }
+
+        return $this->GetInputValue($name, InputMethod::Session);
     }
 
     public function SetSessionVariable($name, $value)
     {
-        $_SESSION[$this->GetNameInContext($name)] = $value;
+        $inputArray = &$this->GetArrayByInputMethod(InputMethod::Session);
+        $inputArray[$this->GetNameInContext($name)] = $value;
     }
 
     public function UnSetSessionVariable($name)
     {
-        unset($_SESSION[$this->GetNameInContext($name)]);
+        $inputArray = &$this->GetArrayByInputMethod(InputMethod::Session);
+        unset($inputArray[$this->GetNameInContext($name)]);
     }
 
     #endregion
+
+    public function fillGetParams(LinkBuilder $linkBuilder) {
+        $inputArray = &$this->GetArrayByInputMethod(InputMethod::Get);
+        foreach ($inputArray as $key => $value) {
+            $linkBuilder->AddParameter($key, $value);
+        }
+    }
 }

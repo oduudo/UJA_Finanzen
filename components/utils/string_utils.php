@@ -38,23 +38,23 @@ class StringUtils
         return explode ($delimiter, $string);
     }
 
-    public static function JSStringLiteral($stringLiteral, 
+    public static function JSStringLiteral($stringLiteral,
         $mode = JavaScriptStringLiteralEscapeMode::DoubleQuote)
     {
         switch ($mode)
         {
             case JavaScriptStringLiteralEscapeMode::DoubleQuote:
-                $searches = array( '"', "\n" );
-                $replacements = array( '\\"', "\\n\"\n\t+\"" );
+                $searches = array('\\', '"', "\n" );
+                $replacements = array('\\\\', '\\"', "\\n\"\n\t+\"" );
                 $quote = '"';
                 break;
             case JavaScriptStringLiteralEscapeMode::SingleQuote:
-                $searches = array( "'", "\n" );
-                $replacements = array( "\\'", "\\n'\n\t+'" );
+                $searches = array('\\', "'", "\n" );
+                $replacements = array( '\\\\', "\\'", "\\n'\n\t+'" );
                 $quote = "'";
                 break;
         }
-        return $quote . str_replace( $searches, $replacements, $stringLiteral ) . $quote;
+        return $quote . str_replace($searches, $replacements, $stringLiteral) . $quote;
     }
 
     /**
@@ -79,7 +79,18 @@ class StringUtils
 
     public static function ReplaceVariableInTemplate($template, $varName, $varValue)
     {
-        return str_ireplace('%' . $varName . '%', $varValue, $template);
+        if (is_array($varValue))
+            return $template;
+        else
+            return str_ireplace('%' . $varName . '%', $varValue, $template);
+    }
+
+    public static function ReplaceVariables($template, $vars)
+    {
+        foreach ($vars as $key => $value) {
+            $template = self::ReplaceVariableInTemplate($template, $key, $value);
+        }
+        return $template;
     }
 
     public static function StartsWith($string, $pattern)
@@ -100,7 +111,7 @@ class StringUtils
         return preg_match("/$pattern/", $string, $matches) >= 1;
     }
 
-    public static function EscapeXmlString($strin) 
+    public static function EscapeXmlString($strin)
     {
         $strout = null;
 
@@ -147,7 +158,7 @@ class StringUtils
     {
         return str_replace($oldValue, $newValue, $string);
     }
-    
+
     public static function ApplyVarablesMapToTemplate($template, $varArray)
     {
         $result = $template;
@@ -178,7 +189,7 @@ class StringUtils
 
     public static function Format($format)
     {
-        $arg_list = func_get_args(); 
+        $arg_list = func_get_args();
         return call_user_func_array('sprintf', $arg_list);
     }
 
@@ -206,6 +217,14 @@ class StringUtils
         {
             return $text;
         }
+    }
+
+    public static function getEncodedArray($array, $sourceEncoding, $targetEncoding) {
+        $result = array();
+        foreach($array as $value) {
+            $result[] = self::ConvertTextToEncoding($value, $sourceEncoding, $targetEncoding);
+        }
+        return $result;
     }
 
     public static function SubString($value, $start, $length, $encoding)
