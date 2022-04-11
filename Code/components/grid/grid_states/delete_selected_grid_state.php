@@ -28,6 +28,7 @@ class DeleteSelectedGridState extends AbstractCommitValuesGridState
             $this->getDataset()->Open();
 
             if ($this->getDataset()->Next()) {
+                $this->CheckRLSDeleteGrant();
                 $this->doProcessMessages($this->getDataset()->GetCurrentFieldValues());
             }
 

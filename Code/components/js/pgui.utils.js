@@ -36,24 +36,30 @@ define([
         updatePopupHints: function ($container) {
             $container.find('.js-more-hint').each(function () {
                 var $hintLink = $(this);
-                var $hintMessage = $hintLink.siblings('.js-more-box').html();
+                var $hintMessage = $hintLink.closest('td[data-column-name]').find('.js-more-box').html();
                 $hintLink
-                    .on('click', function() {
+                    .off('click').on('click', function() {
                         $(this).popover('hide');
                         _showBootBoxAlert($hintMessage);
                         return false;
-                    })
-                    .popover({
-                        title: '',
-                        placement: function () {
-                            return $hintLink.offset().top - $(window).scrollTop() < $(window).height() / 2
-                                ? 'bottom'
-                                : 'top';
-                        },
-                        html: true,
-                        trigger: 'hover',
-                        content: $hintMessage
                     });
+                var popover = $hintLink.data('bs.popover');
+                if (popover) {
+                    popover.options.content = $hintMessage;
+                } else{
+                    $hintLink
+                        .popover({
+                            title: '',
+                            placement: function () {
+                                return $hintLink.offset().top - $(window).scrollTop() < $(window).height() / 2
+                                    ? 'bottom'
+                                    : 'top';
+                            },
+                            html: true,
+                            trigger: 'hover',
+                            content: $hintMessage
+                        });
+                }
             });
         },
         buildDismissableMessage: function (className, message, messageDisplayTime) {
@@ -68,6 +74,29 @@ define([
             autoHideMessage($message, messageDisplayTime);
 
             return $message;
+        },
+        createLoadingModalDialog: function(operationName) {
+            var operationNameContent = (operationName !== undefined) ? ('&nbsp&nbsp<span>' + operationName + '</span>') : '';
+            var loadingContent = '<div class="modal-dialog modal-sm">'
+                + '<div class="modal-content">'
+                + '<div class="modal-body" style="text-align: center">'
+                + '<img src="components/assets/img/loading.gif" />'
+                + operationNameContent
+                + '</div></div>';
+
+            return $('<div/>', {
+                class: 'modal fade',
+                tabIndex: '-1',
+                'data-backdrop': 'static'
+            }).append(loadingContent).appendTo($('body'));
+        },
+        replaceRow: function($oldRow, $newRow) {
+            var $oldRowDetails = $oldRow.find('.details').first();
+            var $newRowDetails = $newRow.find('.details').first();
+            if (($oldRowDetails.length > 0) && ($newRowDetails.length > 0)) {
+                $newRowDetails.replaceWith($oldRowDetails);
+            }
+            $oldRow.replaceWith($newRow);
         }
     }
 });

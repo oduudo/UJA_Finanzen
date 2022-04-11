@@ -7,42 +7,31 @@ include_once dirname(__FILE__) . '/' . 'user_identity_storage/user_identity_stor
 
 class UserManagementRequestHandler
 {
-    /**
-     * @var RequestRouter
-     */
+    /** @var RequestRouter */
     private $router;
 
     /** @var TableBasedUserGrantManager */
     private $tableBasedGrantsManager;
 
-    /** @var IdentityCheckStrategy */
-    private $identityCheckStrategy;
+    /** @var AbstractUserAuthentication */
+    private $userAuthentication;
 
-    /**
-     * @var SecureApplication
-     */
+    /** @var SecureApplication */
     private $app;
 
-    /**
-     * @var UserIdentityCookieStorage
-     */
-    private $userIdentityStorage;
+    /** @var IUserManager */
+    private $userManger;
 
     /**
-     * @param TableBasedUserGrantManager $tableBasedGrantsManager
-     * @param IdentityCheckStrategy $identityCheckStrategy
-     * @param UserIdentityStorage $userIdentityStorage
+     * @param TableBasedUserGrantManager|null $tableBasedGrantsManager
+     * @param IUserManager $userManager
      */
-    private function __construct(
-        TableBasedUserGrantManager $tableBasedGrantsManager,
-        IdentityCheckStrategy $identityCheckStrategy,
-        UserIdentityStorage $userIdentityStorage)
-    {
+    private function __construct($tableBasedGrantsManager, $userManager) {
         $this->tableBasedGrantsManager = $tableBasedGrantsManager;
-        $this->identityCheckStrategy = $identityCheckStrategy;
         $this->router = $this->CreateAndConfigureRequestRouter();
         $this->app = GetApplication();
-        $this->userIdentityStorage = $userIdentityStorage;
+        $this->userAuthentication = $this->app->GetUserAuthentication();
+        $this->userManger = $userManager;
     }
 
     /**
@@ -51,23 +40,47 @@ class UserManagementRequestHandler
      */
     public function SelfChangePassword($currentPassword, $newPassword)
     {
-        $userSelfManagement = new UserSelfManagement($this->app,
-            $this->tableBasedGrantsManager, $this->identityCheckStrategy);
+        $userSelfManagement = new UserSelfManagement($this->app, $this->userManger);
         $userSelfManagement->ValidateAndChangePassword($currentPassword, $newPassword);
-        $this->userIdentityStorage->UpdatePassword($newPassword);
+    }
+
+    /**
+     * @param string $userName
+     * @param string $password
+     * @return array
+     */
+    public function AdminAddUser($userName, $password)
+    {
+        $this->CheckAdminGrant();
+        $userId = $this->userManger->addUser($userName, $password);
+        return array('id' => $userId, 'name' => $userName, 'password' => '******');
+    }
+
+    /**
+     * @param string $userName
+     * @param string $password
+     * @param string $email
+     * @return array
+     */
+    public function AdminAddUserEx($userName, $password, $email)
+    {
+        $this->CheckAdminGrant();
+        $userId = $this->userManger->addUserEx($userName, $password, $email);
+        return array('id' => $userId, 'name' => $userName, 'password' => '******', 'email' => $email);
     }
 
     /**
      * @param int $userId
      * @param string $userName
-     * @param string $password
+     * @param string $email
+     * @param int $status
      * @return array
      */
-    public function AdminAddUser($userId, $userName, $password)
+    public function AdminUpdateUser($userId, $userName, $email, $status)
     {
         $this->CheckAdminGrant();
-        $this->tableBasedGrantsManager->AddUser($userId, $userName, $password);
-        return array('id' => $userId, 'name' => $userName, 'password' => '******');
+        $this->userManger->updateUser($userId, $userName, $email, $status);
+        return array('id' => $userId, 'name' => $userName, 'email' => $email, 'status' => $status);
     }
 
     /**
@@ -76,7 +89,7 @@ class UserManagementRequestHandler
     public function AdminRemoveUser($userId)
     {
         $this->CheckAdminGrant();
-        $this->tableBasedGrantsManager->RemoveUser($userId);
+        $this->userManger->RemoveUser($userId);
     }
 
     /**
@@ -87,7 +100,8 @@ class UserManagementRequestHandler
     public function AdminChangeUserName($userId, $newUserName)
     {
         $this->CheckAdminGrant();
-        return array('username' => $this->tableBasedGrantsManager->ChangeUserName($userId, $newUserName));
+        $this->userManger->renameUser($userId, $newUserName);
+        return array('username' => $newUserName);
     }
 
     /**
@@ -98,7 +112,7 @@ class UserManagementRequestHandler
     public function AdminChangeUserPassword($userId, $newUserPassword)
     {
         $this->CheckAdminGrant();
-        $this->tableBasedGrantsManager->ChangeUserPassword($userId, $newUserPassword);
+        $this->userManger->ChangeUserPassword($userId, $newUserPassword);
     }
 
     /**
@@ -148,11 +162,17 @@ class UserManagementRequestHandler
                 array('current_password', 'new_password')),
             new RequestRoute('au',
                 array($this, 'AdminAddUser'),
-                array('id', 'username', 'password')),
+                array('username', 'password')),
+            new RequestRoute('aue',
+                array($this, 'AdminAddUserEx'),
+                array('username', 'password', 'email')),
+            new RequestRoute('uu',
+                array($this, 'AdminUpdateUser'),
+                array('user_id', 'username', 'email', 'status')),
             new RequestRoute('ru',
                 array($this, 'AdminRemoveUser'),
                 array('user_id')),
-            new RequestRoute('eu',
+            new RequestRoute('cun',
                 array($this, 'AdminChangeUserName'),
                 array('user_id', 'username')),
             new RequestRoute('cup',
@@ -197,25 +217,18 @@ class UserManagementRequestHandler
     }
 
     private function hasAdminGrant() {
-        return $this->app->GetUserAuthorizationStrategy()->HasAdminGrant($this->app->GetCurrentUser());
+        return $this->app->HasAdminGrantForCurrentUser();
     }
 
     /**
      * @param array $parameters
-     * @param TableBasedUserGrantManager $tableBasedGrantsManager
-     * @param IdentityCheckStrategy $identityCheckStrategy
-     * @param UserIdentityStorage $userIdentityStorage
+     * @param TableBasedUserGrantManager|null $tableBasedGrantsManager
+     * @param IUserManager $userManager
      */
-    static public function HandleRequest(
-        $parameters,
-        TableBasedUserGrantManager $tableBasedGrantsManager,
-        IdentityCheckStrategy $identityCheckStrategy,
-        UserIdentityStorage $userIdentityStorage)
-    {
+    static public function HandleRequest($parameters, $tableBasedGrantsManager, $userManager) {
         $instance = new UserManagementRequestHandler(
             $tableBasedGrantsManager,
-            $identityCheckStrategy,
-            $userIdentityStorage
+            $userManager
         );
 
         header('Content-Type: application/json');

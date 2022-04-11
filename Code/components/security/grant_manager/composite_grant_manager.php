@@ -21,10 +21,10 @@ class CompositeGrantManager extends UserGrantManager {
     /**
      * @inheritdoc
      */
-    public function GetSecurityInfo($userName, $dataSourceName) {
+    public function GetPermissionSet($userName, $dataSourceName) {
         $securityInfos = array();
         foreach ($this->grantManagers as $grantsManager)
-            array_push($securityInfos, $grantsManager->GetSecurityInfo($userName, $dataSourceName));
+            array_push($securityInfos, $grantsManager->GetPermissionSet($userName, $dataSourceName));
         return new CompositePermissionSet($securityInfos);
     }
 

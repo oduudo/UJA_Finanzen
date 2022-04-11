@@ -15,7 +15,7 @@ abstract class AbstractPdfRenderer extends AbstractExportRenderer
         CheckMbStringExtension();
         CheckIconvExtension();
 
-        include_once dirname(__FILE__) . '/' . '../../libs/mpdf/mpdf.php';
+        include_once dirname(__FILE__) . '/' . '../../libs/mpdf/mpdf_common.php';
 
         set_time_limit(0);
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
@@ -38,8 +38,15 @@ abstract class AbstractPdfRenderer extends AbstractExportRenderer
 
         $html = $this->result;
         $options = array(
+            'size' => 'A4',
             'orientation' => 'P',
             'filename' => Path::ReplaceFileNameIllegalCharacters($Page->GetTitle() . ".pdf"),
+            'margin-left' => 10,
+            'margin-right' => 10,
+            'margin-top' => 10,
+            'margin-bottom' => 10,
+            'margin-header' => 5,
+            'margin-footer' => 5
         );
         $Page->GetCustomExportOptions(
             'pdf',
@@ -47,11 +54,42 @@ abstract class AbstractPdfRenderer extends AbstractExportRenderer
             $options
         );
 
-        $mpdf = new mPDF('utf-8', 'A4-' . $options['orientation'], '8', '', 10, 10, 7, 7, 10, 10);
+        $orientationString = $options['orientation'] === 'L' ? '-L' : '';
+
+        $configParams = array(
+            'mode' => 'utf-8',
+            'format' => $options['size'] . $orientationString,
+            'default_font_size' => 8,
+            'default_font' => '',
+            'margin_left' => $options['margin-left'],
+            'margin_right' => $options['margin-right'],
+            'margin_top' => $options['margin-top'],
+            'margin_bottom' => $options['margin-bottom'],
+            'margin_header' => $options['margin-header'],
+            'margin_footer' => $options['margin-footer']
+        );
+
+        $mpdf = createMPDF($configParams);
         $mpdf->charset_in = $Page->GetContentEncoding();
 
-
         $stylesheet = FileUtils::ReadAllText('components/assets/css/pdf.css');
+        $userCss = 'components/assets/css/user_pdf.css';
+        if (FileUtils::FileExists($userCss)) {
+            $stylesheet .= FileUtils::ReadAllText($userCss);
+        }
+
+        if (array_key_exists('header', $options)) {
+            $mpdf->SetHeader($options['header']);
+        } elseif (array_key_exists('html-header', $options)) {
+            $mpdf->SetHTMLHeader($options['html-header']);
+        }
+
+        if (array_key_exists('footer', $options)) {
+            $mpdf->SetFooter($options['footer']);
+        } elseif (array_key_exists('html-footer', $options)) {
+            $mpdf->SetHTMLFooter($options['html-footer']);
+        }
+
         $mpdf->WriteHTML($stylesheet, 1);
 
         $mpdf->list_indent_first_level = 0;
@@ -150,5 +188,21 @@ abstract class AbstractPdfRenderer extends AbstractExportRenderer
 
     protected function ShowHtmlNullValue()  {
         return true;
+    }
+
+    /** @inheritdoc */
+    public function RenderImageViewColumn(ImageViewColumn $column)
+    {
+        if (is_null($column->GetValue())) {
+            $this->result = $this->GetNullValuePresentation($column);
+        } else {
+            $this->result =
+                sprintf(
+                    '<img src="%s" %s%s>',
+                    $column->GetImageLink(),
+                    $column->generateImageSizeString(),
+                    $this->getColumnStyle($column)
+                );
+        }
     }
 }

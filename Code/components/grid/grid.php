@@ -3,8 +3,7 @@
 include_once dirname(__FILE__) . '/../renderers/renderer.php';
 include_once dirname(__FILE__) . '/../component.php';
 include_once dirname(__FILE__) . '/../editors/editors.php';
-include_once dirname(__FILE__) . '/../editors/multilevel_selection.php';
-include_once dirname(__FILE__) . '/../editors/autocomplete.php';
+include_once dirname(__FILE__) . '/../editors/dynamic_combobox.php';
 include_once dirname(__FILE__) . '/../editors/multivalue_select.php';
 include_once dirname(__FILE__) . '/../editors/checkboxgroup.php';
 include_once dirname(__FILE__) . '/../utils/array_utils.php';
@@ -18,6 +17,7 @@ include_once dirname(__FILE__) . '/columns/view_column_group.php';
 include_once dirname(__FILE__) . '/filters/column_filter/column_filter.php';
 include_once dirname(__FILE__) . '/filters/filter_builder/filter_builder.php';
 include_once dirname(__FILE__) . '/filters/quick_filter.php';
+include_once dirname(__FILE__) . '/filters/selection_filter.php';
 
 define('otAscending', 1);
 define('otDescending', 2);
@@ -84,6 +84,9 @@ class Grid {
     /** @var CustomEditColumn[] */
     private $editColumns = array();
 
+    /** @var CustomEditColumn[] */
+    private $multiEditColumns = array();
+
     /** @var AbstractViewColumn[] */
     private $viewColumns = array();
 
@@ -92,6 +95,9 @@ class Grid {
 
     /** @var CustomEditColumn[] */
     private $insertColumns = array();
+
+    /** @var CustomEditColumn[] */
+    private $multiUploadColumns = array();
 
     /** @var AbstractViewColumn[] */
     private $exportColumns = array();
@@ -135,6 +141,18 @@ class Grid {
     /** @var bool */
     private $allowAddMultipleRecords = true;
 
+    /** @var bool */
+    private $multiEditAllowed = true;
+
+    /** @var bool */
+    private $useModalMultiEdit = false;
+
+    /** @var bool */
+    private $includeAllFieldsForMultiEditByDefault = true;
+
+    /** @var bool */
+    private $allowMultiUpload = false;
+
     //
     public $Width;
     public $Margin;
@@ -154,6 +172,8 @@ class Grid {
      */
     private $quickFilter;
 
+    /** @var SelectionFilter */
+    private $selectionFilter;
     //
     private $orderColumnFieldName;
     private $orderType;
@@ -189,6 +209,7 @@ class Grid {
     private $insertClientFormLoadedScript;
     private $editClientEditorValueChangedScript;
     private $insertClientEditorValueChangedScript;
+    private $calculateControlValuesScript;
 
     private $internalName;
     private $showUpdateLink = true;
@@ -198,7 +219,6 @@ class Grid {
     private $width;
 
     private $enableRunTimeCustomization = true;
-    private $enableSortDialog = true;
     private $viewMode;
     private $cardCountInRow = array('lg' => 3, 'md' => 3, 'sm' => 2, 'xs' => 1);
 
@@ -206,7 +226,10 @@ class Grid {
     private $totals = array();
 
     /** @var bool */
-    private $allowOrdering;
+    private $allowSortingByClick = true;
+
+    /** @var bool */
+    private $allowSortingByDialog = true;
 
     /** @var Event */
     public $OnCustomRenderColumn;
@@ -256,6 +279,15 @@ class Grid {
     /** @var Event */
     public $OnCustomCompareColumn;
 
+    /** @var Event */
+    public $OnCustomDefaultValues;
+
+    /** @var Event */
+    public $OnGetSelectionFilters;
+
+    /** @var Event */
+    public $OnGetCustomFormLayout;
+
     /** @var DetailColumn[] */
     private $details;
 
@@ -274,8 +306,32 @@ class Grid {
     /** @var FormLayout */
     private $editFormLayout;
 
+    /** @var FormLayout */
+    private $multiEditFormLayout;
+
+    /** @var FormLayout */
+    private $inlineInsertFormLayout;
+
+    /** @var FormLayout */
+    private $inlineEditFormLayout;
+
+    /** @var FormLayout */
+    private $inlineViewFormLayout;
+
+    /** @var FormLayout */
+    private $multiUploadFormLayout;
+
     /** @var boolean */
     private $isMaster = false;
+
+    /** @var bool */
+    private $reloadPageAfterAjaxOperation = false;
+
+    /** $var FilterComponentInterface[] */
+    private $selectionFilters = array();
+
+    /** @var bool */
+    private $selectionFilterAllowed = true;
 
     function __construct(Page $page, Dataset $dataset) {
         $this->page = $page;
@@ -283,6 +339,7 @@ class Grid {
         $this->internalName = $page->getPageId() . 'Grid';
         //
         $this->editColumns = array();
+        $this->multiEditColumns = array();
         $this->viewColumns = array();
         $this->printColumns = array();
         $this->insertColumns = array();
@@ -312,7 +369,9 @@ class Grid {
         $this->OnCustomRenderPrintColumn = new Event();
         $this->OnCustomRenderExportColumn = new Event();
         $this->OnGetCustomTemplate = new Event();
-
+        $this->OnCustomDefaultValues = new Event();
+        $this->OnGetSelectionFilters = new Event();
+        $this->OnGetCustomFormLayout = new Event();
         //
         $this->SetState(OPERATION_VIEWALL);
         $this->highlightRowAtHover = false;
@@ -334,7 +393,6 @@ class Grid {
         $this->useFixedHeader = false;
         $this->showLineNumbers = false;
         $this->showKeyColumnsImagesInHeader = true;
-        $this->allowOrdering = true;
 
         $this->viewMode = ViewMode::getDefaultMode();
 
@@ -344,20 +402,7 @@ class Grid {
         $this->filterBuilder = new FilterBuilder();
         $this->columnFilter = new ColumnFilter();
         $this->quickFilter = new QuickFilter();
-    }
-
-    /**
-     * @param string $columnName
-     * @return \AbstractViewColumn|null
-     */
-    private function FindViewColumnByName($columnName) {
-        $columns = $this->GetViewColumns();
-        foreach ($columns as $column) {
-            if ($this->GetColumnName($column) == $columnName) {
-                return $column;
-            }
-        }
-        return null;
+        $this->selectionFilter = new SelectionFilter($this->page->GetLocalizerCaptions());
     }
 
     public function GetTemplate($mode, $defaultTemplate) {
@@ -559,6 +604,12 @@ class Grid {
         return $column;
     }
 
+    public function AddMultiEditColumn($column) {
+        $this->multiEditColumns[] = $column;
+        $this->DoAddColumn($column);
+        return $column;
+    }
+
     public function AddPrintColumn($column) {
         $this->printColumns[] = $column;
         $this->DoAddColumn($column);
@@ -567,6 +618,12 @@ class Grid {
 
     public function AddInsertColumn($column) {
         $this->insertColumns[] = $column;
+        $this->DoAddColumn($column);
+        return $column;
+    }
+
+    public function AddMultiUploadColumn($column) {
+        $this->multiUploadColumns[] = $column;
         $this->DoAddColumn($column);
         return $column;
     }
@@ -582,6 +639,13 @@ class Grid {
      */
     public function GetEditColumns() {
         return $this->editColumns;
+    }
+
+    /**
+     * @return CustomEditColumn[]
+     */
+    public function GetMultiEditColumns() {
+        return $this->multiEditColumns;
     }
 
     /**
@@ -706,6 +770,14 @@ class Grid {
      * @param string $columnName
      * @return CustomEditColumn|null
      */
+    public function getMultiEditColumn($columnName) {
+        return $this->getEditBasedColumn($this->GetMultiEditColumns(), $columnName);
+    }
+
+    /**
+     * @param string $columnName
+     * @return CustomEditColumn|null
+     */
     public function getInsertColumn($columnName) {
         return $this->getEditBasedColumn($this->GetInsertColumns(), $columnName);
     }
@@ -777,6 +849,13 @@ class Grid {
         return $this->insertColumns;
     }
 
+    /**
+     * @return CustomEditColumn[]
+     */
+    public function GetMultiUploadColumns() {
+        return $this->multiUploadColumns;
+    }
+
     #endregion
 
     /**
@@ -792,22 +871,30 @@ class Grid {
         $map = array(
             OPERATION_VIEW => 'SingleRecordGridState',
             OPERATION_PRINT_ONE => 'SingleRecordGridState',
-            OPERATION_PRINT_SELECTED => 'SelectedRecordsGridState',
             OPERATION_EDIT => 'EditGridState',
+            OPERATION_MULTI_EDIT => 'MultiEditGridState',
             OPERATION_VIEWALL => 'ViewAllGridState',
-            OPERATION_COMMIT => 'CommitEditedValuesGridState',
             OPERATION_INSERT => 'InsertGridState',
             OPERATION_COPY => 'CopyGridState',
-            OPERATION_COMMIT_INSERT => 'CommitInsertedValuesGridState',
             OPERATION_DELETE => 'SingleRecordGridState',
+            OPERATION_COMMIT_EDIT => 'CommitEditedValuesGridState',
+            OPERATION_COMMIT_MULTI_EDIT => 'CommitMultiEditGridState',
+            OPERATION_COMMIT_INSERT => 'CommitInsertedValuesGridState',
+            OPERATION_COMMIT_MULTI_UPLOAD => 'CommitMultiUploadGridState',
             OPERATION_COMMIT_DELETE => 'CommitDeleteGridState',
-            OPERATION_DELETE_SELECTED => 'DeleteSelectedGridState',
             OPERATION_EXCEL_EXPORT_RECORD => 'SingleRecordGridState',
             OPERATION_WORD_EXPORT_RECORD => 'SingleRecordGridState',
             OPERATION_XML_EXPORT_RECORD => 'SingleRecordGridState',
             OPERATION_CSV_EXPORT_RECORD => 'SingleRecordGridState',
             OPERATION_PDF_EXPORT_RECORD => 'SingleRecordGridState',
             OPERATION_COMPARE => 'SelectedRecordsGridState',
+            OPERATION_EXCEL_EXPORT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_WORD_EXPORT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_XML_EXPORT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_CSV_EXPORT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_PDF_EXPORT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_PRINT_SELECTED => 'SelectedRecordsGridState',
+            OPERATION_DELETE_SELECTED => 'DeleteSelectedGridState',
         );
 
         if (isset($map[$name])) {
@@ -824,26 +911,32 @@ class Grid {
     }
 
     public function GetInsertPageAction() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridInsertHandler());
-        return $linkBuilder->GetLink();
+        return $this->getActionLink(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridInsertHandler());
+    }
+
+    public function GetMultiUploadPageAction() {
+        return $this->getActionLink(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridMultiUploadHandler());
     }
 
     public function GetEditPageAction() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridEditHandler());
-        return $linkBuilder->GetLink();
+        return $this->getActionLink(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridEditHandler());
+    }
+
+    public function GetMultiEditPageAction() {
+        return $this->getActionLink(OPERATION_HTTPHANDLER_NAME_PARAMNAME, $this->GetPage()->GetGridMultiEditHandler());
     }
 
     public function GetReturnUrl() {
-        $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_PARAMNAME, 'return');
-        return $linkBuilder->GetLink();
+        return $this->getActionLink(OPERATION_PARAMNAME, OPERATION_RETURN);
     }
 
     public function GetInsertUrl() {
+        return $this->getActionLink(OPERATION_PARAMNAME, OPERATION_INSERT);
+    }
+
+    private function getActionLink($parameterName, $parameterValue) {
         $linkBuilder = $this->CreateLinkBuilder();
-        $linkBuilder->AddParameter(OPERATION_PARAMNAME, OPERATION_INSERT);
+        $linkBuilder->AddParameter($parameterName, $parameterValue);
         return $linkBuilder->GetLink();
     }
 
@@ -1000,6 +1093,12 @@ class Grid {
         return $result->GetLink();
     }
 
+    public function GetMultiUploadLink() {
+        $result = $this->CreateLinkBuilder();
+        $result->AddParameter(OPERATION_PARAMNAME, OPERATION_MULTI_UPLOAD);
+        return $result->GetLink();
+    }
+
     function SetShowUpdateLink($value) {
         $this->showUpdateLink = $value;
     }
@@ -1036,19 +1135,13 @@ class Grid {
         return $this->allowCompare;
     }
 
-    /**
-     * @param bool $allowAddMultipleRecords
-     */
-    public function setAllowAddMultipleRecords($allowAddMultipleRecords)
-    {
+    /** @param bool $allowAddMultipleRecords */
+    public function setAllowAddMultipleRecords($allowAddMultipleRecords) {
         $this->allowAddMultipleRecords = $allowAddMultipleRecords;
     }
 
-    /**
-     * @param bool $allowAddMultipleRecords
-     */
-    public function getAllowAddMultipleRecords()
-    {
+    /** @return bool */
+    public function getAllowAddMultipleRecords() {
         return $this->allowAddMultipleRecords;
     }
 
@@ -1078,12 +1171,6 @@ class Grid {
 
         $isSubmitted = false;
 
-        $this->columnFilter->createFilterComponent(
-            $masterConnection,
-            $sourceSelect,
-            $captions
-        );
-
         $isSubmitted = $isSubmitted || $this->processFilterBuilder(
             $this->filterBuilder,
             $superGlobals
@@ -1103,6 +1190,12 @@ class Grid {
             $this->quickFilter->getFilterComponent()
         );
 
+        $this->columnFilter->createFilterComponent(
+            $masterConnection,
+            $sourceSelect,
+            $captions
+        );
+
         $isSubmitted = $isSubmitted || $this->processColumnFilter(
             $this->columnFilter,
             $masterConnection,
@@ -1115,7 +1208,28 @@ class Grid {
             $this->columnFilter->getFilterComponent()
         );
 
+        $this->processSelectionFilter($superGlobals);
+
         return $isSubmitted;
+    }
+
+    private function processSelectionFilter(SuperGlobals $superGlobals) {
+        $selectionFilter = array(
+            'condition' => '',
+            'keys' => array()
+        );
+        $id = 'selection_filter';
+
+        if ($superGlobals->isGetValueSet($id)) {
+            $selectionFilter['condition'] = $superGlobals->getGetValue($id);
+            $selectionFilter['keys'] = $superGlobals->getGETValueDef('keys', array());
+        } else {
+            $selectionFilter = array_merge($selectionFilter, $superGlobals->getSessionVariableDef($this->getId() . $id, array()));
+        }
+
+        $this->selectionFilter->deserialize($selectionFilter);
+        $this->selectionFilter->applyFilter($this->dataset);
+        $superGlobals->setSessionVariable($this->getId() . $id, $this->selectionFilter->serialize());
     }
 
     public function clearFilters()
@@ -1200,7 +1314,8 @@ class Grid {
         $disabledChildren = array();
         $nextData['order'] = $prevData['order'];
         foreach ($nextData['children'] as $columnName => $enabledOptions) {
-            if (count($enabledOptions) > 0) {
+            $selectedOptions = array_key_exists('children', $enabledOptions) ? $enabledOptions['children'] : $enabledOptions;
+            if ((count($selectedOptions) > 0) || (array_key_exists('selectedDateTimeValues', $enabledOptions))) {
                 if (!in_array($columnName, $prevData['order'])) {
                     $nextData['order'][] = $columnName;
                 }
@@ -1210,7 +1325,7 @@ class Grid {
         }
 
         $nextData['order'] = array_diff($nextData['order'], $disabledChildren);
-
+        $nextData['order'] = array_intersect($nextData['order'], array_keys($nextData['children']));
         return $nextData;
     }
 
@@ -1239,7 +1354,7 @@ class Grid {
         $filterOperatorParam = 'quick_filter_operator';
         $filterOperator = $superGlobals->isGetValueSet($filterOperatorParam)
             ? $superGlobals->getGetValue($filterOperatorParam)
-            : $superGlobals->getSessionVariableDef($this->getId() . $filterOperatorParam, FilterConditionOperator::IS_LIKE);
+            : $superGlobals->getSessionVariableDef($this->getId() . $filterOperatorParam, FilterConditionOperator::CONTAINS);
 
         $quickFilter->setValue($filterValue);
         $quickFilter->setSelectedFieldNames($filterFields);
@@ -1290,27 +1405,11 @@ class Grid {
         $session->setValue($id, $messages);
     }
 
-    #region Utils
-
-    private $internalStateSwitch = false;
-    private $internalStateSwitchPrimaryKeys = array();
-
-    function SetInternalStateSwitch($primaryKeys) {
-        $this->internalStateSwitch = true;
-        $this->internalStateSwitchPrimaryKeys = $primaryKeys;
-    }
-
     function GetPrimaryKeyValuesFromGet() {
-        if ($this->internalStateSwitch) {
-            return $this->internalStateSwitchPrimaryKeys;
-        } else {
-            $primaryKeyValues = array();
-            ExtractPrimaryKeyValues($primaryKeyValues, METHOD_GET);
-            return $primaryKeyValues;
-        }
+        $primaryKeyValues = array();
+        ExtractPrimaryKeyValues($primaryKeyValues, METHOD_GET);
+        return $primaryKeyValues;
     }
-
-    #endregion
 
     public function GetName() {
         return $this->name;
@@ -1353,12 +1452,24 @@ class Grid {
         return $result[0];
     }
 
-    public function GetAllowOrdering() {
-        return $this->allowOrdering;
+    public function getAllowSortingByClick() {
+        return $this->allowSortingByClick;
     }
 
-    public function SetAllowOrdering($value) {
-        $this->allowOrdering = $value;
+    public function setAllowSortingByClick($value) {
+        $this->allowSortingByClick = $value;
+    }
+
+    public function getAllowSortingByDialog() {
+        return $this->allowSortingByDialog;
+    }
+
+    public function setAllowSortingByDialog($value) {
+        $this->allowSortingByDialog = $value;
+    }
+
+    public function allowSorting() {
+        return $this->allowSortingByClick || $this->allowSortingByDialog;
     }
 
     public function GetEditClientFormLoadedScript() {
@@ -1391,6 +1502,14 @@ class Grid {
 
     public function SetInsertClientEditorValueChangedScript($insertClientEditorValueChangedScript) {
         $this->insertClientEditorValueChangedScript = $insertClientEditorValueChangedScript;
+    }
+
+    public function getCalculateControlValuesScript() {
+        return $this->calculateControlValuesScript;
+    }
+
+    public function setCalculateControlValuesScript($value) {
+        $this->calculateControlValuesScript = $value;
     }
 
     #endregion
@@ -1525,7 +1644,7 @@ class Grid {
     }
 
     private function GetRowStyles($rowValues, &$rowStyle, &$rowClasses) {
-        $cellCssStyles = '';
+        $cellCssStyles = array();
         $cellClasses = array();
         $this->OnExtendedCustomDrawRow->Fire(array($rowValues, &$cellCssStyles, &$rowStyle, &$rowClasses, &$cellClasses));
     }
@@ -1534,13 +1653,12 @@ class Grid {
         $result = array();
         $dataset = $this->GetDataset();
 
-        $editColumnNames = array_map(
-            create_function('$c', 'return $c->GetName();'),
-            array_filter(
-                $this->GetEditColumns(),
-                create_function('$c', 'return $c->getAllowListCellEdit();')
-            )
-        );
+        $editColumnNames = array();
+        foreach ($this->GetEditColumns() as $column) {
+            if ($column->getAllowListCellEdit()) {
+                $editColumnNames[] = $column->GetName();
+            }
+        }
 
         $dataset->Open();
         $lineNumber = $this->GetStartLineNumber();
@@ -1591,7 +1709,8 @@ class Grid {
                 $actionsRowViewData[$operationName] = array(
                     'IconClass' => $operation->GetIconClassByOperationName(),
                     'OperationName' => $operationName,
-                    'Data' => $operation->GetValue()
+                    'Data' => $operation->GetValue(),
+                    'LinkTarget' => $this->getOperationLinkTarget($operationName)
                 );
             }
 
@@ -1647,20 +1766,35 @@ class Grid {
                 return $customTotalValue;
             }
 
+            if ($column instanceof NumberViewColumn) {
+                $totalValue = number_format(
+                    (double) $totalValue,
+                    $column->GetNumberAfterDecimal(),
+                    $column->GetDecimalSeparator(),
+                    $column->GetThousandsSeparator()
+                );
+
+            }
+
             return StringUtils::Format('%s = %s', $aggregate, $totalValue);
         }
         return '';
     }
 
-    private function GetTotalsViewData() {
-        if ($this->HasTotals()) {
+    /**
+     * @param AbstractViewColumn[] $columns
+     * @return array|null
+     */
+    public function getTotalsViewData($columns) {
+        if (!$this->RequestFilterFromUser() and $this->HasTotals()) {
             $result = array();
             $totalValues = $this->GetTotalValues();
-            foreach ($this->GetViewColumns() as $column) {
+            foreach ($columns as $column) {
                 $result[] = array(
                     'Classes' => $column->GetGridColumnClass(),
                     'Caption' => $column->getCaption(),
-                    'Value' => $this->GetTotalDataForColumn($column, $totalValues)
+                    'Value' => $this->GetTotalDataForColumn($column, $totalValues),
+                    'Align' => $column->GetAlign()
                 );
             }
             return $result;
@@ -1683,12 +1817,12 @@ class Grid {
         if ($this->GetShowLineNumbers()) {
             $result->AddAttrValue('data-start-line-number', $this->GetStartLineNumber());
         }
-
         return $result->GetAsString();
     }
 
-    private function RequestFilterFromUser() {
-        return $this->GetPage()->isFilterConditionRequired()
+    public function RequestFilterFromUser() {
+        return !$this->isMaster()
+            && $this->GetPage()->isFilterConditionRequired()
             && $this->getFilterBuilder()->isCommandFilterEmpty()
             && $this->getColumnFilter()->isCommandFilterEmpty()
             && $this->getQuickFilter()->isCommandFilterEmpty();
@@ -1715,7 +1849,7 @@ class Grid {
         $viewColumnGroup = $this->getViewColumnGroup();
         $columns = $viewColumnGroup->getLeafs();
         foreach($columns as $column) {
-            if ($column->ShowOrderingControl()) {
+            if ($column->allowSorting()) {
                 $sortableColumn = array(
                     'name' => $column->getFieldName(),
                     'index' => $column->getSortIndex(),
@@ -1743,23 +1877,28 @@ class Grid {
             'FilterBuilder' => $this->filterBuilder,
             'QuickFilter' => $this->quickFilter,
             'ColumnFilter' => $this->columnFilter,
+            'SelectionFilter' => $this->selectionFilter,
 
             'AllowDeleteSelected' => $this->GetAllowDeleteSelected(),
             'AllowCompare' => $this->GetAllowCompare(),
             'AllowPrintSelected' => $this->GetPage()->getAllowPrintSelectedRecords(),
+            'PrintLinkTarget' => $this->GetPage()->getPrintLinkTarget(),
+            'MultiEditAllowed' => $this->getMultiEditAllowed(),
+            'UseModalMultiEdit' => $this->getUseModalMultiEdit(),
             'AllowSelect' => $this->getAllowSelect(),
-
+            'AllowExportSelected' => $this->GetPage()->getAllowExportSelectedRecords(),
+            'AllowMultiUpload' => $this->getAllowMultiUpload(),
+            'ReloadPageAfterAjaxOperation' => $this->getReloadPageAfterAjaxOperation(),
+            'SelectionFilters' => array_keys($this->selectionFilters),
+            'SelectionFilterAllowed' => $this->selectionFilterAllowed,
             // Action panel
-            'ActionsPanelAvailable' =>
-                ($this->GetShowAddButton()) ||
-                ($this->GetAllowCompare()) ||
-                ($this->GetAllowDeleteSelected()) ||
-                ($this->GetShowUpdateLink()),
+            'ActionsPanelAvailable' => $this->getActionsPanelAvailability(),
 
             'Links' => array(
                 'ModalInsertDialog' => $this->GetInsertPageAction(),
                 'SimpleAddNewRow' => $this->GetAddRecordLink(),
                 'Refresh' => $parentPage->GetLink(),
+                'MultiUpload' => $this->GetMultiUploadLink(),
             ),
 
             'ActionsPanel' => array(
@@ -1787,7 +1926,7 @@ class Grid {
             'ShowLineNumbers' => $this->GetShowLineNumbers(),
 
             'Rows' => $rows,
-            'Totals' => $this->GetTotalsViewData(),
+            'Totals' => $this->getTotalsViewData($this->GetViewColumns()),
 
             'Messages' => $this->getMessages(),
             'ErrorMessages' => $this->getErrorMessages(),
@@ -1795,7 +1934,8 @@ class Grid {
             'DataSortPriority' => $this->getSortedColumns(),
 
             'EnableRunTimeCustomization' => $this->enableRunTimeCustomization,
-            'EnableSortDialog' => !$this->isMaster() && $this->enableSortDialog,
+            'EnableSortDialog' => $this->getEnableSortDialog(),
+            'allowSortingByClick' => !$this->isMaster() && $this->allowSorting() && $this->allowSortingByClick,
             'ViewModeList' => ViewMode::getList(),
             'ViewMode' => $this->GetViewMode(),
             'CardCountInRow' => $this->GetCardCountInRow(),
@@ -1807,7 +1947,23 @@ class Grid {
     }
 
     private function getAllowSelect() {
-        return !$this->isMaster() && ($this->GetAllowCompare() || $this->GetAllowDeleteSelected() || $this->GetPage()->getAllowPrintSelectedRecords());
+        return !$this->isMaster() && ($this->GetAllowCompare() || $this->GetAllowDeleteSelected() ||
+            $this->GetPage()->getAllowPrintSelectedRecords() || $this->GetPage()->getAllowExportSelectedRecords() ||
+            $this->getMultiEditAllowed() || (count($this->selectionFilters) > 0));
+    }
+
+    private function getActionsPanelAvailability() {
+        return ($this->GetShowAddButton()) ||
+            ($this->getAllowMultiUpload()) ||
+            ($this->GetShowUpdateLink()) ||
+            ($this->GetPage()->getExportListAvailable()) ||
+            ($this->GetPage()->getPrintListAvailable()) ||
+            ($this->getAllowSelect()) ||
+            ($this->filterBuilder->hasColumns()) ||
+            ($this->getEnableSortDialog()) ||
+            ($this->enableRunTimeCustomization) ||
+            ($this->GetPage()->getDetailedDescription() !== '') ||
+            ($this->quickFilter->hasColumns());
     }
 
     public function GetInsertViewData() {
@@ -1825,12 +1981,13 @@ class Grid {
             'ClientOnLoadScript' => $this->GetInsertClientFormLoadedScript(),
             'ClientValidationScript' => $this->GetInsertClientValidationScript(),
             'ClientValueChangedScript' => $this->GetInsertClientEditorValueChangedScript(),
+            'ClientCalculateControlValuesScript' => $this->getCalculateControlValuesScript(),
             'CancelUrl' => $this->GetReturnUrl(),
             'InsertUrl' => $this->GetInsertUrl(),
             'Title' => $this->resolveFormTitle(
                 $this->GetPage()->GetLocalizerCaptions()->GetMessageString('AddNewRecord'),
                 $this->GetPage()->GetInsertFormTitle(),
-                $this->getFormColumnsReplacements($this->GetInsertColumns())
+                array()
             ),
             'Details' => $detailViewData,
             'Messages' => $this->getMessages(),
@@ -1839,13 +1996,39 @@ class Grid {
         );
     }
 
+    public function operationIsEnabled($operationName) {
+        foreach ($this->getActions()->getOperations() as $operation) {
+            if ($operationName == $operation->GetName()) {
+                return true;
+            }
+        }
+        if ($operationName == 'insert') {
+            return $this->GetShowAddButton();
+        }
+        return false;
+    }
+
+    public function GetMultiUploadViewData() {
+        return
+            array(
+                'FormId' => 'Form' . uniqid(),
+                'FormAction' => $this->GetMultiUploadPageAction(),
+                'FormLayout' => $this->getMultiUploadFormLayout(),
+                'Title' => $this->GetPage()->GetLocalizerCaptions()->GetMessageString('UploadFiles'),
+                'CancelUrl' => $this->GetReturnUrl(),
+                'Messages' => $this->getMessages(),
+                'ErrorMessages' => $this->getErrorMessages(),
+                'AllowAddMultipleRecords' => false
+            );
+    }
+
     public function GetInlineInsertViewData() {
         return array_merge($this->GetInsertViewData(), array(
             'FormLayout' => $this->getInlineInsertFormLayout(),
         ));
     }
 
-    public function GetEditViewData() {
+    public function GetCommonEditViewData() {
         $detailViewData = array();
         foreach ($this->details as $detail) {
             $linkBuilder = $this->CreateLinkBuilder();
@@ -1860,23 +2043,52 @@ class Grid {
 
         return array(
             'FormId' => 'Form' . uniqid(),
-            'FormAction' => $this->GetEditPageAction(),
-            'FormLayout' => $this->getEditFormLayout(),
             'ClientOnLoadScript' => $this->GetEditClientFormLoadedScript(),
             'ClientValidationScript' => $this->GetEditClientValidationScript(),
             'ClientValueChangedScript' => $this->GetEditClientEditorValueChangedScript(),
+            'ClientCalculateControlValuesScript' => $this->getCalculateControlValuesScript(),
             'CancelUrl' => $this->GetReturnUrl(),
             'InsertUrl' => $this->GetInsertUrl(),
             'Details' => $detailViewData,
-            'Title' => $this->resolveFormTitle(
-                $this->GetPage()->GetLocalizerCaptions()->GetMessageString('Edit'),
-                $this->GetPage()->GetEditFormTitle(),
-                $this->getFormColumnsReplacements($this->GetEditColumns())
-            ),
             'Messages' => $this->getMessages(),
             'ErrorMessages' => $this->getErrorMessages(),
             'AllowAddMultipleRecords' => false,
         );
+    }
+
+    public function GetEditViewData() {
+        return
+            array_merge(
+                $this->GetCommonEditViewData(),
+                array(
+                    'FormAction' => $this->GetEditPageAction(),
+                    'FormLayout' => $this->getEditFormLayout(),
+                    'Title' => $this->resolveFormTitle(
+                        $this->GetPage()->GetLocalizerCaptions()->GetMessageString('Edit'),
+                        $this->GetPage()->GetEditFormTitle(),
+                        $this->getFormColumnsReplacements($this->GetEditColumns())
+                    )
+                )
+            );
+    }
+
+    public function GetMultiEditViewData() {
+        if (!$this->getIncludeAllFieldsForMultiEditByDefault()) {
+            foreach ($this->GetMultiEditColumns() as $column) {
+                $column->setEnabled(false);
+            }
+        }
+        return
+            array_merge(
+                $this->GetCommonEditViewData(),
+                array(
+                    'FormAction' => $this->GetMultiEditPageAction(),
+                    'FormLayout' => $this->getMultiEditFormLayout(),
+                    'Title' => $this->GetPage()->GetLocalizerCaptions()->GetMessageString('MultiEdit'),
+                    'MultiEditColumns' => $this->GetMultiEditColumns(),
+                    'AllFieldsToBeUpdatedByDefault' => $this->getIncludeAllFieldsForMultiEditByDefault()
+                )
+            );
     }
 
     public function GetInlineEditViewData() {
@@ -1909,7 +2121,7 @@ class Grid {
         if ($this->GetDataset()->Next()) {
             $primaryKeyMap = $this->GetDataset()->GetPrimaryKeyValuesMap();
             $titleReplacements = array();
-            foreach ($this->GetExportColumns() as $column) {
+            foreach ($this->GetExportColumns(true) as $column) {
                 $titleReplacements['%' . $this->GetColumnName($column) . '%'] = $column->getValue();
             }
 
@@ -1925,7 +2137,7 @@ class Grid {
         }
     }
 
-    public function GetViewSingleRowViewData()
+    public function GetViewSingleRowViewData($isInline = false)
     {
         $detailViewData = array();
         $this->GetDataset()->Open();
@@ -1947,17 +2159,20 @@ class Grid {
                 );
             }
 
-            $layout = $this->getViewFormLayout();
+            if ($isInline) {
+                $layout = $this->getInlineViewFormLayout();
+            } else {
+                $layout = $this->getViewFormLayout();
+            }
             $cellEditUrls = array();
 
             if ($this->allowDisplayEditButtonOnViewForm()) {
-                $editColumnNames = array_map(
-                    create_function('$c', 'return $c->GetName();'),
-                    array_filter(
-                        $this->GetEditColumns(),
-                        create_function('$c', 'return $c->getAllowSingleViewCellEdit();')
-                    )
-                );
+                $editColumnNames = array();
+                foreach ($this->GetEditColumns() as $column) {
+                    if ($column->getAllowSingleViewCellEdit()) {
+                        $editColumnNames[] = $column->GetName();
+                    }
+                }
 
                 $viewColumns = $layout->getColumns();
                 foreach (array_intersect(array_keys($viewColumns), $editColumnNames) as $name) {
@@ -1966,17 +2181,19 @@ class Grid {
             }
 
             return array(
+                'Id' => $this->GetId(),
                 'Details' => $detailViewData,
                 'HasEditGrant' => $this->allowDisplayEditButtonOnViewForm(),
                 'CancelUrl' => $this->GetReturnUrl(),
                 'EditUrl' => $this->GetEditCurrentRecordLink($primaryKeys),
                 'PrintOneRecord' => $this->GetPage()->GetPrintOneRecordAvailable(),
                 'PrintRecordLink' => $linkBuilder->GetLink(),
+                'PrintLinkTarget' => $this->GetPage()->getPrintLinkTarget(),
                 'ExportButtons' => $this->GetPage()->getExportOneRecordButtonsViewData($primaryKeys),
                 'Title' => $this->resolveFormTitle(
                     $this->GetPage()->GetLocalizerCaptions()->GetMessageString('View'),
                     $this->GetPage()->GetViewFormTitle(),
-                    $this->getViewColumnsReplacements($this->GetSingleRecordViewColumns())
+                    $this->getViewColumnsReplacements($this->GetSingleRecordViewColumns(true))
                 ),
                 'CellEditUrls' => $cellEditUrls,
                 'PrimaryKeyMap' => $primaryKeyMap,
@@ -2005,7 +2222,7 @@ class Grid {
         $columnsDiff = array();
         $dataset = $this->GetDataset();
         $dataset->Open();
-        $primaryKeyFields = $dataset->getPrimaryKeyFields();
+        $primaryKeyFields = $dataset->getPrimaryKeyFieldNames();
         $isDiffers = false;
 
         if (!is_null(ArrayWrapper::createGetWrapper()->getValue('keys'))) {
@@ -2109,7 +2326,6 @@ class Grid {
         $replacements = array();
 
         foreach ($columns as $column) {
-            $column->SetControlValuesFromDataset();
             $replacements['%' . $column->GetFieldName() . '%'] = $column->GetEditControl()->GetDisplayValue();
         }
 
@@ -2219,11 +2435,6 @@ class Grid {
     public function getEnableRunTimeCustomization()
     {
         return $this->enableRunTimeCustomization;
-    }
-
-    public function setEnableSortDialog($value)
-    {
-        $this->enableSortDialog = (bool) $value;
     }
 
     public function SetCardCountInRow($value) {
@@ -2375,10 +2586,10 @@ class Grid {
     public function getViewColumnGroup()
     {
         $columns = $this->GetViewColumns();
-        $columnNames = array_map(
-            create_function('$l', 'return $l->getName();'),
-            $this->viewColumnGroup->getLeafs()
-        );
+        $columnNames = array();
+        foreach ($this->viewColumnGroup->getLeafs() as $leaf) {
+            $columnNames[] = $leaf->getName();
+        }
 
         foreach ($columns as $column) {
             if (!in_array($column->getName(), $columnNames)) {
@@ -2403,142 +2614,14 @@ class Grid {
     }
 
     /**
-     * @param FormLayout $layout
-     */
-    public function setViewFormLayout(FormLayout $layout)
-    {
-        $this->viewFormLayout = $layout;
-    }
-
-    /**
-     * @return FormLayout
-     */
-    public function getViewFormLayout()
-    {
-        return $this->fillFormLayout($this->viewFormLayout, $this->GetSingleRecordViewColumns());
-    }
-
-    /**
-     * @param FormLayout $layout
-     */
-    public function setInsertFormLayout(FormLayout $layout)
-    {
-        $this->insertFormLayout = $layout;
-    }
-
-    /**
-     * @return FormLayout
-     */
-    public function getInsertFormLayout()
-    {
-        return $this->fillFormLayout($this->insertFormLayout, $this->GetInsertColumns());
-    }
-
-    /**
-     * @param FormLayout $layout
-     */
-    public function setEditFormLayout(FormLayout $layout)
-    {
-        $this->editFormLayout = $layout;
-    }
-
-    /**
-     * @return FormLayout
-     */
-    public function getEditFormLayout()
-    {
-        return $this->fillFormLayout($this->editFormLayout, $this->GetEditColumns());
-    }
-
-    /**
-     * @param FormLayout $layout
-     */
-    public function setInlineInsertFormLayout(FormLayout $layout)
-    {
-        $this->inlineInsertFormLayout = $layout;
-    }
-
-    /**
-     * @param FormLayout $layout
-     */
-    public function setInlineEditFormLayout(FormLayout $layout)
-    {
-        $this->inlineEditFormLayout = $layout;
-    }
-
-    /**
-     * @return FormLayout
-     */
-    public function getInlineInsertFormLayout()
-    {
-        return $this->fillInlineFormLayout($this->inlineInsertFormLayout, $this->GetInsertColumns());
-    }
-
-    /**
-     * @return FormLayout
-     */
-    public function getInlineEditFormLayout()
-    {
-        return $this->fillInlineFormLayout($this->inlineEditFormLayout, $this->GetEditColumns());
-    }
-
-    /**
-     * @param FormLayout        $layout
      * @param ColumnInterface[] $columns
-     *
-     * @return FormLayout
-     */
-    private function fillFormLayout(FormLayout $layout, $columns)
-    {
-        $columnNames = $layout->getColumnNames();
-        $group = $layout->addGroup();
-
-        foreach ($columns as $column) {
-            if (!in_array($column->GetName(), $columnNames)) {
-                $group->addRow()->addCol($column);
-            }
-        }
-
-        return $layout;
-    }
-
-    private function fillInlineFormLayout(FormLayout $layout, $columns)
-    {
-        if ($this->GetViewMode() === ViewMode::CARD) {
-            return $this->fillFormLayout($layout, $columns);
-        }
-
-        $columnNames = $layout->getColumnNames();
-
-        if (count($columnNames) > 0) {
-            return $this->fillFormLayout($layout, $columns);
-        }
-
-        $groups = array(
-            $layout->addGroup(null, 6),
-            $layout->addGroup(null, 6)
-        );
-
-        foreach ($columns as $i => $column) {
-            $groups[$i%2]->addRow()->addCol($column);
-        }
-
-        return $layout;
-    }
-
-    /**
-     * @param ColumnInterface[] $columns
-     *
      * @return array
      */
-    static public function getNamedColumns($columns)
-    {
+    static public function getNamedColumns($columns) {
         $namedColumns = array();
-
         foreach ($columns as $column) {
             $namedColumns[$column->getName()] = $column;
         }
-
         return $namedColumns;
     }
 
@@ -2565,4 +2648,288 @@ class Grid {
     {
         return $this->GetId() . '_' . $this->getPage()->getViewId();
     }
+
+    private function getEnableSortDialog() {
+        return !$this->isMaster() && $this->allowSorting() && $this->allowSortingByDialog;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setMultiEditAllowed($value) {
+        $this->multiEditAllowed = $value;
+        return $this;
+    }
+
+    /** @return bool */
+    public function getMultiEditAllowed() {
+        return $this->multiEditAllowed;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setUseModalMultiEdit($value) {
+        $this->useModalMultiEdit = $value;
+        return $this;
+    }
+
+    /** @return bool */
+    public function getUseModalMultiEdit() {
+        return $this->useModalMultiEdit;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIncludeAllFieldsForMultiEditByDefault($value) {
+        $this->includeAllFieldsForMultiEditByDefault = $value;
+        return $this;
+    }
+
+    /** @return bool */
+    public function getIncludeAllFieldsForMultiEditByDefault() {
+        return $this->includeAllFieldsForMultiEditByDefault;
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setAllowMultiUpload($value) {
+        $this->allowMultiUpload = $value;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowMultiUpload() {
+        return $this->allowMultiUpload && !$this->isMaster();
+    }
+
+    /** @return bool */
+    public function getReloadPageAfterAjaxOperation() {
+        return $this->reloadPageAfterAjaxOperation;
+    }
+
+    /** @var bool @value */
+    public function setReloadPageAfterAjaxOperation($value) {
+        $this->reloadPageAfterAjaxOperation = $value;
+    }
+
+    public function prepareSelectionFilters(FixedKeysArray $columns) {
+        $this->OnGetSelectionFilters->Fire(array(
+            $columns,
+            &$this->selectionFilters
+        ));
+    }
+
+    /** @return FilterComponentInterface[] */
+    public function getSelectionFilters() {
+        return $this->selectionFilters;
+    }
+
+    /** @return bool */
+    public function getSelectionFilterAllowed() {
+        return $this->selectionFilterAllowed;
+    }
+
+    /** @var bool @value */
+    public function setSelectionFilterAllowed($value) {
+        $this->selectionFilterAllowed = $value;
+    }
+
+    private function getOperationLinkTarget($operation) {
+        if ($operation == OPERATION_PRINT_ONE) {
+            return $this->GetPage()->getPrintLinkTarget();
+        } elseif ($operation == OPERATION_PDF_EXPORT_RECORD) {
+            return $this->GetPage()->getExportToPdfLinkTarget();
+        } else {
+            return '';
+        }
+    }
+
+    #region Form Layouts
+
+    /** @param FormLayout $layout */
+    public function setViewFormLayout($layout) {
+        $this->viewFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getViewFormLayout() {
+        if (!$this->viewFormLayout) {
+            $this->viewFormLayout = $this->getFormLayout('view', $this->GetSingleRecordViewColumns());
+        }
+        return $this->viewFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setInsertFormLayout($layout) {
+        $this->insertFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getInsertFormLayout() {
+        if (!$this->insertFormLayout) {
+            $this->insertFormLayout = $this->getFormLayout('insert', $this->GetInsertColumns());
+        }
+        return $this->insertFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setEditFormLayout($layout) {
+        $this->editFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getEditFormLayout() {
+        if (!$this->editFormLayout) {
+            $this->editFormLayout = $this->getFormLayout('edit', $this->GetEditColumns());
+        }
+        return $this->editFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setMultiEditFormLayout($layout) {
+        $this->multiEditFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getMultiEditFormLayout() {
+        if (!$this->multiEditFormLayout) {
+            $this->multiEditFormLayout = $this->getFormLayout('multi_edit', $this->GetMultiEditColumns());
+        }
+        return $this->multiEditFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setInlineInsertFormLayout($layout) {
+        $this->inlineInsertFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getInlineInsertFormLayout() {
+        if (!$this->inlineInsertFormLayout) {
+            $this->inlineInsertFormLayout = $this->getInlineFormLayout('inline_insert', $this->GetInsertColumns());
+        }
+        return $this->inlineInsertFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setInlineEditFormLayout($layout) {
+        $this->inlineEditFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getInlineEditFormLayout() {
+        if (!$this->inlineEditFormLayout) {
+            $this->inlineEditFormLayout = $this->getInlineFormLayout('inline_edit', $this->GetEditColumns());
+        }
+        return $this->inlineEditFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setInlineViewFormLayout($layout) {
+        $this->inlineViewFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getInlineViewFormLayout() {
+        if (!$this->inlineViewFormLayout) {
+            $this->inlineViewFormLayout = $this->getInlineFormLayout('inline_view', $this->GetSingleRecordViewColumns());
+        }
+        return $this->inlineViewFormLayout;
+    }
+
+    /** @param FormLayout $layout */
+    public function setMultiUploadFormLayout($layout) {
+        $this->multiUploadFormLayout = $layout;
+    }
+
+    /** @return FormLayout */
+    public function getMultiUploadFormLayout() {
+        if (!$this->multiUploadFormLayout) {
+            $this->multiUploadFormLayout = new FormLayout();
+            $this->tuneFormLayout($this->multiUploadFormLayout, $this->GetMultiUploadColumns());
+        }
+        return $this->multiUploadFormLayout;
+    }
+
+    /**
+     * @param string $mode
+     * @param ColumnInterface[] $columns
+     * @return FormLayout
+     */
+    private function getFormLayout($mode, $columns) {
+        $layout = new FormLayout();
+        $this->OnGetCustomFormLayout->Fire(array($mode, new FixedKeysArray(self::getNamedColumns($columns)), $layout));
+        $this->tuneFormLayout($layout, $columns);
+        return $layout;
+    }
+
+    /**
+     * @param string $mode
+     * @param ColumnInterface[] $columns
+     * @return FormLayout
+     */
+    private function getInlineFormLayout($mode, $columns) {
+        $layout = new FormLayout(FormLayoutMode::VERTICAL);
+        $this->OnGetCustomFormLayout->Fire(array($mode, new FixedKeysArray(self::getNamedColumns($columns)), $layout));
+        $this->tuneInlineFormLayout($layout, $columns);
+        return $layout;
+    }
+
+    /**
+     * @param FormLayout        $layout
+     * @param ColumnInterface[] $columns
+     */
+    private function tuneFormLayout($layout, $columns) {
+        $columnNames = $layout->getColumnNames();
+        if ($layout->tabsEnabled()) {
+            $tab = $layout->addTab('Default');
+            $group = $tab->addGroup();
+        } else {
+            $group = $layout->addGroup();
+        }
+
+        foreach ($columns as $column) {
+            if (!in_array($column->GetName(), $columnNames)) {
+                $group->addRow()->addCol($column);
+            }
+        }
+    }
+
+    /**
+     * @param FormLayout        $layout
+     * @param ColumnInterface[] $columns
+     */
+    private function tuneInlineFormLayout($layout, $columns) {
+        if ($this->GetViewMode() === ViewMode::CARD) {
+            $this->tuneFormLayout($layout, $columns);
+            return;
+        }
+
+        $columnNames = $layout->getColumnNames();
+
+        if (count($columnNames) > 0) {
+            $this->tuneFormLayout($layout, $columns);
+        } else {
+            $groups = array(
+                $layout->addGroup(null, 6),
+                $layout->addGroup(null, 6)
+            );
+
+            foreach ($columns as $i => $column) {
+                $groups[$i%2]->addRow()->addCol($column);
+            }
+        }
+    }
+
+    #endregion
+
 }

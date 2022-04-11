@@ -106,7 +106,7 @@ abstract class DetailPage extends Page
             $this->dataset->SetMasterFieldValue($field, $this->foreignKeyValues[$i]);
         }
 
-        $this->masterDataset->GetSelectCommand()->ClearFieldFilters();
+        $this->masterDataset->GetSelectCommand()->ClearAllFilters();
         foreach ($this->masterKeyFields as $i => $masterField) {
             $this->masterDataset->AddFieldFilter($masterField, new FieldFilter($this->foreignKeyValues[$i], '='));
             $this->masterDataset->SetMasterFieldValue($masterField, $this->foreignKeyValues[$i]);
@@ -201,7 +201,8 @@ abstract class DetailPage extends Page
         return ArrayWrapper::createGetWrapper()->getValue('inline', false);
     }
 
-    public function getNavigation(array $fieldValues = array())
+    /** @inheritdoc */
+    public function getNavigation($fieldValues = array())
     {
         if ($fieldValues) {
             $this->foreignKeyValues = $fieldValues;

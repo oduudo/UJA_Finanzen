@@ -10,6 +10,7 @@ class PageLink {
     private $description;
     private $classAttribute;
     private $target;
+    private $pageId;
 
     /**
      * @param string $caption
@@ -20,8 +21,9 @@ class PageLink {
      * @param string $groupName
      * @param string $description
      * @param string $target
+     * @param string $pageId
      */
-    public function __construct($caption, $link, $hint = '', $showAsText = false, $beginNewGroup = false, $groupName = '', $description = '', $classAttribute = '', $target = null)
+    public function __construct($caption, $link, $hint = '', $showAsText = false, $beginNewGroup = false, $groupName = '', $description = '', $classAttribute = '', $target = null, $pageId = '')
     {
         $this->caption = $caption;
         $this->link = $link;
@@ -32,6 +34,7 @@ class PageLink {
         $this->description = $description;
         $this->classAttribute = $classAttribute;
         $this->target = $target;
+        $this->pageId = $pageId;
     }
 
     public function GetGroupName()
@@ -150,6 +153,26 @@ class PageLink {
         return $this->target;
     }
 
+    /**
+     * @param string $pageId
+     *
+     * @return $this
+     */
+    public function setPageId($pageId)
+    {
+        $this->pageId = $pageId;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPageId()
+    {
+        return $this->pageId;
+    }
+
     public function GetViewData()
     {
         return array(
@@ -197,9 +220,9 @@ class PageList {
     const TYPE_SIDEBAR = 'type_sidebar';
     const TYPE_MENU = 'type_menu';
 
-    /**
-     * @var PageLink[]
-     */
+    /** @var CommonPage */
+    private $parentPage;
+    /** @var PageLink[] */
     private $pages;
     private $currentPageOptions;
     private $currentPageRss;
@@ -213,52 +236,48 @@ class PageList {
         $this->currentPageOptions = array();
         $this->currentPageRss = null;
         $this->groups = array();
+        if ($this->parentPage) {
+            $this->createMenu();
+        }
     }
 
-    /**
-     * @param CommonPage $page
-     *
-     * @return PageList
-     */
-    public static function createForPage(CommonPage $page)
-    {
-        $currentPageFilename = $page->GetPageFileName();
-        $pageList = new PageList($page);
+    private function createMenu() {
+        $currentPageFilename = $this->parentPage->GetPageFileName();
 
         $pageGroups = GetPageGroups();
         foreach ($pageGroups as $group) {
-            $pageList->addGroupEx(new PageGroup($page->RenderText($group['caption']), $page->RenderText($group['description'])));
+            $this->addGroupEx(new PageGroup($group['caption'], $group['description']));
         }
 
         $pageInfos = GetPageInfos();
         foreach($pageInfos as $pageInfo) {
-            if (!GetCurrentUserGrantForDataSource($pageInfo['name'])->HasViewGrant()) {
+            if (!GetCurrentUserPermissionsForPage($pageInfo['name'])->HasViewGrant()) {
                 continue;
             }
 
-            $groupName = $page->RenderText($pageInfo['group_name']);
-            if (!$pageList->hasGroup($groupName)) {
-                $pageList->AddGroup($groupName);
+            $groupName = $pageInfo['group_name'];
+            if (!$this->hasGroup($groupName)) {
+                $this->AddGroup($groupName);
             }
 
-            $shortCaption = $page->RenderText($pageInfo['short_caption']);
-            $pageList->AddPage(new PageLink(
-                $page->RenderText($pageInfo['caption']),
+            $shortCaption = $pageInfo['short_caption'];
+            $this->AddPage(new PageLink(
+                $pageInfo['caption'],
                 $pageInfo['filename'],
                 $shortCaption,
                 $currentPageFilename == $pageInfo['filename'],
                 $pageInfo['add_separator'],
-                $page->RenderText($pageInfo['group_name']),
-                isset($pageInfo['description']) ? $page->RenderText($pageInfo['description']) : '',
-                isset($pageInfo['class_attribute']) ? $pageInfo['class_attribute'] : ''
+                $pageInfo['group_name'],
+                isset($pageInfo['description']) ? $pageInfo['description'] : '',
+                isset($pageInfo['class_attribute']) ? $pageInfo['class_attribute'] : '',
+                null,
+                $pageInfo['name']
             ));
         }
 
         if (function_exists('Global_GetCustomPageList')) {
-            Global_GetCustomPageList($page, $pageList);
+            Global_GetCustomPageList($this->parentPage, $this);
         }
-
-        return $pageList;
     }
 
     /**
@@ -291,6 +310,22 @@ class PageList {
     public function AddPage(PageLink $page)
     {
         $this->pages[] = $page;
+    }
+
+    /**
+     * @param string $pageId
+     * @return $this
+     */
+    public function removePage($pageId)
+    {
+        foreach ($this->pages as $key => $page) {
+            if ($page->getPageId() == $pageId) {
+                unset($this->pages[$key]);
+                break;
+            }
+        }
+
+        return $this;
     }
 
     /**

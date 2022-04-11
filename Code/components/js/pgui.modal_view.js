@@ -1,12 +1,16 @@
 define([
     'pgui.field-embedded-video',
     'pgui.cell-edit',
-    'pgui.utils'
-], function(showFieldEmbeddedVideo, initCellEdit, utils) {
+    'pgui.utils',
+    'pgui.image_popup'
+], function(showFieldEmbeddedVideo, initCellEdit, utils, initImagePopup) {
     var $body = $('body');
-    var $modalContainer = $('<div class="modal fade"></div>');
 
-    return function(item) {
+    return function init(item) {
+        if (item.data('modal-view')) {
+            return;
+        }
+        var $modalContainer = $('<div class="modal fade"></div>');
         var contentUrl = item.data('content-link');
         item.click(function (e) {
             e.preventDefault();
@@ -20,9 +24,10 @@ define([
                     .modal();
 
                 showFieldEmbeddedVideo($modalContainer, false, false);
+                initImagePopup($modalContainer);
 
                 $modalContainer.find('[data-edit-url]').each(function (i, el) {
-                    var $el = $(el)
+                    var $el = $(el);
                     var columnName = $el.data('column-name');
                     initCellEdit($el, function (response) {
                         $el.html(response.columns[columnName]);
@@ -33,7 +38,12 @@ define([
                         ));
                     });
                 });
+
+                $modalContainer.find('[data-modal-operation=view]').each(function (i, el) {
+                    init($(el));
+                });
             });
         });
+        item.data('modal-view', true);
     }
 });

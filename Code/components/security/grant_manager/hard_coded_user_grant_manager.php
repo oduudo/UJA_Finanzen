@@ -9,11 +9,14 @@ class HardCodedUserGrantManager extends UserGrantManager {
     private $applicationGrants;
     private $defaultUserName;
 
-    public function __construct(
-        array $dataSourceGrants,
-        array $applicationGrants,
-        $defaultUserName = 'defaultUser',
-        $guestUserName = 'guest') {
+    /**
+     * @param array $dataSourceGrants
+     * @param array $applicationGrants
+     * @param string $defaultUserName
+     * @param string $guestUserName
+     */
+    public function __construct($dataSourceGrants, $applicationGrants, $defaultUserName = 'defaultUser', $guestUserName = 'guest')
+    {
         $this->dataSourceGrants = $dataSourceGrants;
         $this->applicationGrants = $applicationGrants;
         $this->defaultUserName = $defaultUserName;
@@ -102,7 +105,7 @@ class HardCodedUserGrantManager extends UserGrantManager {
     /**
      * @inheritdoc
      */
-    public function GetSecurityInfo($userName, $dataSourceName) {
+    public function GetPermissionSet($userName, $dataSourceName) {
         $result = new PermissionSet(false, false, false, false);
         $grants = $this->FindDataSourceGrants($userName);
 

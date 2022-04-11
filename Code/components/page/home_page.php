@@ -4,20 +4,20 @@ include_once dirname(__FILE__) . '/common_page.php';
 
 class HomePage extends CommonPage
 {
-    /**
-     * @var bool
-     */
-    public $showPageList = true;
-
-    /**
-     * @var string
-     */
+    /** @var string */
     private $selectedGroup;
+
+    /** @var string */
+    private $banner;
 
     public function __construct($grants, $contentEncoding)
     {
         parent::__construct('', $contentEncoding);
         $this->selectedGroup = ArrayWrapper::createGetWrapper()->getValue('group');
+
+        if (function_exists('GetHomePageBanner')) {
+            $this->banner = GetHomePageBanner();
+        }
     }
 
     /**
@@ -34,14 +34,6 @@ class HomePage extends CommonPage
             : $this->selectedGroup;
     }
 
-    /**
-     * @return PageList
-     */
-    public function GetReadyPageList()
-    {
-        return PageList::createForPage($this);
-    }
-
     public function getSelectedGroup()
     {
         return $this->selectedGroup;
@@ -52,24 +44,15 @@ class HomePage extends CommonPage
         $renderer->RenderHomePage($this);
     }
 
-    public function SetShowPageList($showPageList)
-    {
-        $this->showPageList = $showPageList;
-    }
-
-    public function GetShowPageList()
-    {
-        return $this->showPageList;
-    }
-
     public function GetAuthenticationViewData() {
         return array(
-            'Enabled' => function_exists('SetUpUserAuthorization'),
+            'Enabled' => GetApplication()->isAuthenticationEnabled(),
             'LoggedIn' => GetApplication()->IsCurrentUserLoggedIn(),
             'CurrentUser' => array(
                 'Name' => GetApplication()->GetCurrentUser(),
                 'Id' => GetApplication()->GetCurrentUserId(),
             ),
+            'CanChangeOwnPassword' => GetApplication()->GetUserAuthentication()->canUserChangeOwnPassword(),
             'isAdminPanelVisible' => GetApplication()->HasAdminPanelForCurrentUser(),
         );
     }
@@ -83,4 +66,15 @@ class HomePage extends CommonPage
     {
         return GetHomeURL();
     }
+
+    public function setBanner($value)
+    {
+        $this->banner = $value;
+    }
+
+    public function getBanner()
+    {
+        return $this->banner;
+    }
+
 }

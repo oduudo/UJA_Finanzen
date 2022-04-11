@@ -1,6 +1,6 @@
 <?php
 
-include_once("engine.php");
+include_once dirname(__FILE__) . '/' . 'engine.php';
 
 abstract class PDOConnection extends EngConnection
 {
@@ -57,24 +57,22 @@ abstract class PDOConnection extends EngConnection
         return $this->connection->lastInsertId();
     }
 
-    protected function doExecScalarSQL($sql)
-    {
+    public function ExecScalarSQL($sql) {
+        $this->logQuery($sql);
         if ($queryHandle = $this->connection->query($sql)) {
             $row = $queryHandle->fetch(PDO::FETCH_NUM);
-            if ($row === false)
-            {
-                return false;
-            }
-            else
-            {
+            if ($row === false) {
+                $this->raiseSQLStatementReturnsNoRowsException($sql);
+            } else {
                 return $row[0];
             }
+        } else {
+            $this->raiseSQLExecutionException($sql);
         }
-        return false;
     }
 
-	protected  function doExecQueryToArray($sql, &$array)
-	{
+    protected  function doExecQueryToArray($sql, &$array)
+    {
         if ($queryHandle = $this->connection->query($sql)) {
             while ($row = $queryHandle->fetch(PDO::FETCH_ASSOC)) {
                 $array[] = $row;
@@ -221,7 +219,11 @@ class PDODataReader extends EngDataReader
 
     public function GetFieldValueByName($fieldName)
     {
-        return $this->GetActualFieldValue($fieldName, $this->lastFetchedRow[$fieldName]);
+        if ($this->lastFetchedRow) {
+            return $this->GetActualFieldValue($fieldName, $this->lastFetchedRow[$fieldName]);
+        } else {
+            return null;
+        }
     }
 
     protected function LastError()

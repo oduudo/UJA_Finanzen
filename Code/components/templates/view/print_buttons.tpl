@@ -1,4 +1,4 @@
-{if $buttons.print_page or $buttons.print_all}
+{if isset($buttons.print_page) or isset($buttons.print_all)}
     <div class="btn-group">
         <a class="btn btn-default dropdown-toggle" data-toggle="dropdown" href="#" title="{$Captions->GetMessageString('Print')}">
             <i class="icon-print-page"></i>
@@ -10,7 +10,7 @@
             {foreach from=$pageTitleButtons item=printButton key=name}
                 {if $name == 'print_page' or $name == 'print_all'}
                     <li>
-                        <a href="{$printButton.Href|escapeurl}">
+                        <a href="{$printButton.Href|escapeurl}"{$printButton.Target}>
                             <i class="{$printButton.IconClass}"></i>
                             {$printButton.Caption}
                         </a>

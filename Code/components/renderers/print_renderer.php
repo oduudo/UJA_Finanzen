@@ -1,10 +1,6 @@
 <?php
 
-// require_once 'components/renderers/renderer.php';
-// require_once 'components/utils/query_utils.php';
-
 include_once dirname(__FILE__) . '/' . 'renderer.php';
-include_once dirname(__FILE__) . '/' . '../utils/query_utils.php';
 
 abstract class AbstractPrintRenderer extends Renderer
 {
@@ -38,8 +34,11 @@ abstract class AbstractPrintRenderer extends Renderer
 
         while ($Grid->GetDataset()->Next()) {
             $rowValues = $Grid->GetDataset()->GetCurrentFieldValues();
-            $Rows[] = Q::ToArray(Q::Select($Grid->GetPrintColumns(),
-                Q::L('$c => $_1->RenderViewColumn($c, $_2)', $this, $rowValues)));
+            $Row = array();
+            foreach ($Grid->GetPrintColumns() as $column) {
+                $Row[] = $this->RenderViewColumn($column, $rowValues);
+            }
+            $Rows[] = $Row;
         }
 
         $template = $Grid->GetPage()->GetCustomTemplate(PagePart::Grid, $pageMode, $templatePath, $customParams);
@@ -117,17 +116,8 @@ class PrintRenderer extends AbstractPrintRenderer
     {
         $Grid->GetDataset()->Open();
 
-        $totals = array();
-        if ($Grid->HasTotals()) {
-            $totalValues = $Grid->GetTotalValues();
-            foreach($Grid->GetPrintColumns() as $column) {
-                $totals[] = $column->GetTotalPresentationData(
-                    ArrayUtils::GetArrayValueDef($totalValues, $column->GetName(), null));
-            }
-        }
-
         $this->doRenderGrid($Grid, PageMode::PrintAll, 'print/grid.tpl', array(
-            'Totals' => $totals,
+            'Totals' => $Grid->getTotalsViewData($Grid->GetPrintColumns())
         ));
     }
 }

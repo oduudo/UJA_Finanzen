@@ -6,7 +6,7 @@ include_once dirname(__FILE__) . '/../../utils/string_utils.php';
 
 class LookUpEditColumn extends CustomEditColumn
 {
-    /** @var stirng */
+    /** @var string */
     private $linkFieldName;
 
     /** @var string */
@@ -63,7 +63,7 @@ class LookUpEditColumn extends CustomEditColumn
 
     public function IsValueNull()
     {
-        if (GetOperation() == OPERATION_INSERT)
+        if ((GetOperation() == OPERATION_INSERT) || (GetOperation() == OPERATION_MULTI_EDIT))
             return false;
         else
         {
@@ -77,6 +77,12 @@ class LookUpEditColumn extends CustomEditColumn
         foreach($this->GetLookupValues() as $name => $value) {
             $this->GetEditControl()->addChoice($name, $value);
         }
+    }
+
+    /** @inheritdoc */
+    public function setControlValue($value) {
+        $this->PrepareEditorControl();
+        parent::setControlValue($value);
     }
 
     public function SetControlValuesFromDataset()
@@ -101,7 +107,13 @@ class LookUpEditColumn extends CustomEditColumn
     {
         return array_merge(parent::getViewData(), array(
             'NestedInsertFormLink' => $this->insertFormLink,
+            'LinkFieldName' => $this->linkFieldName,
             'DisplayFieldName' => $this->displayFieldName,
         ));
+    }
+
+    /** @return Dataset */
+    public function getLookupDataset() {
+        return $this->lookUpDataset;
     }
 }

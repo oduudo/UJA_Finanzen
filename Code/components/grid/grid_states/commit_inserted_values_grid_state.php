@@ -22,7 +22,7 @@ class CommitInsertedValuesGridState extends AbstractCommitValuesGridState
 
         return array_merge(
             $auxArray,
-            $this->GetDataset()->GetCurrentFieldValues()
+            $this->GetDataset()->GetCurrentFieldValues(false)
         );
     }
 
@@ -37,6 +37,9 @@ class CommitInsertedValuesGridState extends AbstractCommitValuesGridState
     public function ProcessMessages()
     {
         $this->getDataset()->Insert();
+        foreach ($this->getDataset()->getMasterFieldValues() as $fieldName => $value) {
+            $this->getDataset()->SetFieldValueByName($fieldName, $value);
+        }
         $this->doProcessMessages(array());
     }
 
@@ -55,10 +58,5 @@ class CommitInsertedValuesGridState extends AbstractCommitValuesGridState
     protected function getRealEditColumns()
     {
         return $this->grid->GetInsertColumns();
-    }
-
-    public function SetInternalStateSwitch($primaryKeys)
-    {
-        $this->grid->SetInternalStateSwitch($primaryKeys);
     }
 }

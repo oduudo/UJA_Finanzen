@@ -26,7 +26,7 @@ define(['moment'], function (moment) {
             $.each(chart.data.columns, function (j, col) {
                 var value = rowData[j];
 
-                if (col.type === 'date' || col.type === 'datetime') {
+                if ((col.type === 'date' || col.type === 'datetime') && (value !== null)) {
                     value = moment(value).toDate();
                 }
 
@@ -39,7 +39,7 @@ define(['moment'], function (moment) {
         applyFormatters(chart.data.columns, table);
 
         return table;
-    };
+    }
 
 
     function applyFormatters(columns, table) {
@@ -50,7 +50,7 @@ define(['moment'], function (moment) {
         };
 
         $.each(columns, function (i, column) {
-            var Formatter = formatterClasses[transformType(column.type)]
+            var Formatter = formatterClasses[transformType(column.type)];
             if (!column.format || !Formatter) {
                 return;
             }
@@ -65,7 +65,7 @@ define(['moment'], function (moment) {
         type = type || 'string';
         switch (type.toLowerCase()) {
             case 'string':
-                return 'string'
+                return 'string';
             case 'date':
                 return 'date';
             case 'datetime':
@@ -78,27 +78,31 @@ define(['moment'], function (moment) {
     function mergeStyles($container, chartType, options) {
         var textColor = $container.css('color');
         var gridlinesColor = $container.css('border-color');
-        var result = $.extend(true, {
-            backgroundColor: 'none',
-            titleTextStyle: {
-                color: textColor
+        var result = $.extend(true,
+            {
+                backgroundColor: 'none',
+                titleTextStyle: {
+                    color: textColor
+                },
+                vAxis: {
+                    gridlines: {color: gridlinesColor}
+                },
+                hAxis: {
+                    gridlines: {color: gridlinesColor}
+                }
             },
-            vAxis: {
-                gridlines: {color: gridlinesColor}
-            },
-            hAxis: {
-                gridlines: {color: gridlinesColor}
-            }
-        }, options);
+            options
+        );
 
         if (chartType != 'Geo') {
-            result = $.extend(result, {
-                legend:{
-                    textStyle: {
-                        color: textColor,
-                    },
+            result = $.extend(true,
+                {
+                    legend: {
+                        textStyle: {color: textColor}
+                    }
                 },
-            });
+                result
+            );
         }
 
         if (chartType == 'Pie') {
@@ -107,25 +111,43 @@ define(['moment'], function (moment) {
 
         var axisStyles = {
             titleTextStyle: {color: textColor},
-            textStyle: {color: textColor},
+            textStyle: {color: textColor}
         };
 
-        return $.extend(true, {
-            hAxis: axisStyles,
-            vAxis: axisStyles,
-        }, result);
+        return $.extend(true,
+            {},
+            {
+                hAxis: axisStyles,
+                vAxis: axisStyles
+            },
+            result
+        );
+    }
+
+    function googleObjectAvailable() {
+        return (typeof google !== 'undefined' && google);
     }
 
     function drawCharts() {
-        if (!google) {
+        if (!googleObjectAvailable()) {
             return;
         }
 
         $.each(charts, function (i, chartConfig) {
             chartConfig.table = chartConfig.table || getTable(chartConfig);
+
             var $container = $('[data-id=' + chartConfig.id + ']');
             chartConfig.options = mergeStyles($container, chartConfig.type, chartConfig.options);
-            var chart = new google.visualization[chartConfig.type + 'Chart']($container.get(0));
+
+            if (chartConfig.type == 'TreeMap' && ('generateTooltip' in chartConfig)) {
+                window['chartData_' + chartConfig.id].dataTable = chartConfig.table;
+                chartConfig.options.generateTooltip = chartConfig.generateTooltip;
+            }
+            var chartClass = chartConfig.type;
+            if (!['Histogram', 'Gantt', 'Timeline', 'TreeMap'].includes(chartClass)) {
+                chartClass += 'Chart';
+            }
+            var chart = new google.visualization[chartClass]($container.get(0));
             chart.draw(chartConfig.table, chartConfig.options);
         });
     }
@@ -150,7 +172,8 @@ define(['moment'], function (moment) {
                 $chart.data('ready', true);
             });
 
-            google.charts.setOnLoadCallback(drawCharts);
+            if (googleObjectAvailable())
+                google.charts.setOnLoadCallback(drawCharts);
 
             $(window).off('resize', drawCharts).on('resize', drawCharts);
         },

@@ -55,7 +55,7 @@ class PageNavigatorPage {
     }
 
     function GetHint() {
-        return $this->renderText ? $this->page->RenderText($this->hint) : $this->hint;
+        return $this->hint;
     }
 
     function GetPage() {
@@ -67,7 +67,7 @@ class PageNavigatorPage {
     }
 
     function GetPageCaption() {
-        return $this->renderText ? $this->page->RenderText($this->caption) : $this->caption;
+        return $this->caption;
     }
 
     function GetPageLink() {
@@ -123,16 +123,6 @@ class AbstractPageNavigator {
 
     /** @var integer */
     private $currentPageNumber;
-
-    /** @var array */
-    private $ignorePageNavigationOperations = array(
-        OPERATION_PRINT_ALL
-        //, OPERATION_EXCEL_EXPORT
-        //, OPERATION_WORD_EXPORT
-        //, OPERATION_XML_EXPORT
-        //, OPERATION_CSV_EXPORT
-        //, OPERATION_PDF_EXPORT
-    );
 
     function __construct($name, $page, $dataset, $caption, $pageNavigatorList, $prefix = null) {
         $this->name = $name;
@@ -224,9 +214,7 @@ class AbstractPageNavigator {
             $this->ResetPageNumber();
         }
 
-        if (!in_array(GetOperation(), $this->ignorePageNavigationOperations)) {
-            $this->ApplyPageToDataset($this->currentPageNumber, $this->dataset);
-        }
+        $this->ApplyPageToDataset($this->currentPageNumber, $this->dataset);
     }
 
     public function BuildPages(LinkBuilder $linkBuilder) {
@@ -366,6 +354,9 @@ class PageNavigator {
     }
 
     public function GetRowCount() {
+        if ($this->page->GetGrid()->RequestFilterFromUser()) {
+            return 0;
+        }
         if (!isset($this->rowCount))
             $this->rowCount = $this->RetrieveRowCount();
         return $this->rowCount;
@@ -380,11 +371,15 @@ class PageNavigator {
 
     function GetHintForPage($number, $shortCut = null) {
         $page = $number - 1;
-        $rowCount = $this->rowCount;
+        $rowCount = $this->GetRowCount();
         $rowsPerPage = $this->rowsPerPage;
 
         $startRecord = $page * $rowsPerPage + 1;
-        $endRecord = min(array(($page + 1) * $rowsPerPage, $rowCount));
+        if ($rowsPerPage == 0) {
+            $endRecord = $rowCount;
+        } else {
+            $endRecord = min(array(($page + 1) * $rowsPerPage, $rowCount));
+        }
 
         $result = sprintf($this->page->GetLocalizerCaptions()->GetMessageString('RecordsMtoKFromN'),
             $startRecord, $endRecord, $rowCount);

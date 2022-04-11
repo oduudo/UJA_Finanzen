@@ -11,6 +11,12 @@ class SMSQLException extends Exception {
     }
 }
 
+class SMQueryReturnsNoRowsException extends Exception {
+    public function __construct($message) {
+        parent::__construct($message);
+    }
+}
+
 /** @var IEngConnection[] $connectionPool  */
 $connectionPool = array();
 
@@ -442,8 +448,12 @@ abstract class EngConnection implements IEngConnection {
         return false;
     }
 
-    private function raiseSQLExecutionException($sql) {
+    protected function raiseSQLExecutionException($sql) {
         throw new SMSQLException('Cannot execute SQL statement: ' /*. $sql . "\n"*/ . $this->LastError());
+    }
+
+    protected function raiseSQLStatementReturnsNoRowsException($sql) {
+        throw new SMQueryReturnsNoRowsException("SQL statement '$sql' returns no rows");
     }
 
     private function CheckDriverSupported() {
@@ -699,27 +709,6 @@ abstract class EngDataReader implements IEngDataReader {
         return $this->GetConnection()->LastError();
     }
 
-    protected function GetDateTimeFieldValueByName(&$value) {
-        if (isset($value))
-            return SMDateTime::Parse($value, '%Y-%m-%d %H:%M:%S');
-        else
-            return null;
-    }
-
-    protected function GetDateFieldValueByName(&$value) {
-        if (isset($value))
-            return SMDateTime::Parse($value, '%Y-%m-%d');
-        else
-            return null;
-    }
-
-    protected function GetTimeFieldValueByName(&$value) {
-        if (isset($value))
-            return SMDateTime::Parse($value, '%H:%M:%S');
-        else
-            return null;
-    }
-
     /**
      * @param string $fieldName
      * @return mixed
@@ -732,11 +721,11 @@ abstract class EngDataReader implements IEngDataReader {
         if (!isset($fieldInfo))
             return $value;
         if ($fieldInfo->FieldType == ftDateTime)
-            return $this->GetDateTimeFieldValueByName($value);
+            return AnsiSQLStringToDateTime($value);
         elseif ($fieldInfo->FieldType == ftDate)
-            return $this->GetDateFieldValueByName($value);
+            return AnsiSQLStringToDate($value);
         elseif ($fieldInfo->FieldType == ftTime)
-            return $this->GetTimeFieldValueByName($value);
+            return AnsiSQLStringToTime($value);
         else {
             return $value;
         }

@@ -1,7 +1,8 @@
 define([
     'pgui.editors/plain',
-    'underscore'
-], function (PlainEditor, _) {
+    'underscore',
+    'pgui.editors/checkbox'
+], function (PlainEditor, _, CheckBox) {
 
     var inputTemplateString = '<input'
         + ' type="checkbox"'
@@ -10,11 +11,11 @@ define([
         + '<%=caption%>';
 
     var stackedItemTemplate = _.template(
-        '<div class="checkbox"><label>' + inputTemplateString + '</label></div>'
+        '<div class="checkbox js-value"><label>' + inputTemplateString + '</label></div>'
     );
 
     var inlineItemTemplate = _.template(
-        '<label class="checkbox-inline">' + inputTemplateString + '</label>'
+        '<label class="checkbox-inline js-value">' + inputTemplateString + '</label>'
     );
 
     return PlainEditor.extend({
@@ -24,6 +25,14 @@ define([
             this.rootElement.find("input").change(_.bind(function() {
                 this.doChanged();
             }, this));
+
+            this.bind('submit.pgui.nested-insert', function ($insertButton, primaryKey, record) {
+                this.addItem(
+                    record[$insertButton.data('stored-field-name')],
+                    record[$insertButton.data('display-field-name')],
+                    true
+                );
+            }.bind(this));
         },
 
         getValue: function() {
@@ -47,11 +56,19 @@ define([
 
             var checkedValues = value.split(',');
             var index;
+
             this.rootElement.find("input").each(function(i, item) {
+                var isChecked = false;
                 for (index = 0; index < checkedValues.length; ++index) {
                     if ($(item).attr('value') == checkedValues[index]) {
-                        $(item).attr('checked', true);
+                        $(item).prop('checked', true);
+                        isChecked = true;
+                        break;
                     }
+                }
+
+                if (!isChecked) {
+                    $(item).prop('checked', false);
                 }
             });
         },
@@ -79,10 +96,10 @@ define([
         },
 
         clear: function() {
-            this.rootElement.find("label").remove();
+            this.rootElement.find(".checkbox, .checkbox-inline").remove();
         },
 
-        addItem: function(value, caption) {
+        addItem: function(value, caption, checked) {
             var $editor = this.rootElement;
             var isInline = $editor.data('inline');
             var data = {
@@ -91,9 +108,16 @@ define([
                 caption: caption
             };
 
-            $editor.append(
-                ($(isInline ? inlineItemTemplate(data) : stackedItemTemplate(data)))
-            );
+            var $newItem = $(isInline ? inlineItemTemplate(data) : stackedItemTemplate(data));
+            if (typeof(checked) === 'boolean' && checked) {
+                $newItem.find("input").prop('checked', true);
+            }
+
+            if (this.getItemCount() > 0) {
+                $editor.find('.js-value').last().after($newItem);
+            } else {
+                $editor.prepend($newItem);
+            }
 
             return this;
         },

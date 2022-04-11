@@ -1,13 +1,5 @@
 <?php
 
-if (file_exists(dirname(__FILE__) . '/../phpgen_settings.php')) {
-    include_once dirname(__FILE__) . '/../phpgen_settings.php';
-} else {
-    function GetAnsiEncoding() {
-        return 'windows-1251';
-    }
-}
-
 include_once dirname(__FILE__) . '/utils/string_utils.php';
 include_once dirname(__FILE__) . '/utils/system_utils.php';
 
@@ -19,11 +11,7 @@ class Captions
 
     private function __construct($encoding)
     {
-        if ($encoding == null || $encoding == '') {
-            $this->encoding = GetAnsiEncoding();
-        } else {
-            $this->encoding = $encoding;
-        }
+        $this->encoding = $encoding;
 
         $defaultLangTranslations = require($this->getDefaultLangFile());
         $selectedLangTranslations = require($this->getLangFile());
@@ -31,6 +19,10 @@ class Captions
         $this->translations = array_merge($defaultLangTranslations, $selectedLangTranslations);
     }
 
+    /**
+     * @param string $encoding
+     * @return Captions
+     */
     static public function getInstance($encoding)
     {
         if (!isset(self::$instances[$encoding])) {
@@ -38,11 +30,6 @@ class Captions
         }
 
         return self::$instances[$encoding];
-    }
-
-    public function RenderText($text)
-    {
-        return ConvertTextToEncoding($text, GetAnsiEncoding(), $this->encoding);
     }
 
     public function GetEncoding()

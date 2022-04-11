@@ -43,7 +43,7 @@ class ViewAllRenderer extends Renderer
     }
 
     /**
-     * @param Page $Page
+     * @param Page $page
      */
     public function RenderPage(Page $page) {
 
@@ -147,6 +147,15 @@ class ViewAllRenderer extends Renderer
 
     private function getChartsParams(Page $page)
     {
+        if (GetOfflineMode()) {
+            return array(
+                'ChartsBeforeGrid' => null,
+                'ChartsBeforeGridClasses' => '',
+                'ChartsAfterGrid' => null,
+                'ChartsAfterGridClasses' => ''
+            );
+        }
+
         $renderedCharts = array(
             ChartPosition::BEFORE_GRID => array(),
             ChartPosition::AFTER_GRID => array(),
@@ -193,9 +202,14 @@ class ViewAllRenderer extends Renderer
         $template = $this->renderSingleRow ? $selectedTemplates['single'] : $selectedTemplates['grid'];
         $customParams = array();
 
+        $singleRowTemplate = $page->GetCustomTemplate(PagePart::GridRow, PageMode::ViewAll, $selectedTemplates['single'], $customParams);
         if (!$this->renderSingleRow) {
             $template = $page->GetCustomTemplate(PagePart::Grid, PageMode::ViewAll, $template, $customParams);
+        } else {
+            $template = $singleRowTemplate;
         }
+
+        $gridToolbarTemplate = $page->GetCustomTemplate(PagePart::GridToolbar, PageMode::ViewAll, 'list/grid_toolbar.tpl', $customParams);
 
         $this->DisplayTemplate(
             $template,
@@ -207,11 +221,13 @@ class ViewAllRenderer extends Renderer
             array_merge($customParams,
                 array(
                     'isMasterGrid' => $grid->isMaster(),
-                    'SingleRowTemplate' => $page->GetCustomTemplate(PagePart::GridRow, PageMode::ViewAll, $selectedTemplates['single']),
+                    'SingleRowTemplate' => $singleRowTemplate,
+                    'GridToolbarTemplate' => $gridToolbarTemplate,
                     'isInline' => $page->isInline(),
                     'HiddenValues' => $grid->GetHiddenValues(),
                     'Authentication' => $page->GetAuthenticationViewData(),
                     'Columns' => $grid->getViewColumnGroup()->getLeafs(),
+                    'GridViewMode' => $grid->getViewMode() === ViewMode::TABLE ? 'table' : 'card',
                     'CurrentViewMode' => $grid->getViewMode(),
                     'ViewModes' => ViewMode::getList(),
                 )

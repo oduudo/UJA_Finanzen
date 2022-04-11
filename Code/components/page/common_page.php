@@ -8,21 +8,27 @@ include_once dirname(__FILE__) . '/../captions.php';
  */
 abstract class CommonPage
 {
-    private $header;
-    private $footer;
+    /** @var string */
     private $id;
+    /** @var string */
     private $contentEncoding;
-    private $localizerCaptions;
+    /** @var string */
     private $title;
+    /** @var string */
+    private $header;
+    /** @var string */
+    private $footer;
+    /** @var Captions */
+    private $localizerCaptions;
 
-    /**
-     * @var Event
-     */
+    /** @var PageList */
+    private $pageList;
+    /** @var boolean */
+    private $showPageList = false;
+
+    /** @var Event */
     public $OnGetCustomTemplate;
-
-    /**
-     * @var Event
-     */
+    /** @var Event */
     public $OnCustomHTMLHeader;
 
     /**
@@ -30,20 +36,34 @@ abstract class CommonPage
      * @param $id
      * @param $contentEncoding
      */
-    public function __construct($id, $contentEncoding)
-    {
+    public function __construct($id, $contentEncoding) {
         $this->id = $id;
         $this->contentEncoding = $contentEncoding;
 
+        if (function_exists('GetPagesHeader')) {
+            $this->header = GetPagesHeader();
+        }
+        if (function_exists('GetPagesFooter')) {
+            $this->footer = GetPagesFooter();
+        }
+
         $this->OnGetCustomTemplate = new Event();
         $this->OnCustomHTMLHeader = new Event();
+
+        $this->attachCommonEventListeners();
     }
 
-    /**
-     * @return CommonPageViewData
-     */
-    public function getCommonViewData()
-    {
+    private function attachCommonEventListeners() {
+        if (function_exists('Global_GetCustomTemplateHandler')) {
+            $this->OnGetCustomTemplate->AddListener('Global_GetCustomTemplateHandler');
+        }
+        if (function_exists('Global_CustomHTMLHeaderHandler')) {
+            $this->OnCustomHTMLHeader->AddListener('Global_CustomHTMLHeaderHandler');
+        }
+    }
+
+    /** @return CommonPageViewData */
+    public function getCommonViewData() {
         $viewData = new CommonPageViewData();
 
         return $viewData
@@ -53,6 +73,7 @@ abstract class CommonPage
             ->setHeader($this->GetHeader())
             ->setFooter($this->GetFooter())
             ->setCustomHead($this->GetCustomPageHeader())
+            ->setInactivityTimeout(GetInactivityTimeout())
             ->setClientSideScript(
                 'OnBeforeLoadEvent',
                 $this->GetCustomClientScript()
@@ -63,75 +84,63 @@ abstract class CommonPage
             );
     }
 
-    /**
-     * @return string
-     */
-    public function GetPageDirection()
-    {
+    /** @return string */
+    public function GetPageDirection() {
         return null;
     }
 
-    /**
-     * @return string
-     */
-    public function GetContentEncoding()
-    {
+    /** @return string */
+    public function GetContentEncoding() {
         return $this->contentEncoding;
     }
 
-    /**
-     * @return string
-     */
-    public function GetCustomClientScript()
-    {
+    /** @return string */
+    public function GetCustomClientScript() {
         return '';
     }
 
-    /**
-     * @return string
-     */
-    public function GetOnPageLoadedClientScript()
-    {
+    /** @return string */
+    public function GetOnPageLoadedClientScript() {
         return '';
     }
 
-    public function GetTitle()
-    {
-        return $this->RenderText($this->title);
+    /** @return string */
+    public function GetPageId() {
+        return $this->id;
     }
 
-    public function SetTitle($value)
-    {
+    /** @return string */
+    public function GetTitle() {
+        return $this->title;
+    }
+
+    /** @param string $value */
+    public function SetTitle($value) {
         $this->title = $value;
     }
 
-    public function GetHeader()
-    {
-        return $this->RenderText($this->header);
+    /** @return string */
+    public function GetHeader() {
+        return $this->header;
     }
 
-    public function SetHeader($value)
-    {
+    /** @param string $value */
+    public function SetHeader($value) {
         $this->header = $value;
     }
 
-    public function GetFooter()
-    {
-        return $this->RenderText($this->footer);
+    /** @return string */
+    public function GetFooter() {
+        return $this->footer;
     }
 
-    public function SetFooter($value)
-    {
+    /** @param string $value */
+    public function SetFooter($value) {
         $this->footer = $value;
     }
 
-    public function RenderText($text)
-    {
-        return ConvertTextToEncoding($text, GetAnsiEncoding(), $this->GetContentEncoding());
-    }
-
-    public function GetLocalizerCaptions()
-    {
+    /** @return Captions */
+    public function GetLocalizerCaptions() {
         if (!isset($this->localizerCaptions)) {
             $this->localizerCaptions = Captions::getInstance($this->GetContentEncoding());
         }
@@ -142,13 +151,7 @@ abstract class CommonPage
     public abstract function GetPageFileName();
     public abstract function getType();
 
-    public function GetPageId()
-    {
-        return $this->id;
-    }
-
-    public function GetCustomTemplate($part, $mode, $defaultValue, &$params = array())
-    {
+    public function GetCustomTemplate($part, $mode, $defaultValue, &$params = array()) {
         $result = null;
         $this->OnGetCustomTemplate->Fire(array($this->getType(), $part, $mode, &$result, &$params, $this));
 
@@ -159,15 +162,31 @@ abstract class CommonPage
         return $defaultValue;
     }
 
-    public function GetCustomPageHeader()
-    {
+    public function GetCustomPageHeader() {
         $result = '';
         $this->OnCustomHTMLHeader->Fire(array(&$this, &$result));
         return $result;
     }
 
-    public function getLink()
-    {
+    public function getLink() {
         return null;
+    }
+
+    public function GetReadyPageList() {
+        if (!$this->pageList) {
+            $this->pageList = new PageList($this);
+        };
+
+        return $this->pageList;
+    }
+
+    /** @return boolean */
+    public function GetShowPageList() {
+        return $this->showPageList;
+    }
+
+    /** @param boolean $value */
+    public function SetShowPageList($value) {
+        $this->showPageList = $value;
     }
 }

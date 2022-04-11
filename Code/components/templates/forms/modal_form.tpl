@@ -16,7 +16,7 @@
             </div>
 
             {if $Grid.AllowAddMultipleRecords}
-                <div class="row" style="margin-top: 20px">
+                <div class="row form-add-another-record">
                     <a href="#" class="js-form-add col-md-12{if $Grid.FormLayout->isHorizontal()} col-md-offset-3{/if}">
                         <span class="icon-plus"></span> {$Captions->GetMessageString('FormAdd')}
                     </a>
@@ -35,16 +35,24 @@
 
                 <div class="btn-group">
                     <button type="submit" class="btn btn-primary js-save js-primary-save">
+                        {if $isMultiEditOperation}
+                        {$Captions->GetMessageString('Update')}
+                        {else}
                         {$Captions->GetMessageString('Save')}
+                        {/if}
                     </button>
-                    {if not $isNested}
+                    {if not $isNested && not $isMultiEditOperation}
                         <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
                             <li><a href="#" class="js-save">{$Captions->GetMessageString('SaveAndBackToList')}</a></li>
-                            <li><a href="#" class="js-save js-multiple-insert-hide" data-action="edit">{$Captions->GetMessageString('SaveAndEdit')}</a></li>
-                            <li><a href="#" class="js-save js-save-insert" data-action="insert">{$Captions->GetMessageString('SaveAndInsert')}</a></li>
+                            {if $EditOperationIsEnabled}
+                                <li><a href="#" class="js-save js-multiple-insert-hide" data-action="edit">{$Captions->GetMessageString('SaveAndEdit')}</a></li>
+                            {/if}
+                            {if $InsertOperationIsEnabled}
+                                <li><a href="#" class="js-save js-save-insert" data-action="insert">{$Captions->GetMessageString('SaveAndInsert')}</a></li>
+                            {/if}
 
                             {if $Grid.Details and count($Grid.Details) > 0}
                                 <li class="divider js-multiple-insert-hide"></li>

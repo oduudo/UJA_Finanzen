@@ -1,10 +1,14 @@
 {capture assign="ContentBlock"}
 
-    {$BeforePageList}
+    {if isset($BeforePageList)}{$BeforePageList}{/if}
 
     {assign var=ListObj value=$Page->getReadyPageList()}
     {assign var=List value=$ListObj->GetViewData()}
     {assign var=SelectedGroup value=$Page->getSelectedGroup()}
+
+    {if is_null($SelectedGroup)}
+        {$Banner}
+    {/if}
 
     {foreach item=Group from=$List.Groups}
         {assign var=GroupCaption value=$Group->getCaption()}
@@ -49,7 +53,7 @@
         {/if}
     {/foreach}
 
-    {$AfterPageList}
+    {if isset($AfterPageList)}{$AfterPageList}{/if}
 
 {/capture}
 

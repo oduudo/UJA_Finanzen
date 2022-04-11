@@ -3,6 +3,21 @@ define([
     'jquery.validate'
 ], function(_) {
 
+    function validateTabs(element) {
+        var $formTabsContainer = $(element).closest('form').find('.form-tabs-container');
+        if ($formTabsContainer.length > 0) {
+            $formTabsContainer.find('a span.required').remove();
+            var $tabContent = $(element).closest('.tab-content');
+            if ($tabContent.length > 0) {
+                $tabContent.find('.tab-pane:has(.form-group.has-error)').each(function() {
+                    var id = $(this).attr('id');
+                    var $tab = $formTabsContainer.find('a[href^="#' + id + '"]');
+                    $tab.append(' <span class="required">***</span>');
+                });
+            }
+        }
+    }
+
     var methods = {
 
         init: function(options) {
@@ -19,11 +34,13 @@ define([
                 validate_success: function(element) {
                     var $formGroup = $(element).closest('.form-group').removeClass('has-error');
                     $formGroup.prev('.form-group-label').removeClass('has-error');
+                    validateTabs(element);
                     $(element).remove();
                 },
                 highlight: function(element) {
                     var $formGroup = $(element).closest('.form-group').addClass('has-error');
-                    $formGroup.prev('.form-group-label').addClass('has-error')
+                    $formGroup.prev('.form-group-label').addClass('has-error');
+                    validateTabs(element);
                 },
                 unhighlight: undefined
             };
@@ -77,10 +94,10 @@ define([
                                     ];
                                     appendErrorMessage(rules[i]);
                                 } else if (rules[i] == 'max-value') {
-                                    validationRule.max = $(input).attr('max-value');
+                                    validationRule.max = Number($(input).attr('max-value'));
                                     appendErrorMessage('max', 'maxValue');
                                 } else if (rules[i] == 'min-value') {
-                                    validationRule.min = $(input).attr('min-value');
+                                    validationRule.min = Number($(input).attr('min-value'));
                                     appendErrorMessage('min', 'minValue');
                                 } else if (rules[i] == 'max-length') {
                                     validationRule.maxlength = $(input).attr('max-length');

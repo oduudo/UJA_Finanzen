@@ -8,38 +8,50 @@ class LoginPage extends CommonPage
 {
     private $loginControl;
     private $renderer;
-    private $header;
-    private $footer;
     private $pageFileName;
+    private $inactivityTimeoutExpired;
+    /** @var AbstractUserAuthentication */
+    private $userAuthentication;
+    private $reCaptcha;
 
-    /** @var Event */
-    public $OnAferLogin;
+    #region Events
+    public $OnAfterLogin;
+    public $OnAfterFailedLoginAttempt;
+    public $OnBeforeLogout;
+    #endregion
 
-    public function __construct(
-        $mainPageUrl,
-        $pageFileName,
-        IdentityCheckStrategy $identityCheckStrategy,
-        UserIdentityStorage $userIdentityStorage,
-        ConnectionFactory $connectionFactory,
-        $canLoginAsGuest,
-        Captions $captions)
+    /**
+     * @param string $mainPageUrl
+     * @param string $pageFileName
+     * @param AbstractUserAuthentication $userAuthentication
+     * @param ConnectionFactory $connectionFactory
+     * @param Captions $captions
+     * @param GoogleReCaptcha|null $reCaptcha
+     * @param string $startupPage
+     */
+    public function __construct($mainPageUrl, $pageFileName, $userAuthentication, $connectionFactory, $captions, $reCaptcha, $startupPage)
     {
         parent::__construct('login', 'UTF-8');
 
         $this->loginControl = new LoginControl(
             $this,
             $mainPageUrl,
-            $identityCheckStrategy,
-            $userIdentityStorage,
+            $userAuthentication,
             $connectionFactory,
-            $canLoginAsGuest,
-            $captions
+            $captions,
+            $reCaptcha,
+            $startupPage
         );
 
+        $this->userAuthentication = $userAuthentication;
         $this->pageFileName = $pageFileName;
         $this->captions = $captions;
         $this->OnAfterLogin = new Event();
+        $this->OnAfterFailedLoginAttempt = new Event();
+        $this->OnBeforeLogout = new Event();
         $this->renderer = new ViewAllRenderer($this->captions);
+        $this->inactivityTimeoutExpired = false;
+        $this->reCaptcha = $reCaptcha;
     }
 
     public function GetPageFileName()
@@ -67,36 +79,29 @@ class LoginPage extends CommonPage
         return 'Login';
     }
 
-    public function SetHeader($value) {
-        $this->header = $value;
-    }
-
-    public function GetHeader() {
-        return $this->RenderText($this->header);
-    }
-
-    public function SetFooter($value) {
-        $this->footer = $value;
-    }
-
-    public function GetFooter() {
-        return $this->RenderText($this->footer);
-    }
-
     public function BeginRender() {
         $this->loginControl->ProcessMessages();
+        $this->inactivityTimeoutExpired = GetApplication()->GetSuperGlobals()->IsGetValueSet('inactivity_timeout_expired');
     }
 
     public function EndRender() {
         echo $this->renderer->Render($this);
     }
 
-    public function getType()
-    {
+    public function getType() {
         return PageType::Login;
     }
 
     public function GetTitle() {
         return $this->GetLocalizerCaptions()->GetMessageString('LoginTitle');
     }
+
+    public function getInactivityTimeoutExpired() {
+        return $this->inactivityTimeoutExpired;
+    }
+
+    public function getReCaptcha() {
+        return $this->reCaptcha;
+    }
+
 }

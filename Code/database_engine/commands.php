@@ -77,10 +77,12 @@ PredefinedAggregate::Init();
 class CustomAggregate extends Aggregate
 {
     private $expression;
+    private $expressionAsString;
 
-    public function __construct($expression)
+    public function __construct($expression, $expressionAsString)
     {
         $this->expression = $expression;
+        $this->expressionAsString = $expressionAsString;
     }
 
     public function AsSQL($fieldAsSQL)
@@ -90,7 +92,7 @@ class CustomAggregate extends Aggregate
 
     public function AsString()
     {
-        return $this->expression;
+        return $this->expressionAsString;
     }
 }
 
@@ -284,10 +286,11 @@ class FilterConditionGenerator {
 
     public function VisitIsBlankFieldFilter($filter)
     {
-        $this->resultCondition = sprintf('((%s) OR (%s = \'\'))',
-            $this->engCommandImp->GetIsNullExpression($this->field),
-            $this->engCommandImp->GetCastedToCharFieldExpression($this->field)
-        );
+        $this->resultCondition = sprintf('(%s)', $this->engCommandImp->GetIsNullExpression($this->field));
+        if ($this->field->FieldType == ftString) {
+            $this->resultCondition = sprintf('(' . $this->resultCondition . ' OR (%s = \'\'))',
+                $this->engCommandImp->GetCastedToCharFieldExpression($this->field));
+        }
     }
 
     /**
@@ -755,16 +758,6 @@ abstract class EngCommandImp
     }
 
     /**
-     * @param int $limitCount
-     * @param int $upLimit
-     * @return string
-     */
-    public function GetLimitClause($limitCount, $upLimit)
-    {
-        return "LIMIT $upLimit, $limitCount";
-    }
-
-    /**
      * @param int $joinKind
      * @return string
      */
@@ -933,20 +926,19 @@ abstract class EngCommandImp
         $connection->ExecSQL($command->GetSQL());
     }
 
-    /**
-     * @param BaseSelectCommand $command
-     * @param Boolean $withLimit
-     * @return string
-     * @description returns string between SELECT and column list (for example, FIRST/SKIP for Firebird)
-     */
-    public function GetAfterSelectSQL($command, $withLimit = true)
-    {
-        return '';
-    }
-
     public function SupportsDefaultValue()
     {
         return true;
+    }
+
+    /**
+     * @param string $selectSQL
+     * @param int $limitNumber
+     * @param int $limitOffset
+     * @return string
+     */
+    public function getSelectSQLWithLimitation($selectSQL, $limitNumber, $limitOffset) {
+        return $selectSQL;
     }
 }
 

@@ -8,19 +8,34 @@
     {/if}
     <div class="clearfix"></div>
 
-    {include file='common/messages.tpl' type='danger' dismissable=true messages=$Grid.ErrorMessages displayTime=$Grid.MessageDisplayTime}
-    {include file='common/messages.tpl' type='success' dismissable=true messages=$Grid.Messages displayTime=$Grid.MessageDisplayTime}
+    {include file='common/messages_block.tpl' GridMessages=$Grid}
+
+    {if $ShowErrorsOnTop}
+        <div class="row">
+            <div class="col-md-12 form-error-container form-error-container-top"></div>
+        </div>
+    {/if}
+
+    {if $isMultiEditOperation}
+        {include file='forms/fields_to_be_updated.tpl'}
+    {/if}
 
     {include file='forms/form_fields.tpl' isViewForm=false}
+
+    {include file='forms/form_footer.tpl'}
 
     {if $flashMessages}
         <input type="hidden" name="flash_messages" value="1" />
     {/if}
 
-    <div class="row">
-        <div class="col-md-12 form-error-container"></div>
-    </div>
+    {if $ShowErrorsAtBottom}
+        <div class="row">
+            <div class="col-md-12 form-error-container form-error-container-bottom"></div>
+        </div>
+    {/if}
 
-    {include file='forms/form_scripts.tpl'}
+    {if !$isMultiUploadOperation}
+        {include file='forms/form_scripts.tpl'}
+    {/if}
 
 </form>

@@ -7,8 +7,9 @@ define([
     'pgui.filter_builder',
     'pgui.column_filter',
     'pgui.charts',
+    'pgui.utils',
     'jquery.stickytableheaders'
-], function (_, pageSettings, shortcuts, Grid, Filter, FilterBuilder, ColumnFilter, charts) {
+], function (_, pageSettings, shortcuts, Grid, Filter, FilterBuilder, ColumnFilter, charts, utils) {
 
     function initGrids($grids) {
         $grids.each(function (i, el) {
@@ -34,23 +35,24 @@ define([
             // Column filter
             var columnFilter = grid.getColumnFilter();
             _.each(gridData.columnFilter.columns, function (columnData) {
-                columnFilter.addColumn(new Filter.Column(
+                columnFilter.addColumn(new ColumnFilter.Column(
                     columnData.fieldName,
-                    columnData.caption
+                    columnData.caption,
+                    columnData.typeIsDateTime
                 ));
             });
 
             var columnFilterGroup = new ColumnFilter.Group();
             columnFilterGroup.deserialize(columnFilter.getColumns(), gridData.columnFilter.data);
             columnFilter.setFilterComponent(columnFilterGroup);
-            columnFilter.setExcludedComponents(gridData.columnFilter.excludedComponents);
-            columnFilter.setSearchEnabled(gridData.columnFilter.isSearchEnabled);
+            columnFilter.setDefaultsEnabled(gridData.columnFilter.isDefaultsEnabled);
             columnFilter.attach();
 
             // Quick filter
             var quickFilter = grid.getQuickFilter();
             quickFilter.setColumnNames(gridData.quickFilter.columns);
             quickFilter.highlight($grid);
+            utils.updatePopupHints($grid.find('.pg-row'));
         });
     }
 
@@ -59,16 +61,16 @@ define([
 
         pageSettings($body);
 
-        if ($('table.table.fixed-header').length > 0) {
+        var $tableToFixHeader = $('table.table.fixed-header');
+        if ($tableToFixHeader.length > 0) {
             var $navbar = $('.navbar');
-            var $el = $('table.table');
             var marginTop = 0;
 
             if ($navbar.hasClass('navbar-fixed-top')) {
                 marginTop += $navbar.outerHeight();
             }
 
-            $el.stickyTableHeaders({
+            $tableToFixHeader.stickyTableHeaders({
                 selector: 'thead:first',
                 marginTop: marginTop
             });

@@ -14,6 +14,8 @@ class DynamicSearchHandler extends AbstractHTTPHandler
     private $valueField;
     /** @var string */
     private $captionTemplate;
+    /** @var int */
+    private $numberOfValuesToDisplay;
 
     /**
      * @param Dataset $dataset
@@ -22,8 +24,9 @@ class DynamicSearchHandler extends AbstractHTTPHandler
      * @param string $idField
      * @param string $valueField
      * @param string $captionTemplate
+     * @param int $numberOfValuesToDisplay
      */
-    public function __construct($dataset, $parentPage, $name, $idField, $valueField, $captionTemplate)
+    public function __construct($dataset, $parentPage, $name, $idField, $valueField, $captionTemplate = null, $numberOfValuesToDisplay = 20)
     {
         parent::__construct($name);
         $this->dataset = $dataset;
@@ -32,12 +35,8 @@ class DynamicSearchHandler extends AbstractHTTPHandler
         $this->idField = $idField;
         $this->valueField = $valueField;
         $this->captionTemplate = $captionTemplate;
-    }
-
-    private function GetSuperGlobals()
-    {
-        return GetApplication()->GetSuperGlobals();
-    }
+        $this->numberOfValuesToDisplay = $numberOfValuesToDisplay;
+   }
 
     /**
      * @param Renderer $renderer
@@ -66,6 +65,11 @@ class DynamicSearchHandler extends AbstractHTTPHandler
             $this->dataset->AddFieldFilter($field, FieldFilter::Equals($value));
         }
 
+        $excludedValues = $getWrapper->getValue('excludedValues', array());
+        foreach ($excludedValues as $value) {
+            $this->dataset->AddFieldFilter($this->valueField, FieldFilter::DoesNotEqual($value));
+        }
+
         header('Content-Type: application/json; charset=utf-8');
 
         $this->dataset->Open();
@@ -76,14 +80,15 @@ class DynamicSearchHandler extends AbstractHTTPHandler
         while ($this->dataset->Next()) {
             $result[] = array(
                 'id' => $this->dataset->GetFieldValueByName($this->idField),
-                'value' => StringUtils::IsNullOrEmpty($this->captionTemplate)
+                'value' => $this->dataset->GetFieldValueByName($this->valueField),
+                'formatted_value' => StringUtils::IsNullOrEmpty($this->captionTemplate)
                     ? $this->dataset->GetFieldValueByName($this->valueField)
                     : DatasetUtils::FormatDatasetFieldsTemplate($this->dataset, $this->captionTemplate),
                 'fields' => $this->dataset->getFieldValues(true),
 
             );
 
-            if (++$valueCount >= 20) {
+            if (++$valueCount >= $this->numberOfValuesToDisplay) {
                 break;
             }
         }

@@ -9,22 +9,25 @@ class UploadFileToFolderColumn extends CustomEditColumn
 {
     private $targetFolderTemplate;
     private $targetFilenameTemplate;
+    private $keepFileNameOnly = false;
+    private $replaceUploadedFileIfExist;
+
     private $useThumbnailGeneration;
     private $fieldNameToSaveThumbnailPath;
+    private $directoryToSaveThumbnails;
+    private $storeThumbnailNameOnly = false;
+    /** @var ImageFilter */
+    private $thumbnailImageFilter;
+    /** @var int */
+    private $maxUploadFileSize = 0;
 
     /** @var Delegate */
     private $generateFileNameDelegate;
 
-    /** @var ImageFilter */
-    private $thumbnailImageFilter;
-    private $directoryToSaveThumbnails;
-    private $replaceUploadedFileIfExist;
-    private $keepFileNameOnly = false;
-
     /**
      * @var Event
      */
-    private $onGetCustomFileName;
+    private $OnFileUpload;
 
     /**
      * @param string     $caption
@@ -35,7 +38,8 @@ class UploadFileToFolderColumn extends CustomEditColumn
      * @param boolean    $allowSetToDefault
      * @param string     $targetFolderTemplate
      * @param string     $targetFilenameTemplate
-     * @param Event|null $onGetCustomFileName
+     * @param Event|null $onFileUpload
+     * @param bool $keepFileNameOnly
      */
     public function __construct(
         $caption,
@@ -46,7 +50,7 @@ class UploadFileToFolderColumn extends CustomEditColumn
         $allowSetToDefault = false,
         $targetFolderTemplate = '',
         $targetFilenameTemplate = null,
-        Event $onGetCustomFileName = null,
+        Event $onFileUpload = null,
         $keepFileNameOnly = false)
     {
         parent::__construct(
@@ -62,7 +66,7 @@ class UploadFileToFolderColumn extends CustomEditColumn
         $this->targetFilenameTemplate = $targetFilenameTemplate;
         $this->useThumbnailGeneration = false;
         $this->replaceUploadedFileIfExist = true;
-        $this->onGetCustomFileName = $onGetCustomFileName;
+        $this->OnFileUpload = $onFileUpload;
         $this->keepFileNameOnly = $keepFileNameOnly;
     }
 
@@ -74,7 +78,7 @@ class UploadFileToFolderColumn extends CustomEditColumn
 
         $result = $this->GetDataset()->GetFieldValueByName($this->GetFieldName());
 
-        if ($this->keepFileNameOnly) {
+        if (!is_null($result) && $this->keepFileNameOnly) {
             $targetFolder = FormatDatasetFieldsTemplate($this->GetDataset(), $this->targetFolderTemplate);
             $result = Path::Combine($targetFolder, $result);
         }
@@ -87,11 +91,8 @@ class UploadFileToFolderColumn extends CustomEditColumn
         return false;
     }
 
-    private function GetNewFileName($originalFileName, $originalFileExtension, $fileSize)
+    private function getTargetFileName($originalFileName, $originalFileExtension, $fileSize, $targetFolder)
     {
-        $targetFolder = FormatDatasetFieldsTemplate($this->GetDataset(), $this->targetFolderTemplate);
-        FileUtils::ForceDirectories($targetFolder);
-
         $result = Path::Combine(
             $targetFolder,
             $this->generateFilename(
@@ -114,22 +115,7 @@ class UploadFileToFolderColumn extends CustomEditColumn
             }
         }
 
-        if (is_null($this->onGetCustomFileName)) {
-            return $result;
-        }
-
-        $handled = false;
-        $customResult = $result;
-        $this->onGetCustomFileName->Fire(array(
-            $this->getFieldName(),
-            &$customResult,
-            &$handled,
-            $originalFileName,
-            $originalFileExtension,
-            $fileSize
-        ));
-
-        return $handled ? $customResult : $result;
+        return $result;
     }
 
     private function generateFilename(
@@ -137,7 +123,7 @@ class UploadFileToFolderColumn extends CustomEditColumn
         $originalFileExtension,
         $fileSize)
     {
-        return ApplyVarablesMapToTemplate($this->targetFilenameTemplate, array(
+        return ApplyVariablesMapToTemplate($this->targetFilenameTemplate, array(
             'original_file_name' => $originalFileName,
             'original_file_extension' => $originalFileExtension,
             'file_size' => $fileSize,
@@ -171,6 +157,11 @@ class UploadFileToFolderColumn extends CustomEditColumn
         return $result;
     }
 
+    /** @return ImageUploader */
+    public function GetEditControl() {
+        return parent::GetEditControl();
+    }
+
     public function AfterSetAllDatasetValues()
     {
         $valueChanged = true;
@@ -185,28 +176,46 @@ class UploadFileToFolderColumn extends CustomEditColumn
             $valueChanged
         );
 
+        $this->checkFileSizeLimitation($value);
+
         if ($valueChanged && $value === null) {
             $this->clearImageAndThumbnail();
             return;
         }
 
-        $original_file_extension = $this->GetEditControl()->extractFileTypeFromArray(
+        $originalFileExtension = $this->GetEditControl()->extractFileTypeFromArray(
             $postWrapper,
             $filesWrapper
         );
-        $original_file_name = $this->GetEditControl()->extractFileNameFromArray(
+        $originalFileName = $this->GetEditControl()->extractFileNameFromArray(
             $postWrapper,
             $filesWrapper
         );
-        $file_size = $this->GetEditControl()->extractFileSizeFromArray(
+        $fileSize = $this->GetEditControl()->extractFileSizeFromArray(
             $postWrapper,
             $filesWrapper
         );
 
-        $target = $this->GetNewFileName($original_file_name, $original_file_extension, $file_size);
+        $targetFolder = FormatDatasetFieldsTemplate($this->GetDataset(), $this->targetFolderTemplate);
 
-        if ($valueChanged && isset($target) && !empty($target)) {
-            FileUtils::MoveUploadedFile($value, $target, $this->replaceUploadedFileIfExist);
+        $targetFileName = $this->getTargetFileName($originalFileName, $originalFileExtension, $fileSize, $targetFolder);
+
+        $acceptFile = true;
+        if (!is_null($this->OnFileUpload)) {
+            $this->OnFileUpload->Fire(array(
+                $this->getFieldName(),
+                &$targetFileName,
+                &$acceptFile,
+                $originalFileName,
+                $originalFileExtension,
+                $fileSize,
+                $value
+            ));
+        }
+
+        if ($acceptFile && $valueChanged && !empty($targetFileName)) {
+            FileUtils::ForceDirectories($targetFolder);
+            FileUtils::MoveUploadedFile($value, $targetFileName, $this->replaceUploadedFileIfExist);
 
             if ($this->GetSetToNullFromPost()) {
                 $this->clearImageAndThumbnail();
@@ -220,19 +229,44 @@ class UploadFileToFolderColumn extends CustomEditColumn
             } else {
                 $this->GetDataset()->SetFieldValueByName(
                     $this->GetFieldName(),
-                    $this->keepFileNameOnly ? basename($target) : $target
+                    $this->keepFileNameOnly ? basename($targetFileName) : $targetFileName
                 );
 
                 if ($this->useThumbnailGeneration) {
-                    $image = file_get_contents($target);
+                    $image = file_get_contents($targetFileName);
                     $thumbnailFileName = $this->GetThumbnailFileName(
-                        $original_file_name,
-                        $original_file_extension,
-                        $file_size
+                        $originalFileName,
+                        $originalFileExtension,
+                        $fileSize
                     );
                     $this->thumbnailImageFilter->ApplyFilter($image, $thumbnailFileName);
-                    $this->GetDataset()->SetFieldValueByName($this->fieldNameToSaveThumbnailPath, $thumbnailFileName);
+                    $this->GetDataset()->SetFieldValueByName(
+                        $this->fieldNameToSaveThumbnailPath,
+                        $this->storeThumbnailNameOnly ? basename($thumbnailFileName) : $thumbnailFileName
+                    );
                 }
+            }
+        }
+    }
+
+    /** @return int */
+    public function getMaxUploadFileSize() {
+        return $this->maxUploadFileSize;
+    }
+
+    /** @var int $value */
+    public function setMaxUploadFileSize($value) {
+        $this->maxUploadFileSize = $value;
+    }
+
+    /**
+     * @param string $fileName
+     * @throws FileSizeExceedMaxSize
+     */
+    private function checkFileSizeLimitation($fileName) {
+        if ($this->maxUploadFileSize > 0) {
+            if (filesize($fileName) > $this->maxUploadFileSize) {
+                throw new FileSizeExceedMaxSize($this->GetFieldName(), filesize($fileName), $this->maxUploadFileSize);
             }
         }
     }
@@ -270,14 +304,15 @@ class UploadFileToFolderColumn extends CustomEditColumn
         $fieldNameToSaveThumbnailPath,
         $directoryToSave,
         IDelegate $generateFileNameDelegate,
-        ImageFilter $thumbnailImageFilter)
+        ImageFilter $thumbnailImageFilter,
+        $storeNameOnly = false)
     {
         $this->useThumbnailGeneration = true;
         $this->directoryToSaveThumbnails = $directoryToSave;
         $this->fieldNameToSaveThumbnailPath = $fieldNameToSaveThumbnailPath;
         $this->generateFileNameDelegate = $generateFileNameDelegate;
         $this->thumbnailImageFilter = $thumbnailImageFilter;
-
+        $this->storeThumbnailNameOnly = $storeNameOnly;
     }
 
     public function GetReplaceUploadedFileIfExist()

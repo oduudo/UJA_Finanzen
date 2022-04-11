@@ -10,19 +10,17 @@
 
     include_once dirname(__FILE__) . '/components/startup.php';
     include_once dirname(__FILE__) . '/components/application.php';
+    include_once dirname(__FILE__) . '/' . 'authorization.php';
 
 
     include_once dirname(__FILE__) . '/' . 'database_engine/mysql_engine.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/page.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/detail_page.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/nested_form_page.php';
-
+    include_once dirname(__FILE__) . '/' . 'components/page/page_includes.php';
 
     function GetConnectionOptions()
     {
         $result = GetGlobalConnectionOptions();
         $result['client_encoding'] = 'utf8';
-        GetApplication()->GetUserAuthorizationStrategy()->ApplyIdentityToConnectionOptions($result);
+        GetApplication()->GetUserAuthentication()->applyIdentityToConnectionOptions($result);
         return $result;
     }
 
@@ -37,28 +35,26 @@
     {
         protected function DoBeforeCreate()
         {
+            $this->SetTitle('Transaktionen');
+            $this->SetMenuLabel('Transaktionen');
+    
             $this->dataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`transaktionen`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $this->dataset->AddField($field, true);
-            $field = new IntegerField('anteil');
-            $this->dataset->AddField($field, false);
-            $field = new DateField('datum');
-            $this->dataset->AddField($field, false);
-            $field = new StringField('typ');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $this->dataset->AddField($field, false);
-            $this->dataset->AddLookupField('anteil', 'depots', new IntegerField('id', null, null, true), new StringField('name', 'anteil_name', 'anteil_name_depots'), 'anteil_name_depots');
+            $this->dataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('anteil'),
+                    new DateField('datum'),
+                    new StringField('typ'),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('wert')
+                )
+            );
+            $this->dataset->AddLookupField('anteil', 'depots', new IntegerField('id'), new StringField('name', false, false, false, false, 'anteil_name', 'anteil_name_depots'), 'anteil_name_depots');
         }
     
         protected function DoPrepare() {
@@ -70,7 +66,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(50);
+            $partitionNavigator->SetRowsPerPage(20);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -89,14 +85,14 @@
         protected function getFiltersColumns()
         {
             return array(
-                new FilterColumn($this->dataset, 'id', 'id', $this->RenderText('Id')),
-                new FilterColumn($this->dataset, 'datum', 'datum', $this->RenderText('Datum')),
-                new FilterColumn($this->dataset, 'typ', 'typ', $this->RenderText('Typ')),
-                new FilterColumn($this->dataset, 'anzahl', 'anzahl', $this->RenderText('Anzahl')),
-                new FilterColumn($this->dataset, 'preis', 'preis', $this->RenderText('Preis')),
-                new FilterColumn($this->dataset, 'kosten', 'kosten', $this->RenderText('Kosten')),
-                new FilterColumn($this->dataset, 'wert', 'wert', $this->RenderText('Wert')),
-                new FilterColumn($this->dataset, 'anteil', 'anteil_name', $this->RenderText('Anteil'))
+                new FilterColumn($this->dataset, 'id', 'id', 'Id'),
+                new FilterColumn($this->dataset, 'datum', 'datum', 'Datum'),
+                new FilterColumn($this->dataset, 'typ', 'typ', 'Typ'),
+                new FilterColumn($this->dataset, 'anzahl', 'anzahl', 'Anzahl'),
+                new FilterColumn($this->dataset, 'preis', 'preis', 'Preis'),
+                new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
+                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert'),
+                new FilterColumn($this->dataset, 'anteil', 'anteil_name', 'Anteil')
             );
         }
     
@@ -140,7 +136,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $main_editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             
             $filterBuilder->addColumn(
                 $columns['datum'],
@@ -162,8 +158,8 @@
             );
             
             $main_editor = new MultiValueSelect('typ');
-            $main_editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $main_editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $main_editor->addChoice('Kauf', 'Kauf');
+            $main_editor->addChoice('Verkauf', 'Verkauf');
             
             $text_editor = new TextEdit('typ');
             
@@ -259,14 +255,14 @@
                 )
             );
             
-            $main_editor = new AutocompleteComboBox('anteil_edit', $this->CreateLinkBuilder());
+            $main_editor = new DynamicCombobox('anteil_edit', $this->CreateLinkBuilder());
             $main_editor->setAllowClear(true);
             $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $main_editor->SetHandlerName('filter_builder_anteil_name_search');
+            $main_editor->SetHandlerName('filter_builder_transaktionen_anteil_search');
             
             $multi_value_select_editor = new RemoteMultiValueSelect('anteil', $this->CreateLinkBuilder());
-            $multi_value_select_editor->SetHandlerName('filter_builder_anteil_name_search');
+            $multi_value_select_editor->SetHandlerName('filter_builder_transaktionen_anteil_search');
             
             $filterBuilder->addColumn(
                 $columns['anteil'],
@@ -337,7 +333,7 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -345,10 +341,10 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -358,7 +354,7 @@
             $column = new TextViewColumn('typ', 'typ', 'Typ', $this->dataset);
             $column->SetOrderable(true);
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -368,10 +364,10 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -381,10 +377,10 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -394,10 +390,10 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -407,10 +403,10 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -420,7 +416,7 @@
             $column = new TextViewColumn('anteil', 'anteil_name', 'Anteil', $this->dataset);
             $column->SetOrderable(true);
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
         }
@@ -441,8 +437,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -458,8 +454,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -468,8 +464,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -478,8 +474,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -488,8 +484,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -505,7 +501,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -516,8 +512,8 @@
             //
             $editor = new CheckBoxGroup('typ_edit');
             $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
-            $editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
             $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -567,37 +563,24 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Anteil', 
                 'anteil', 
@@ -608,12 +591,107 @@
             $grid->AddEditColumn($editColumn);
         }
     
+        protected function AddMultiEditColumns(Grid $grid)
+        {
+            //
+            // Edit column for datum field
+            //
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for typ field
+            //
+            $editor = new CheckBoxGroup('typ_edit');
+            $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
+            $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for anzahl field
+            //
+            $editor = new TextEdit('anzahl_edit');
+            $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for preis field
+            //
+            $editor = new TextEdit('preis_edit');
+            $editColumn = new CustomEditColumn('Preis', 'preis', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for kosten field
+            //
+            $editor = new TextEdit('kosten_edit');
+            $editColumn = new CustomEditColumn('Kosten', 'kosten', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for anteil field
+            //
+            $editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`depots`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $editColumn = new LookUpEditColumn(
+                'Anteil', 
+                'anteil', 
+                $editor, 
+                $this->dataset, 'id', 'name', $lookupDataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+        }
+    
         protected function AddInsertColumns(Grid $grid)
         {
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -624,8 +702,8 @@
             //
             $editor = new CheckBoxGroup('typ_edit');
             $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
-            $editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
             $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -675,37 +753,24 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Anteil', 
                 'anteil', 
@@ -715,6 +780,11 @@
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
             $grid->SetShowAddButton(true && $this->GetSecurityInfo()->HasAddGrant());
+        }
+    
+        private function AddMultiUploadColumn(Grid $grid)
+        {
+    
         }
     
         protected function AddPrintColumns(Grid $grid)
@@ -733,8 +803,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddPrintColumn($column);
             
             //
@@ -750,8 +820,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -760,8 +830,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -770,8 +840,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -780,8 +850,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -808,8 +878,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddExportColumn($column);
             
             //
@@ -825,8 +895,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -835,8 +905,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -845,8 +915,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -855,8 +925,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -873,8 +943,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddCompareColumn($column);
             
             //
@@ -890,8 +960,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -900,8 +970,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -910,8 +980,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -920,8 +990,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -976,25 +1046,29 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(true);
+            $result->SetUseFixedHeader(false);
             $result->SetShowLineNumbers(false);
+            $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
             $result->setEnableRuntimeCustomization(true);
             $result->setAllowCompare(true);
             $this->AddCompareHeaderColumns($result);
             $this->AddCompareColumns($result);
-            $result->setTableBordered(true);
-            $result->setTableCondensed(true);
+            $result->setMultiEditAllowed($this->GetSecurityInfo()->HasEditGrant() && true);
+            $result->setTableBordered(false);
+            $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(true);
+            $result->SetHighlightRowAtHover(false);
             $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
             $this->AddSingleRecordViewColumns($result);
             $this->AddEditColumns($result);
+            $this->AddMultiEditColumns($result);
             $this->AddInsertColumns($result);
             $this->AddPrintColumns($result);
             $this->AddExportColumns($result);
+            $this->AddMultiUploadColumn($result);
     
     
             $this->SetShowPageList(true);
@@ -1003,9 +1077,11 @@
             $this->setPrintListAvailable(true);
             $this->setPrintListRecordAvailable(false);
             $this->setPrintOneRecordAvailable(true);
-            $this->setExportListAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setAllowPrintSelectedRecords(true);
+            $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportListRecordAvailable(array());
-            $this->setExportOneRecordAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
         }
@@ -1016,43 +1092,30 @@
     
         protected function doRegisterHandlers() {
             
+            
             $lookupDataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
-            $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteil_name_search', 'id', 'name', null);
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_transaktionen_anteil_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
         }
        
@@ -1086,22 +1149,27 @@
     
         }
     
+        protected function doCustomDefaultValues(&$values, &$handled) 
+        {
+    
+        }
+    
         protected function doCustomCompareColumn($columnName, $valueA, $valueB, &$result)
         {
     
         }
     
-        protected function doBeforeInsertRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeInsertRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeUpdateRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeUpdateRecord($page, $oldRowData, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeDeleteRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeDeleteRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
@@ -1111,7 +1179,7 @@
     
         }
     
-        protected function doAfterUpdateRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
+        protected function doAfterUpdateRecord($page, $oldRowData, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
         {
     
         }
@@ -1136,7 +1204,7 @@
     
         }
     
-        protected function doGetCustomUploadFileName($fieldName, $rowData, &$result, &$handled, $originalFileName, $originalFileExtension, $fileSize)
+        protected function doFileUpload($fieldName, $rowData, &$result, &$accept, $originalFileName, $originalFileExtension, $fileSize, $tempFileName)
         {
     
         }
@@ -1146,12 +1214,37 @@
     
         }
     
+        protected function doPrepareColumnFilter(ColumnFilter $columnFilter)
+        {
+    
+        }
+    
+        protected function doPrepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
+        {
+    
+        }
+    
+        protected function doGetSelectionFilters(FixedKeysArray $columns, &$result)
+        {
+    
+        }
+    
+        protected function doGetCustomFormLayout($mode, FixedKeysArray $columns, FormLayout $layout)
+        {
+    
+        }
+    
+        protected function doGetCustomColumnGroup(FixedKeysArray $columns, ViewColumnGroup $columnGroup)
+        {
+    
+        }
+    
         protected function doPageLoaded()
         {
     
         }
     
-        protected function doGetCustomPagePermissions(Page $page, PermissionSet &$permissions, &$handled)
+        protected function doCalculateFields($rowData, $fieldName, &$value)
         {
     
         }
@@ -1161,20 +1254,19 @@
     
         }
     
+        protected function doAddEnvironmentVariables(Page $page, &$variables)
+        {
+    
+        }
+    
     }
 
-
+    SetUpUserAuthorization();
 
     try
     {
-        $Page = new transaktionenPage("transaktionen", "transaktionen.php", GetCurrentUserGrantForDataSource("transaktionen"), 'UTF-8');
-        $Page->SetTitle('Transaktionen');
-        $Page->SetMenuLabel('Transaktionen');
-        $Page->SetHeader(GetPagesHeader());
-        $Page->SetFooter(GetPagesFooter());
+        $Page = new transaktionenPage("transaktionen", "transaktionen.php", GetCurrentUserPermissionsForPage("transaktionen"), 'UTF-8');
         $Page->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource("transaktionen"));
-        GetApplication()->SetCanUserChangeOwnPassword(
-            !function_exists('CanUserChangeOwnPassword') || CanUserChangeOwnPassword());
         GetApplication()->SetMainPage($Page);
         GetApplication()->Run();
     }

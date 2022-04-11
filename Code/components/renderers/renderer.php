@@ -3,15 +3,13 @@
 include_once dirname(__FILE__) . '/../grid/grid.php';
 include_once dirname(__FILE__) . '/../utils/file_utils.php';
 include_once dirname(__FILE__) . '/../utils/html_utils.php';
+include_once dirname(__FILE__) . '/template_renderer.php';
 
 abstract class Renderer
 {
     protected $result;
     /** @var Captions */
     private $captions;
-    private $renderScripts = true;
-    private $renderText = true;
-    private $additionalParams = null;
 
     private $renderingRecordCardView = false;
 
@@ -43,13 +41,6 @@ abstract class Renderer
         return $this->captions;
     }
 
-    private function CreateSmatryObject()  {
-        $result = new Smarty();
-        $result->template_dir = 'components/templates';
-
-        return $result;
-    }
-
     public function __construct($captions) {
         $this->captions = $captions;
     }
@@ -57,56 +48,26 @@ abstract class Renderer
     #region Rendering
 
     public function DisplayTemplate($TemplateName, $InputObjects, $InputValues) {
-        $smarty = $this->CreateSmatryObject();
-        foreach($InputObjects as $ObjectName => &$Object)
-            $smarty->assign_by_ref($ObjectName, $Object);
-        $smarty->assign_by_ref('Renderer', $this);
-        $smarty->assign_by_ref('Captions', $this->captions);
-        $smarty->assign('RenderScripts', $this->renderScripts);
-        $smarty->assign('RenderText', $this->renderText);
+        $rendererParams = array();
+        $rendererParams['Renderer'] = $this;
+        $rendererParams['Captions'] = $this->captions;
 
-        if (isset($this->additionalParams))
-        {
-            foreach($this->additionalParams as $ValueName => $Value)
-            {
-                $smarty->assign($ValueName, $Value);
-            }
-        }
+        $templateParams = array_merge($InputObjects, $rendererParams, $InputValues);
 
-        foreach($InputValues as $ValueName => $Value)
-            $smarty->assign($ValueName, $Value);
-
-        $this->result = $smarty->fetch($TemplateName);
+        $templateRenderer = GetTemplateRenderer();
+        $this->result = $templateRenderer->render($TemplateName, $templateParams);
     }
 
-    public function Render($Object, $renderScripts = true, $renderText = true, $additionalParams = null) {
-        $oldRenderScripts = $this->renderScripts;
-        $oldRenderText = $this->renderText;
-        $oldAdditionalParams = $this->additionalParams;
-
-        $this->renderScripts = $renderScripts;
-        $this->renderText = $renderText;
-        $this->additionalParams = array();
-        if (isset($additionalParams))
-            $this->additionalParams = $additionalParams;
-
-        if (defined('SHOW_VARIABLES') && ($Object instanceof IVariableContainer)) {
-            $this->additionalParams['Variables'] = $this->RenderVariableContainer($Object);
-        }
-
+    public function Render($Object) {
         $Object->Accept($this);
-
-        $this->renderScripts = $oldRenderScripts;
-        $this->renderText = $oldRenderText;
-        $this->additionalParams = $oldAdditionalParams;
         return $this->result;
     }
 
-    public function RenderDef($object, $default = '', $additionalParams = null) {
+    public function RenderDef($object) {
         if (isset($object))
-            return $this->Render($object, true, true, $additionalParams);
+            return $this->Render($object);
         else
-            return $default;
+            return '';
     }
 
     #endregion
@@ -142,7 +103,7 @@ abstract class Renderer
 
     #region Columns
 
-    private function GetNullValuePresentation(AbstractViewColumn $column)  {
+    protected function GetNullValuePresentation(AbstractViewColumn $column)  {
         if ($this->ShowHtmlNullValue()) {
             $nullLabel = $column->getNullLabel();
             if (is_null($nullLabel)) {
@@ -178,7 +139,7 @@ abstract class Renderer
     {
         $customValue = $this->GetCustomRenderedViewColumn($column, $rowValues);
         if (isset($customValue)) {
-            return $column->GetGrid()->GetPage()->RenderText($customValue);
+            return $customValue;
         }
 
         return $this->Render($column);
@@ -205,19 +166,61 @@ abstract class Renderer
         );
     }
 
+    private function viewColumnRenderLinkedImagesProperties(AbstractDatasetFieldViewColumn $column, $value) {
+        if (is_null($column->getLinkedImages())) {
+            return sprintf('<a class="linked-images-retriever" href="#" data-url="%s">%s</a>', $column->getLinkedImagesLink(), $value);
+        } else {
+            $linkedImagesInfo = $column->getLinkedImages()->getLinkedImagesInfo($column->GetDataset());
+
+            $imageGalleryExpression = '';
+            $imagesToDisplayCount = 0;
+            foreach ($linkedImagesInfo as $linkedImageInfo) {
+                $imageExpression = '';
+                if ($imagesToDisplayCount++ < $column->getNumberOfLinkedImagesToDisplayOnViewForm()) {
+                    $imageExpression = sprintf('<img src="%s" alt="%s"%s>',
+                        $linkedImageInfo['source'],
+                        $linkedImageInfo['caption'],
+                        $column->getLinkedImages()->getInlineStyles() == '' ? '' : ' ' . sprintf('style="%s"', trim($column->getLinkedImages()->getInlineStyles()))
+                    );
+                }
+
+                $imageGalleryExpression .=
+                    sprintf(
+                        '<a class="image gallery-item" data-name="%s" href="%s" title="%s">%s</a>',
+                        $column->getDataNameAttributeValue(),
+                        $linkedImageInfo['source'],
+                        $linkedImageInfo['caption'],
+                        $imageExpression
+                    );
+            }
+
+            if ($column->getNumberOfLinkedImagesToDisplayOnViewForm() > 0) {
+                return $imageGalleryExpression;
+            } else {
+                return sprintf('<a class="linked-images-retriever retrieved" href="#">%s</a>%s', $value, $imageGalleryExpression);
+            }
+        }
+    }
+
     private function viewColumnRenderHyperlinkProperties(AbstractDatasetFieldViewColumn $column, $value)
     {
-        if ($this->HtmlMarkupAvailable() && !is_null($column->getHrefTemplate())) {
-            $href = FormatDatasetFieldsTemplate(
-                $column->getDataset(),
-                $column->getHrefTemplate()
-            );
+        if ($this->HtmlMarkupAvailable()) {
+            if (!is_null($column->getLookupRecordModalViewLink())) {
+                return sprintf('<a href="#" data-modal-operation="view" data-content-link="%s">%s</a>', $column->getLookupRecordModalViewLink(), $value);
+            } elseif ($column->getDisplayLinkedImagesByClick()) {
+                return $this->viewColumnRenderLinkedImagesProperties($column, $value);
+            } elseif (!is_null($column->getHrefTemplate())) {
+                $href = FormatDatasetFieldsTemplate(
+                    $column->getDataset(),
+                    $column->getHrefTemplate()
+                );
 
-            return sprintf('<a href="%s" target="%s">%s</a>',
-                $href,
-                $column->GetTarget(),
-                $value
-            );
+                return sprintf('<a href="%s" target="%s">%s</a>',
+                    $href,
+                    $column->GetTarget(),
+                    $value
+                );
+            }
         }
 
         return $value;
@@ -250,7 +253,7 @@ abstract class Renderer
         return $value;
     }
 
-    private function getColumnStyle(AbstractDatasetFieldViewColumn $column)
+    protected function getColumnStyle(AbstractDatasetFieldViewColumn $column)
     {
         $styleBuilder = new StyleBuilder();
 
@@ -280,9 +283,6 @@ abstract class Renderer
     public function RenderTextViewColumn(TextViewColumn $column)
     {
         $value = $column->GetValue();
-        $dataset = $column->GetDataset();
-
-        $column->BeforeColumnRender->Fire(array(&$value, &$dataset));
 
         if (!isset($value)) {
             $this->result = $this->GetNullValuePresentation($column);
@@ -312,7 +312,7 @@ abstract class Renderer
             $value = $this->getWrappedViewColumnValue(
                 $column,
                 $value
-                . '... <a class="js-more-hint" href="' . $column->GetMoreLink() . '">'
+                . '... <a class="js-more-hint" href="#">'
                 . $this->captions->GetMessageString('more') . '</a>'
                 . '<div class="js-more-box hide">' . $originalValue . '</div>'
             );
@@ -409,9 +409,7 @@ abstract class Renderer
         $this->RenderNumberViewColumn($column, null, '%');
     }
 
-    /**
-     * @param StringTransformViewColumn $column
-     */
+    /** @param StringTransformViewColumn $column */
     public function RenderStringTransformViewColumn(StringTransformViewColumn $column)
     {
         if (is_null($column->GetValue())) {
@@ -419,10 +417,13 @@ abstract class Renderer
             return;
         }
 
-        $this->result = $this->getWrappedViewColumnValue($column, call_user_func(
-            $column->getStringTransformFunction(),
-            $column->getValue()
-        ));
+        if (function_exists($column->getStringTransformFunction())) {
+            $columnValue = call_user_func($column->getStringTransformFunction(), $column->GetValue());
+        } else {
+            $columnValue = $column->GetValue();
+        }
+
+        $this->result = $this->getWrappedViewColumnValue($column, $columnValue);
     }
 
     /**
@@ -440,31 +441,43 @@ abstract class Renderer
         $this->result = $this->getWrappedViewColumnValue($column, sprintf(
             '%s%s%s',
             $prefix,
-            number_format(
-                (double) $column->GetValue(),
-                $column->GetNumberAfterDecimal(),
-                $column->GetDecimalSeparator(),
-                $column->GetThousandsSeparator()
-            ),
+            $column->getFormattedValue(),
             $suffix
         ));
     }
 
     /**
-     * @param ExternalAudioFileColumn $column
+     * @param ExternalAudioViewColumn $column
      */
-    public function RenderExternalAudioViewColumn(ExternalAudioFileColumn $column)
+    public function RenderExternalAudioViewColumn(ExternalAudioViewColumn $column)
     {
-        if (is_null($column->GetValue())) {
+        $code = '<audio class="pgui-field-external-audio" controls><source src="%s" type="audio/mpeg">Your browser does not support the audio element.</audio>';
+        $this->renderExternalMediaViewColumn($column, $code);
+    }
+
+    /**
+     * @param ExternalVideoViewColumn $column
+     */
+    public function RenderExternalVideoViewColumn(ExternalVideoViewColumn $column)
+    {
+        $code = sprintf('<video class="pgui-field-external-video" %scontrols>', $column->generateVideoPlayerSizeString()) .
+            '<source src="%s" type="video/mp4">Your browser does not support the video element.</video>';
+        $this->renderExternalMediaViewColumn($column, $code);
+    }
+
+    /**
+     * @param AbstractWrappedDatasetFieldViewColumn $column
+     * @param string $code
+     */
+    private function renderExternalMediaViewColumn(AbstractWrappedDatasetFieldViewColumn $column, $code) {
+        $value = $column->GetValue();
+        if (is_null($value)) {
             $this->result = $this->GetNullValuePresentation($column);
             return;
         }
 
         if ($this->HtmlMarkupAvailable() && $this->InteractionAvailable()) {
-            $this->result = sprintf(
-                '<audio controls><source src="%s" type="audio/mpeg">Your browser does not support the audio element.</audio>',
-                $column->getWrappedValue()
-            );
+            $this->result = sprintf($code, $column->getWrappedValue());
             return;
         }
 
@@ -476,7 +489,8 @@ abstract class Renderer
      */
     public function RenderDownloadDataViewColumn(DownloadDataColumn $column)
     {
-        if (is_null($column->GetValue())) {
+        $value = $column->GetValue();
+        if ($value == null) {
             $this->result = $this->GetNullValuePresentation($column);
             return;
         }
@@ -485,7 +499,7 @@ abstract class Renderer
             $this->result = sprintf(
                 '<i class="icon-download"></i>&nbsp;<a target="_blank" title="download" href="%s">%s</a>',
                 $column->GetDownloadLink(),
-                $column->GetLinkInnerHtml()
+                $this->captions->GetMessageString('Download')
             );
             return;
         }
@@ -540,14 +554,15 @@ abstract class Renderer
             $imageHint = htmlentities(FormatDatasetFieldsTemplate($column->getDataset(), $column->getImageHintTemplate()));
 
             $this->result = $this->viewColumnRenderHyperlinkProperties($column, sprintf(
-                '<img data-image-column="true" src="%s" alt="%s"%s%s>',
+                '<img data-image-column="true" src="%s" %salt="%s"%s%s>',
                 $column->GetImageLink(),
+                $column->generateImageSizeString(),
                 $imageHint,
                 $customAttributes,
                 $style
             ));
 
-            if ($column->GetEnablePictureZoom()) {
+            if ($column->GetEnablePictureZoom() && !$column->getDisplayLinkedImagesByClick()) {
                 $this->result = sprintf(
                     '<a class="image gallery-item" data-name="%s" href="%s" title="%s">%s</a>',
                     $column->getFieldName(),
@@ -639,12 +654,41 @@ abstract class Renderer
             array(
                 'common' => $loginPage->getCommonViewData(),
                 'Page' => $loginPage,
-                'LoginControl' => $loginPage->GetLoginControl()
+                'LoginControl' => $loginPage->GetLoginControl(),
+                'ReCaptcha' => $loginPage->getReCaptcha()
             ),
-            array_merge($customParams, array(
-                'Title' => $loginPage->GetTitle(),
-                'layoutTemplate' => $layoutTemplate,
-            ))
+            array_merge(
+                $customParams,
+                array(
+                    'Title' => $loginPage->GetTitle(),
+                    'layoutTemplate' => $layoutTemplate,
+                    'InactivityTimeoutExpired' => $loginPage->getInactivityTimeoutExpired()
+                )
+            )
+        );
+    }
+
+    /**
+     * @param LoginControl $loginControl
+     */
+    public function RenderLoginControl($loginControl)  {
+        $customParams = array();
+        $template = $loginControl->getPage()->GetCustomTemplate(
+            PagePart::LoginControl,
+            null,
+            'login_control.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'LoginControl' => $loginControl,
+                'SecurityFeedbackPositive' => $loginControl->getSecurityFeedbackPositive(),
+                'SecurityFeedbackNegative' => $loginControl->getSecurityFeedbackNegative(),
+                'ReCaptcha' => $loginControl->getReCaptcha()
+            ),
+            $customParams
         );
     }
 
@@ -669,7 +713,7 @@ abstract class Renderer
             'common/layout.tpl',
             $customParams
         );
-        $template = $template = $page->GetCustomTemplate(
+        $template = $page->GetCustomTemplate(
             PagePart::HomePage,
             null,
             'home_page.tpl',
@@ -681,6 +725,7 @@ abstract class Renderer
             array(
                 'common' => $page->getCommonViewData(),
                 'Page' => $page,
+                'Banner' => $page->getBanner()
             ),
             array_merge($customParams, array(
                 'layoutTemplate' => $layoutTemplate,
@@ -690,22 +735,190 @@ abstract class Renderer
         );
     }
 
+    /**
+     * @param RegistrationPage $page
+     */
+    public function RenderRegistrationPage(RegistrationPage $page) {
+        $this->SetHTTPContentTypeByPage($page);
+
+        if ($page->getRegistrationForm()->isCommit()) {
+            $this->result = SystemUtils::ToJSON($page->getRegistrationForm()->getResponse());
+            return;
+        }
+
+        $customParams = array();
+        $layoutTemplate = $page->GetCustomTemplate(
+            PagePart::Layout,
+            null,
+            'common/layout.tpl',
+            $customParams
+        );
+
+        $template = $page->GetCustomTemplate(
+            PagePart::RegistrationPage,
+            null,
+            'registration_page.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'common' => $page->getCommonViewData()->setEntryPoint('register'),
+                'Page' => $page,
+                'RegistrationForm' => $page->getRegistrationForm(),
+                'ReCaptcha' => $page->getReCaptcha()
+            ),
+            array_merge(
+                $customParams,
+                array(
+                    'layoutTemplate' => $layoutTemplate
+                )
+            )
+        );
+    }
+
+    /**
+     * @param RegistrationForm $form
+     */
+    public function RenderRegistrationForm(RegistrationForm $form) {
+        $customParams = array();
+        $template = $form->getRegistrationPage()->GetCustomTemplate(
+            PagePart::RegistrationForm,
+            null,
+            'registration_form.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'RegistrationForm' => $form,
+                'ReCaptcha' => $form->getRegistrationPage()->getReCaptcha()
+            ),
+            $customParams
+        );
+    }
+
+    /**
+     * @param PasswordRecoveryPage $page
+     */
+    public function RenderPasswordRecoveryPage(PasswordRecoveryPage $page) {
+        $this->SetHTTPContentTypeByPage($page);
+
+        if ($page->formIsCommit()) {
+            $this->result = SystemUtils::ToJSON($page->getResponse());
+            return;
+        }
+
+        $customParams = array();
+        $layoutTemplate = $page->GetCustomTemplate(
+            PagePart::Layout,
+            null,
+            'common/layout.tpl',
+            $customParams
+        );
+
+        $template = $page->GetCustomTemplate(
+            PagePart::PasswordRecovery,
+            null,
+            'recovering_password_page.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'common' => $page->getCommonViewData()->setEntryPoint('form'),
+                'Page' => $page,
+                'ReCaptcha' => $page->getReCaptcha()
+            ),
+            array_merge($customParams, array(
+                'layoutTemplate' => $layoutTemplate
+            ))
+        );
+    }
+
+    /**
+     * @param ResetPasswordPage $page
+     */
+    public function RenderResetPasswordPage(ResetPasswordPage $page) {
+        $this->SetHTTPContentTypeByPage($page);
+
+        if ($page->formIsCommit()) {
+            $this->result = SystemUtils::ToJSON($page->getResponse());
+            return;
+        }
+
+        $customParams = array();
+        $layoutTemplate = $page->GetCustomTemplate(
+            PagePart::Layout,
+            null,
+            'common/layout.tpl',
+            $customParams
+        );
+
+        $template = $page->GetCustomTemplate(
+            PagePart::ResetPassword,
+            null,
+            'reset_password_page.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'common' => $page->getCommonViewData()->setEntryPoint('reset-password'),
+                'Page' => $page,
+            ),
+            array_merge($customParams, array(
+                'layoutTemplate' => $layoutTemplate
+            ))
+        );
+    }
+
+    /**
+     * @param ResendVerificationPage $page
+     */
+    public function RenderResendVerificationPage(ResendVerificationPage $page) {
+        $this->SetHTTPContentTypeByPage($page);
+
+        if ($page->formIsCommit()) {
+            $this->result = SystemUtils::ToJSON($page->getResponse());
+            return;
+        }
+
+        $customParams = array();
+        $layoutTemplate = $page->GetCustomTemplate(
+            PagePart::Layout,
+            null,
+            'common/layout.tpl',
+            $customParams
+        );
+
+        $template = $page->GetCustomTemplate(
+            PagePart::ResendVerification,
+            null,
+            'resend_verification_page.tpl',
+            $customParams
+        );
+
+        $this->DisplayTemplate(
+            $template,
+            array(
+                'common' => $page->getCommonViewData()->setEntryPoint('form'),
+                'Page' => $page,
+                'ReCaptcha' => $page->getReCaptcha()
+            ),
+            array_merge($customParams, array(
+                'layoutTemplate' => $layoutTemplate
+            ))
+        );
+    }
 
     #endregion
 
     #region Page parts
-
-    /**
-     * @param ShowTextBlobHandler $textBlobViewer
-     */
-    public function RenderTextBlobViewer($textBlobViewer)
-    {
-        $this->DisplayTemplate('text_blob_viewer.tpl',
-            array(
-                'Viewer' => $textBlobViewer,
-                'Page' => $textBlobViewer->GetParentPage()),
-            array());
-    }
 
     public abstract function RenderGrid(Grid $Grid);
 
@@ -732,10 +945,13 @@ abstract class Renderer
         $isInline = $verticalGrid->isInline();
 
         $isEditOperation = $verticalGrid->getOperation() === OPERATION_EDIT;
+        $isMultiEditOperation = $verticalGrid->getOperation() === OPERATION_MULTI_EDIT;
 
-        $hiddenValues = array(OPERATION_PARAMNAME => OPERATION_COMMIT);
+        $hiddenValues = array();
         if ($isEditOperation) {
             AddPrimaryKeyParametersToArray($hiddenValues, $verticalGrid->GetGrid()->GetDataset()->GetPrimaryKeyValues());
+        } elseif ($isMultiEditOperation) {
+            $hiddenValues = $verticalGrid->GetGrid()->GetDataset()->fetchPrimaryKeyValues();
         }
 
         $getWrapper = ArrayWrapper::createGetWrapper();
@@ -744,7 +960,7 @@ abstract class Renderer
         if ($getWrapper->isValueSet('column')) {
             $this->RenderSingleFieldForm(
                 $getWrapper->getValue('column'),
-                $this->getGridFormViewData($grid, true),
+                $this->getGridFormViewData($grid, $verticalGrid->getOperation()),
                 $hiddenValues
             );
             return;
@@ -757,9 +973,9 @@ abstract class Renderer
                 $page,
                 $isInline
                     ? $this->getGridFormInlineViewData($grid, $isEditOperation)
-                    : $this->getGridFormViewData($grid, $isEditOperation),
+                    : $this->getGridFormViewData($grid, $verticalGrid->getOperation()),
                 $hiddenValues,
-                $isEditOperation,
+                $verticalGrid->getOperation(),
                 $flashMessages
             );
         }
@@ -770,7 +986,12 @@ abstract class Renderer
 
         $pageMode = null;
         if ($isModal) {
-            $pageMode = $isEditOperation ? PageMode::ModalEdit : PageMode::ModalInsert;
+            $pageMode = PageMode::ModalInsert;
+            if ($isMultiEditOperation) {
+                $pageMode = PageMode::ModalMultiEdit;
+            } elseif ($isEditOperation) {
+                $pageMode = PageMode::ModalEdit;
+            }
         } else {
             $pageMode = $isEditOperation ? PageMode::InlineEdit : PageMode::InlineInsert;
         }
@@ -785,7 +1006,11 @@ abstract class Renderer
 
         $this->DisplayTemplate(
             $template,
-            array('Grid' => $this->getGridFormViewData($grid, $isEditOperation)),
+            array('Grid' => $this->getGridFormViewData($grid, $verticalGrid->getOperation()),
+                'isMultiEditOperation' => $isMultiEditOperation,
+                'InsertOperationIsEnabled' => $grid->operationIsEnabled('insert'),
+                'EditOperationIsEnabled' => $grid->operationIsEnabled('edit')
+            ),
             array_merge($customParams, array(
                 'Forms' => $forms,
                 'modalSizeClass' => $this->getModalSizeClass($modalFormSize),
@@ -794,11 +1019,15 @@ abstract class Renderer
         );
     }
 
-    private function getGridFormViewData(Grid $grid, $isEditOperation)
+    private function getGridFormViewData(Grid $grid, $operation)
     {
-        return $isEditOperation
-            ? $grid->GetEditViewData()
-            : $grid->GetInsertViewData();
+        if ($operation === OPERATION_EDIT) {
+            return $grid->GetEditViewData();
+        } elseif ($operation === OPERATION_MULTI_EDIT) {
+            return $grid->GetMultiEditViewData();
+        } else {
+            return $grid->GetInsertViewData();
+        }
     }
 
     private function getGridFormInlineViewData(Grid $grid, $isEditOperation)
@@ -808,23 +1037,33 @@ abstract class Renderer
             : $grid->GetInlineInsertViewData();
     }
 
-    protected function RenderForm(Page $page, $gridViewData, $hiddenValues, $isEditOperation, $flashMessages)
+    protected function RenderForm(Page $page, $gridViewData, $hiddenValues, $operation, $flashMessages)
     {
+        $pageMode = PageMode::FormInsert;
+        if ($operation === OPERATION_MULTI_EDIT) {
+            $pageMode = PageMode::FormMultiEdit;
+        } elseif ($operation === OPERATION_EDIT) {
+            $pageMode = PageMode::FormEdit;
+        }
+
         $customParams = array();
         $template = $page->GetCustomTemplate(
             PagePart::VerticalGrid,
-            $isEditOperation ? PageMode::FormEdit : PageMode::FormInsert,
+            $pageMode,
             'forms/form.tpl',
             $customParams
         );
 
-
         $this->DisplayTemplate($template, array(
             'Grid' => $gridViewData,
         ), array_merge($customParams, array(
-            'isEditOperation' => $isEditOperation,
+            'isEditOperation' => ($operation === OPERATION_EDIT || $operation === OPERATION_MULTI_EDIT),
             'flashMessages' => $flashMessages,
             'HiddenValues' => $hiddenValues,
+            'isMultiEditOperation' => $operation === OPERATION_MULTI_EDIT,
+            'isMultiUploadOperation' => $operation === OPERATION_MULTI_UPLOAD,
+            'ShowErrorsOnTop' => $page->getShowFormErrorsOnTop(),
+            'ShowErrorsAtBottom' => $page->getShowFormErrorsAtBottom()
         )));
 
         return $this->result;
@@ -849,17 +1088,22 @@ abstract class Renderer
     }
 
     public function RenderRecordCardView(RecordCardView $recordCardView) {
+        $this->SetHTTPContentTypeByPage($recordCardView->GetGrid()->GetPage());
         $this->renderingRecordCardView = true;
 
         try {
             $grid = $recordCardView->GetGrid();
             $customParams = array();
-            $template = $grid->GetPage()->GetCustomTemplate(PagePart::VerticalGrid, PageMode::ModalView, 'view/record_card_view.tpl', $customParams);
+            if ($recordCardView->isInline()) {
+                $template = $grid->GetPage()->GetCustomTemplate(PagePart::VerticalGrid, PageMode::InlineView, 'view/record_card_inline_view.tpl', $customParams);
+            } else {
+                $template = $grid->GetPage()->GetCustomTemplate(PagePart::VerticalGrid, PageMode::ModalView, 'view/record_card_view.tpl', $customParams);
+            }
 
             $this->DisplayTemplate($template, array(), array_merge(
                 $customParams,
                 array(
-                    'Grid' => $grid->getViewSingleRowViewData(),
+                    'Grid' => $grid->getViewSingleRowViewData($recordCardView->isInline()),
                     'modalSizeClass' => $this->getModalSizeClass($grid->GetPage()->getModalViewSize()),
                 )
             ));
@@ -923,27 +1167,11 @@ abstract class Renderer
 
         $this->DisplayTemplate(
             $template,
-            array('navigation' => $navigation),
-            $customParams
-        );
-    }
-
-
-    /**
-     * @param LoginControl $loginControl
-     */
-    public function RenderLoginControl($loginControl)  {
-        $customParams = array();
-        $template = $loginControl->getPage()->GetCustomTemplate(
-            PagePart::LoginControl,
-            null,
-            'login_control.tpl',
-            $customParams
-        );
-
-        $this->DisplayTemplate(
-            $template,
-            array('LoginControl' => $loginControl),
+            array(
+                'navigation' => $navigation,
+                'HomePageEnabled' => HasHomePage(),
+                'HomePageURL' => GetHomeURL()
+            ),
             $customParams
         );
     }
@@ -958,7 +1186,7 @@ abstract class Renderer
         $this->DisplayTemplate('charts/chart.tpl', array(), array(
             'type' => $chart->getChartType(),
             'chart' => $chart->getViewData(),
-            'uniqueId' => uniqid(),
+            'uniqueId' => 'chart_' . uniqid(),
         ));
     }
 

@@ -9,7 +9,7 @@ abstract class UserGrantManager
      * @param string $dataSourceName
      * @return IPermissionSet
      */
-    public abstract function GetSecurityInfo($userName, $dataSourceName);
+    public abstract function GetPermissionSet($userName, $dataSourceName);
 
     /**
      * @abstract
@@ -31,4 +31,27 @@ abstract class UserGrantManager
      * @return array
      */
     public abstract function getAdminDatasources($userName);
+}
+
+class NullUserGrantManager extends UserGrantManager
+{
+    /** @inheritdoc */
+    public function GetPermissionSet($userName, $dataSourceName) {
+        return new AdminPermissionSet();
+    }
+
+    /** @inheritdoc */
+    public function HasAdminGrant($userName) {
+        return false;
+    }
+
+    /** @inheritdoc */
+    public function HasAdminPanel($userName) {
+        return false;
+    }
+
+    /** @inheritdoc */
+    public function getAdminDatasources($userName) {
+        return array();
+    }
 }

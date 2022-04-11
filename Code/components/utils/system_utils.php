@@ -1,7 +1,6 @@
 <?php
 
 include_once dirname(__FILE__) . '/string_utils.php';
-include_once dirname(__FILE__) . '/../../libs/JSON.php';
 
 class SMReflection
 {
@@ -33,9 +32,9 @@ class SystemUtils
 
     public static function SetTimeZoneIfNeed($timezoneIdentifier)
     {
-        if (SystemUtils::GetPHPMinorVersion() >= 3)
-            if (StringUtils::IsNullOrEmpty(ini_get('date.timezone')))
-                date_default_timezone_set($timezoneIdentifier);
+        if (version_compare(PHP_VERSION, "5.3.0", ">=") && StringUtils::IsNullOrEmpty(ini_get('date.timezone'))) {
+            date_default_timezone_set($timezoneIdentifier);
+        }
     }
 
     public static function DisableMagicQuotesRuntime()
@@ -53,25 +52,11 @@ class SystemUtils
 
     public static function ToJSON($value)
     {
-        if (function_exists('json_encode'))
-        {
-            return json_encode($value);
-        }
-        else
-        {
-            $jsonConverter = new Services_JSON();
-            return $jsonConverter->encode($value);
-        }
+	return json_encode($value);
     }
 
     public static function FromJSON($json, $assoc = false)
     {
-        if (!function_exists('json_decode')) {
-            $jsonConverter = new Services_JSON($assoc ? SERVICES_JSON_LOOSE_TYPE : 0);
-
-            return $jsonConverter->decode($json);
-        }
-
         return json_decode($json, $assoc);
     }
 
@@ -189,8 +174,6 @@ interface IDelegate
     function Call();
 
     function CallFromArray($argumentsArray);
-
-    function Bind($rules);
 }
 
 class Delegate implements IDelegate
@@ -223,11 +206,6 @@ class Delegate implements IDelegate
         return new Delegate(array($className, $methodName));
     }
 
-    public static function CreateFromText($arguments, $body)
-    {
-        return new Delegate(create_function($arguments, $body));
-    }
-
     public function Call()
     {
         $arguments = func_get_args();
@@ -238,72 +216,4 @@ class Delegate implements IDelegate
     {
         return call_user_func_array($this->phpDelegate, $argumentsArray);
     }
-
-    /**
-     * @param  $rules
-     * @return BindableDelegate
-     */
-    public function Bind($rules)
-    {
-        return new BindableDelegate($this, $rules);
-    }
 }
-
-class BindableDelegate implements IDelegate
-{
-    private $delegate;
-    private $rules;
-
-    public function __construct(IDelegate $delegate, $rules)
-    {
-        $this->delegate = $delegate;
-        $this->rules = $rules;
-        if ($this->rules != null)
-            uksort($this->rules, create_function('$a1,$a2', 'return $a1 > $a2;'));
-    }
-
-    private function array_insert_before(&$array, $index, $value)
-    {
-        for ($i = count($array); $i > $index; $i--)
-            $array[$i] = $array[$i - 1];
-        $array[$index] = $value;
-    }
-
-    function Call()
-    {
-        $arguments = func_get_args();
-        if ($this->rules == null)
-        {
-            return $this->delegate->CallFromArray($arguments);
-        }
-        else
-        {
-            foreach($this->rules as $arg => $value)
-            {
-                $this->array_insert_before($arguments, Argument::GetArgumentNumber($arg), $value);
-            }
-            return $this->delegate->CallFromArray($arguments);
-        }
-    }
-
-    function CallFromArray($argumentsArray)
-    {
-        if ($this->rules == null)
-        {
-            return $this->delegate->CallFromArray($argumentsArray);
-        }
-        else
-        {
-            foreach($this->rules as $arg => $value)
-                $this->array_insert_before($argumentsArray, Argument::GetArgumentNumber($arg), $value);
-            return $this->delegate->CallFromArray($argumentsArray);
-        }
-    }
-
-    public function Bind($rules)
-    {
-        return new BindableDelegate($this, $rules);
-    }
-}
-
-?>

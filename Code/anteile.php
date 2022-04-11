@@ -10,19 +10,17 @@
 
     include_once dirname(__FILE__) . '/components/startup.php';
     include_once dirname(__FILE__) . '/components/application.php';
+    include_once dirname(__FILE__) . '/' . 'authorization.php';
 
 
     include_once dirname(__FILE__) . '/' . 'database_engine/mysql_engine.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/page.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/detail_page.php';
-    include_once dirname(__FILE__) . '/' . 'components/page/nested_form_page.php';
-
+    include_once dirname(__FILE__) . '/' . 'components/page/page_includes.php';
 
     function GetConnectionOptions()
     {
         $result = GetGlobalConnectionOptions();
         $result['client_encoding'] = 'utf8';
-        GetApplication()->GetUserAuthorizationStrategy()->ApplyIdentityToConnectionOptions($result);
+        GetApplication()->GetUserAuthentication()->applyIdentityToConnectionOptions($result);
         return $result;
     }
 
@@ -38,28 +36,26 @@
     {
         protected function DoBeforeCreate()
         {
+            $this->SetTitle('Transaktionen');
+            $this->SetMenuLabel('Transaktionen');
+    
             $this->dataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`transaktionen`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $this->dataset->AddField($field, true);
-            $field = new IntegerField('anteil');
-            $this->dataset->AddField($field, false);
-            $field = new DateField('datum');
-            $this->dataset->AddField($field, false);
-            $field = new StringField('typ');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $this->dataset->AddField($field, false);
-            $this->dataset->AddLookupField('anteil', 'anteile', new IntegerField('id', null, null, true), new IntegerField('depotname', 'anteil_depotname', 'anteil_depotname_anteile'), 'anteil_depotname_anteile');
+            $this->dataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('anteil'),
+                    new DateField('datum'),
+                    new StringField('typ'),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('wert')
+                )
+            );
+            $this->dataset->AddLookupField('anteil', 'anteile', new IntegerField('id'), new IntegerField('depotname', false, false, false, false, 'anteil_depotname', 'anteil_depotname_anteile'), 'anteil_depotname_anteile');
         }
     
         protected function DoPrepare() {
@@ -71,7 +67,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(50);
+            $partitionNavigator->SetRowsPerPage(20);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -90,14 +86,14 @@
         protected function getFiltersColumns()
         {
             return array(
-                new FilterColumn($this->dataset, 'id', 'id', $this->RenderText('Id')),
-                new FilterColumn($this->dataset, 'anteil', 'anteil_depotname', $this->RenderText('Anteil')),
-                new FilterColumn($this->dataset, 'datum', 'datum', $this->RenderText('Datum')),
-                new FilterColumn($this->dataset, 'typ', 'typ', $this->RenderText('Typ')),
-                new FilterColumn($this->dataset, 'anzahl', 'anzahl', $this->RenderText('Anzahl')),
-                new FilterColumn($this->dataset, 'preis', 'preis', $this->RenderText('Preis')),
-                new FilterColumn($this->dataset, 'kosten', 'kosten', $this->RenderText('Kosten')),
-                new FilterColumn($this->dataset, 'wert', 'wert', $this->RenderText('Wert'))
+                new FilterColumn($this->dataset, 'id', 'id', 'Id'),
+                new FilterColumn($this->dataset, 'anteil', 'anteil_depotname', 'Anteil'),
+                new FilterColumn($this->dataset, 'datum', 'datum', 'Datum'),
+                new FilterColumn($this->dataset, 'typ', 'typ', 'Typ'),
+                new FilterColumn($this->dataset, 'anzahl', 'anzahl', 'Anzahl'),
+                new FilterColumn($this->dataset, 'preis', 'preis', 'Preis'),
+                new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
+                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert')
             );
         }
     
@@ -141,48 +137,14 @@
                 )
             );
             
-            $main_editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $main_editor = new DynamicCombobox('anteil_edit', $this->CreateLinkBuilder());
+            $main_editor->setAllowClear(true);
+            $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $lookupDataset = new TableDataset(
-                MySqlIConnectionFactory::getInstance(),
-                GetConnectionOptions(),
-                '`anteile`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new IntegerField('depotname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('aktienname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kurs');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('steigerung');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('rendite');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('depotname', GetOrderTypeAsSQL(otAscending));
-            $editColumn = new LookUpEditColumn(
-                'Anteil', 
-                'anteil', 
-                $main_editor, 
-                $this->dataset, 'id', 'depotname', $lookupDataset);
+            $main_editor->SetHandlerName('filter_builder_anteile_transaktionen01_anteil_search');
             
-            $editColumn->PrepareEditorControl();
-            
-            $multi_value_select_editor = new MultiValueSelect('anteil');
-            $multi_value_select_editor->setChoices($main_editor->getChoices());
+            $multi_value_select_editor = new RemoteMultiValueSelect('anteil', $this->CreateLinkBuilder());
+            $multi_value_select_editor->SetHandlerName('filter_builder_anteile_transaktionen01_anteil_search');
             
             $filterBuilder->addColumn(
                 $columns['anteil'],
@@ -202,7 +164,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $main_editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             
             $filterBuilder->addColumn(
                 $columns['datum'],
@@ -224,8 +186,8 @@
             );
             
             $main_editor = new MultiValueSelect('typ');
-            $main_editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $main_editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $main_editor->addChoice('Kauf', 'Kauf');
+            $main_editor->addChoice('Verkauf', 'Verkauf');
             
             $text_editor = new TextEdit('typ');
             
@@ -372,7 +334,7 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -385,7 +347,7 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -393,10 +355,10 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -406,7 +368,7 @@
             $column = new TextViewColumn('typ', 'typ', 'Typ', $this->dataset);
             $column->SetOrderable(true);
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -416,10 +378,10 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -429,10 +391,10 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -442,10 +404,10 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -455,10 +417,10 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
         }
@@ -489,8 +451,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -506,8 +468,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -516,8 +478,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -526,8 +488,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -536,8 +498,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -546,42 +508,30 @@
             //
             // Edit column for anteil field
             //
-            $editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $editor = new DynamicCombobox('anteil_edit', $this->CreateLinkBuilder());
+            $editor->setAllowClear(true);
+            $editor->setMinimumInputLength(0);
             $lookupDataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`anteile`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new IntegerField('depotname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('aktienname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kurs');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('steigerung');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('rendite');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('depotname', GetOrderTypeAsSQL(otAscending));
-            $editColumn = new LookUpEditColumn(
-                'Anteil', 
-                'anteil', 
-                $editor, 
-                $this->dataset, 'id', 'depotname', $lookupDataset);
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'edit_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -589,7 +539,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -600,8 +550,8 @@
             //
             $editor = new CheckBoxGroup('typ_edit');
             $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
-            $editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
             $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -644,47 +594,126 @@
             $grid->AddEditColumn($editColumn);
         }
     
+        protected function AddMultiEditColumns(Grid $grid)
+        {
+            //
+            // Edit column for anteil field
+            //
+            $editor = new DynamicCombobox('anteil_edit', $this->CreateLinkBuilder());
+            $editor->setAllowClear(true);
+            $editor->setMinimumInputLength(0);
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`anteile`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'multi_edit_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for datum field
+            //
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for typ field
+            //
+            $editor = new CheckBoxGroup('typ_edit');
+            $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
+            $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for anzahl field
+            //
+            $editor = new TextEdit('anzahl_edit');
+            $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for preis field
+            //
+            $editor = new TextEdit('preis_edit');
+            $editColumn = new CustomEditColumn('Preis', 'preis', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for kosten field
+            //
+            $editor = new TextEdit('kosten_edit');
+            $editColumn = new CustomEditColumn('Kosten', 'kosten', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+        }
+    
         protected function AddInsertColumns(Grid $grid)
         {
             //
             // Edit column for anteil field
             //
-            $editor = new ComboBox('anteil_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $editor = new DynamicCombobox('anteil_edit', $this->CreateLinkBuilder());
+            $editor->setAllowClear(true);
+            $editor->setMinimumInputLength(0);
             $lookupDataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`anteile`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new IntegerField('depotname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('aktienname');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kurs');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('steigerung');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('rendite');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('depotname', GetOrderTypeAsSQL(otAscending));
-            $editColumn = new LookUpEditColumn(
-                'Anteil', 
-                'anteil', 
-                $editor, 
-                $this->dataset, 'id', 'depotname', $lookupDataset);
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'insert_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -692,7 +721,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'dd.mm.YY');
+            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -703,8 +732,8 @@
             //
             $editor = new CheckBoxGroup('typ_edit');
             $editor->SetDisplayMode(CheckBoxGroup::StackedMode);
-            $editor->addChoice($this->RenderText('Kauf'), $this->RenderText('Kauf'));
-            $editor->addChoice($this->RenderText('Verkauf'), $this->RenderText('Verkauf'));
+            $editor->addChoice('Kauf', 'Kauf');
+            $editor->addChoice('Verkauf', 'Verkauf');
             $editColumn = new CustomEditColumn('Typ', 'typ', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -748,6 +777,11 @@
             $grid->SetShowAddButton(true && $this->GetSecurityInfo()->HasAddGrant());
         }
     
+        private function AddMultiUploadColumn(Grid $grid)
+        {
+    
+        }
+    
         protected function AddPrintColumns(Grid $grid)
         {
             //
@@ -774,8 +808,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddPrintColumn($column);
             
             //
@@ -791,8 +825,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -801,8 +835,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -811,8 +845,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -821,8 +855,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
         }
     
@@ -852,8 +886,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddExportColumn($column);
             
             //
@@ -869,8 +903,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -879,8 +913,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -889,8 +923,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -899,8 +933,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
         }
     
@@ -920,8 +954,8 @@
             // View column for datum field
             //
             $column = new DateTimeViewColumn('datum', 'datum', 'Datum', $this->dataset);
-            $column->SetDateTimeFormat('dd.mm.YY');
             $column->SetOrderable(true);
+            $column->SetDateTimeFormat('dd.mm.YY');
             $grid->AddCompareColumn($column);
             
             //
@@ -937,8 +971,8 @@
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -947,8 +981,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -957,8 +991,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -967,8 +1001,8 @@
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
         }
     
@@ -1016,25 +1050,29 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(true);
+            $result->SetUseFixedHeader(false);
             $result->SetShowLineNumbers(false);
+            $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
             $result->setEnableRuntimeCustomization(true);
             $result->setAllowCompare(true);
             $this->AddCompareHeaderColumns($result);
             $this->AddCompareColumns($result);
-            $result->setTableBordered(true);
-            $result->setTableCondensed(true);
+            $result->setMultiEditAllowed($this->GetSecurityInfo()->HasEditGrant() && true);
+            $result->setTableBordered(false);
+            $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(true);
+            $result->SetHighlightRowAtHover(false);
             $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
             $this->AddSingleRecordViewColumns($result);
             $this->AddEditColumns($result);
+            $this->AddMultiEditColumns($result);
             $this->AddInsertColumns($result);
             $this->AddPrintColumns($result);
             $this->AddExportColumns($result);
+            $this->AddMultiUploadColumn($result);
     
     
             $this->SetShowPageList(true);
@@ -1043,9 +1081,11 @@
             $this->setPrintListAvailable(true);
             $this->setPrintListRecordAvailable(false);
             $this->setPrintOneRecordAvailable(true);
-            $this->setExportListAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setAllowPrintSelectedRecords(true);
+            $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportListRecordAvailable(array());
-            $this->setExportOneRecordAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
         }
@@ -1055,7 +1095,97 @@
         }
     
         protected function doRegisterHandlers() {
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`anteile`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'insert_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            GetApplication()->RegisterHTTPHandler($handler);
             
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`anteile`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`anteile`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'edit_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`anteile`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $lookupDataset->setOrderByField('depotname', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'multi_edit_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            GetApplication()->RegisterHTTPHandler($handler);
         }
        
         protected function doCustomRenderColumn($fieldName, $fieldData, $rowData, &$customText, &$handled)
@@ -1088,22 +1218,27 @@
     
         }
     
+        protected function doCustomDefaultValues(&$values, &$handled) 
+        {
+    
+        }
+    
         protected function doCustomCompareColumn($columnName, $valueA, $valueB, &$result)
         {
     
         }
     
-        protected function doBeforeInsertRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeInsertRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeUpdateRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeUpdateRecord($page, $oldRowData, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeDeleteRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeDeleteRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
@@ -1113,7 +1248,7 @@
     
         }
     
-        protected function doAfterUpdateRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
+        protected function doAfterUpdateRecord($page, $oldRowData, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
         {
     
         }
@@ -1138,7 +1273,7 @@
     
         }
     
-        protected function doGetCustomUploadFileName($fieldName, $rowData, &$result, &$handled, $originalFileName, $originalFileExtension, $fileSize)
+        protected function doFileUpload($fieldName, $rowData, &$result, &$accept, $originalFileName, $originalFileExtension, $fileSize, $tempFileName)
         {
     
         }
@@ -1148,17 +1283,47 @@
     
         }
     
+        protected function doPrepareColumnFilter(ColumnFilter $columnFilter)
+        {
+    
+        }
+    
+        protected function doPrepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
+        {
+    
+        }
+    
+        protected function doGetSelectionFilters(FixedKeysArray $columns, &$result)
+        {
+    
+        }
+    
+        protected function doGetCustomFormLayout($mode, FixedKeysArray $columns, FormLayout $layout)
+        {
+    
+        }
+    
+        protected function doGetCustomColumnGroup(FixedKeysArray $columns, ViewColumnGroup $columnGroup)
+        {
+    
+        }
+    
         protected function doPageLoaded()
         {
     
         }
     
-        protected function doGetCustomPagePermissions(Page $page, PermissionSet &$permissions, &$handled)
+        protected function doCalculateFields($rowData, $fieldName, &$value)
         {
     
         }
     
         protected function doGetCustomRecordPermissions(Page $page, &$usingCondition, $rowData, &$allowEdit, &$allowDelete, &$mergeWithDefault, &$handled)
+        {
+    
+        }
+    
+        protected function doAddEnvironmentVariables(Page $page, &$variables)
         {
     
         }
@@ -1173,37 +1338,30 @@
     {
         protected function DoBeforeCreate()
         {
+            $this->SetTitle('Anteile');
+            $this->SetMenuLabel('Anteile');
+    
             $this->dataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`anteile`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $this->dataset->AddField($field, true);
-            $field = new IntegerField('depotname');
-            $field->SetIsNotNull(true);
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('aktienname');
-            $field->SetIsNotNull(true);
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('anzahl');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('preis');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('kurs');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('steigerung');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $this->dataset->AddField($field, false);
-            $field = new IntegerField('rendite');
-            $this->dataset->AddField($field, false);
-            $this->dataset->AddLookupField('depotname', 'depots', new IntegerField('id', null, null, true), new StringField('name', 'depotname_name', 'depotname_name_depots'), 'depotname_name_depots');
-            $this->dataset->AddLookupField('aktienname', 'aktien', new IntegerField('id', null, null, true), new StringField('name', 'aktienname_name', 'aktienname_name_aktien'), 'aktienname_name_aktien');
+            $this->dataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new IntegerField('depotname', true),
+                    new IntegerField('aktienname', true),
+                    new IntegerField('anzahl'),
+                    new IntegerField('preis'),
+                    new IntegerField('kosten'),
+                    new IntegerField('invest'),
+                    new IntegerField('kurs'),
+                    new IntegerField('steigerung'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('rendite')
+                )
+            );
+            $this->dataset->AddLookupField('depotname', 'depots', new IntegerField('id'), new StringField('name', false, false, false, false, 'depotname_name', 'depotname_name_depots'), 'depotname_name_depots');
+            $this->dataset->AddLookupField('aktienname', 'aktien', new IntegerField('id'), new StringField('name', false, false, false, false, 'aktienname_name', 'aktienname_name_aktien'), 'aktienname_name_aktien');
         }
     
         protected function DoPrepare() {
@@ -1215,7 +1373,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(50);
+            $partitionNavigator->SetRowsPerPage(20);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -1234,17 +1392,17 @@
         protected function getFiltersColumns()
         {
             return array(
-                new FilterColumn($this->dataset, 'id', 'id', $this->RenderText('Id')),
-                new FilterColumn($this->dataset, 'depotname', 'depotname_name', $this->RenderText('Depotname')),
-                new FilterColumn($this->dataset, 'aktienname', 'aktienname_name', $this->RenderText('Aktienname')),
-                new FilterColumn($this->dataset, 'anzahl', 'anzahl', $this->RenderText('Anzahl')),
-                new FilterColumn($this->dataset, 'preis', 'preis', $this->RenderText('Preis')),
-                new FilterColumn($this->dataset, 'kosten', 'kosten', $this->RenderText('Kosten')),
-                new FilterColumn($this->dataset, 'invest', 'invest', $this->RenderText('Invest')),
-                new FilterColumn($this->dataset, 'kurs', 'kurs', $this->RenderText('Kurs')),
-                new FilterColumn($this->dataset, 'steigerung', 'steigerung', $this->RenderText('Steigerung')),
-                new FilterColumn($this->dataset, 'gewinn', 'gewinn', $this->RenderText('Gewinn')),
-                new FilterColumn($this->dataset, 'rendite', 'rendite', $this->RenderText('Rendite'))
+                new FilterColumn($this->dataset, 'id', 'id', 'Id'),
+                new FilterColumn($this->dataset, 'depotname', 'depotname_name', 'Depotname'),
+                new FilterColumn($this->dataset, 'aktienname', 'aktienname_name', 'Aktienname'),
+                new FilterColumn($this->dataset, 'anzahl', 'anzahl', 'Anzahl'),
+                new FilterColumn($this->dataset, 'preis', 'preis', 'Preis'),
+                new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
+                new FilterColumn($this->dataset, 'invest', 'invest', 'Invest'),
+                new FilterColumn($this->dataset, 'kurs', 'kurs', 'Kurs'),
+                new FilterColumn($this->dataset, 'steigerung', 'steigerung', 'Steigerung'),
+                new FilterColumn($this->dataset, 'gewinn', 'gewinn', 'Gewinn'),
+                new FilterColumn($this->dataset, 'rendite', 'rendite', 'Rendite')
             );
         }
     
@@ -1291,14 +1449,14 @@
                 )
             );
             
-            $main_editor = new AutocompleteComboBox('depotname_edit', $this->CreateLinkBuilder());
+            $main_editor = new DynamicCombobox('depotname_edit', $this->CreateLinkBuilder());
             $main_editor->setAllowClear(true);
             $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $main_editor->SetHandlerName('filter_builder_depotname_name_search');
+            $main_editor->SetHandlerName('filter_builder_anteile_depotname_search');
             
             $multi_value_select_editor = new RemoteMultiValueSelect('depotname', $this->CreateLinkBuilder());
-            $multi_value_select_editor->SetHandlerName('filter_builder_depotname_name_search');
+            $multi_value_select_editor->SetHandlerName('filter_builder_anteile_depotname_search');
             
             $text_editor = new TextEdit('depotname');
             
@@ -1326,14 +1484,14 @@
                 )
             );
             
-            $main_editor = new AutocompleteComboBox('aktienname_edit', $this->CreateLinkBuilder());
+            $main_editor = new DynamicCombobox('aktienname_edit', $this->CreateLinkBuilder());
             $main_editor->setAllowClear(true);
             $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $main_editor->SetHandlerName('filter_builder_aktienname_name_search');
+            $main_editor->SetHandlerName('filter_builder_anteile_aktienname_search');
             
             $multi_value_select_editor = new RemoteMultiValueSelect('aktienname', $this->CreateLinkBuilder());
-            $multi_value_select_editor->SetHandlerName('filter_builder_aktienname_name_search');
+            $multi_value_select_editor->SetHandlerName('filter_builder_anteile_aktienname_search');
             
             $text_editor = new TextEdit('aktienname');
             
@@ -1547,7 +1705,7 @@
     
         protected function AddFieldColumns(Grid $grid, $withDetails = true)
         {
-            if (GetCurrentUserGrantForDataSource('anteile.transaktionen01')->HasViewGrant() && $withDetails)
+            if (GetCurrentUserPermissionsForPage('anteile.transaktionen01')->HasViewGrant() && $withDetails)
             {
             //
             // View column for anteile_transaktionen01 detail
@@ -1566,7 +1724,7 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1576,7 +1734,7 @@
             $column = new TextViewColumn('depotname', 'depotname_name', 'Depotname', $this->dataset);
             $column->SetOrderable(true);
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1586,7 +1744,7 @@
             $column = new TextViewColumn('aktienname', 'aktienname_name', 'Aktienname', $this->dataset);
             $column->SetOrderable(true);
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1599,7 +1757,7 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1609,10 +1767,10 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1622,10 +1780,10 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1635,10 +1793,10 @@
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1648,10 +1806,10 @@
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1661,10 +1819,10 @@
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1674,10 +1832,10 @@
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
@@ -1687,10 +1845,10 @@
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription($this->RenderText(''));
+            $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
         }
@@ -1737,8 +1895,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1747,8 +1905,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1757,8 +1915,8 @@
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1767,8 +1925,8 @@
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1777,8 +1935,8 @@
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1787,8 +1945,8 @@
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1797,8 +1955,8 @@
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -1822,43 +1980,30 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
                 'depotname', 
                 $editor, 
                 $this->dataset, 'id', 'name', $lookupDataset);
-            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $this->RenderText($editColumn->GetCaption())));
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -1871,46 +2016,36 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`aktien`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wkn');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('isin');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('branche');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par1');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par3');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par5');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par10');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par20');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kgv');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('div_rendite');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dsr');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('bewertung');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('kommentar');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('kgv'),
+                    new IntegerField('div_rendite'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Aktienname', 
                 'aktienname', 
                 $editor, 
                 $this->dataset, 'id', 'name', $lookupDataset);
-            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $this->RenderText($editColumn->GetCaption())));
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -1988,6 +2123,159 @@
             $grid->AddEditColumn($editColumn);
         }
     
+        protected function AddMultiEditColumns(Grid $grid)
+        {
+            //
+            // Edit column for depotname field
+            //
+            $editor = new ComboBox('depotname_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`depots`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $editColumn = new LookUpEditColumn(
+                'Depotname', 
+                'depotname', 
+                $editor, 
+                $this->dataset, 'id', 'name', $lookupDataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for aktienname field
+            //
+            $editor = new ComboBox('aktienname_edit', $this->GetLocalizerCaptions()->GetMessageString('PleaseSelect'));
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`aktien`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('kgv'),
+                    new IntegerField('div_rendite'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $editColumn = new LookUpEditColumn(
+                'Aktienname', 
+                'aktienname', 
+                $editor, 
+                $this->dataset, 'id', 'name', $lookupDataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for anzahl field
+            //
+            $editor = new TextEdit('anzahl_edit');
+            $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for preis field
+            //
+            $editor = new TextEdit('preis_edit');
+            $editColumn = new CustomEditColumn('Preis', 'preis', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for kosten field
+            //
+            $editor = new TextEdit('kosten_edit');
+            $editColumn = new CustomEditColumn('Kosten', 'kosten', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for invest field
+            //
+            $editor = new TextEdit('invest_edit');
+            $editColumn = new CustomEditColumn('Invest', 'invest', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for kurs field
+            //
+            $editor = new TextEdit('kurs_edit');
+            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for steigerung field
+            //
+            $editor = new TextEdit('steigerung_edit');
+            $editColumn = new CustomEditColumn('Steigerung', 'steigerung', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for gewinn field
+            //
+            $editor = new TextEdit('gewinn_edit');
+            $editColumn = new CustomEditColumn('Gewinn', 'gewinn', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for rendite field
+            //
+            $editor = new TextEdit('rendite_edit');
+            $editColumn = new CustomEditColumn('Rendite', 'rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+        }
+    
         protected function AddInsertColumns(Grid $grid)
         {
             //
@@ -2008,43 +2296,30 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Depotname', 
                 'depotname', 
                 $editor, 
                 $this->dataset, 'id', 'name', $lookupDataset);
-            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $this->RenderText($editColumn->GetCaption())));
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -2057,46 +2332,36 @@
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`aktien`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wkn');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('isin');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('branche');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par1');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par3');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par5');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par10');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par20');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kgv');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('div_rendite');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dsr');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('bewertung');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('kommentar');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('kgv'),
+                    new IntegerField('div_rendite'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
             $editColumn = new LookUpEditColumn(
                 'Aktienname', 
                 'aktienname', 
                 $editor, 
                 $this->dataset, 'id', 'name', $lookupDataset);
-            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $this->RenderText($editColumn->GetCaption())));
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -2175,6 +2440,11 @@
             $grid->SetShowAddButton(true && $this->GetSecurityInfo()->HasAddGrant());
         }
     
+        private function AddMultiUploadColumn(Grid $grid)
+        {
+    
+        }
+    
         protected function AddPrintColumns(Grid $grid)
         {
             //
@@ -2217,8 +2487,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2227,8 +2497,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2237,8 +2507,8 @@
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2247,8 +2517,8 @@
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2257,8 +2527,8 @@
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2267,8 +2537,8 @@
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
             
             //
@@ -2277,8 +2547,8 @@
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddPrintColumn($column);
         }
     
@@ -2324,8 +2594,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2334,8 +2604,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2344,8 +2614,8 @@
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2354,8 +2624,8 @@
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2364,8 +2634,8 @@
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2374,8 +2644,8 @@
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
             
             //
@@ -2384,8 +2654,8 @@
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddExportColumn($column);
         }
     
@@ -2431,8 +2701,8 @@
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2441,8 +2711,8 @@
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2451,8 +2721,8 @@
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2461,8 +2731,8 @@
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2471,8 +2741,8 @@
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2481,8 +2751,8 @@
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
             
             //
@@ -2491,8 +2761,8 @@
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
+            $column->setThousandsSeparator(',');
+            $column->setDecimalSeparator('.');
             $grid->AddCompareColumn($column);
         }
     
@@ -2524,14 +2794,15 @@
             
             $this->AddFieldColumns($result, false);
             $this->AddPrintColumns($result);
+            $this->AddExportColumns($result);
             
             $result->SetAllowDeleteSelected(false);
             $result->SetShowUpdateLink(false);
             $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
             $result->setEnableRuntimeCustomization(false);
-            $result->setTableBordered(true);
-            $result->setTableCondensed(true);
+            $result->setTableBordered(false);
+            $result->setTableCondensed(false);
             
             $this->setupGridColumnGroup($result);
             $this->attachGridEventHandlers($result);
@@ -2561,25 +2832,29 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(true);
+            $result->SetUseFixedHeader(false);
             $result->SetShowLineNumbers(false);
+            $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
             $result->setEnableRuntimeCustomization(true);
             $result->setAllowCompare(true);
             $this->AddCompareHeaderColumns($result);
             $this->AddCompareColumns($result);
-            $result->setTableBordered(true);
-            $result->setTableCondensed(true);
+            $result->setMultiEditAllowed($this->GetSecurityInfo()->HasEditGrant() && true);
+            $result->setTableBordered(false);
+            $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(true);
+            $result->SetHighlightRowAtHover(false);
             $result->SetWidth('1200px');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
             $this->AddSingleRecordViewColumns($result);
             $this->AddEditColumns($result);
+            $this->AddMultiEditColumns($result);
             $this->AddInsertColumns($result);
             $this->AddPrintColumns($result);
             $this->AddExportColumns($result);
+            $this->AddMultiUploadColumn($result);
     
     
             $this->SetShowPageList(true);
@@ -2588,9 +2863,11 @@
             $this->setPrintListAvailable(true);
             $this->setPrintListRecordAvailable(false);
             $this->setPrintOneRecordAvailable(true);
-            $this->setExportListAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setAllowPrintSelectedRecords(true);
+            $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportListRecordAvailable(array());
-            $this->setExportOneRecordAvailable(array('excel','word','xml','csv','pdf'));
+            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
         }
@@ -2600,94 +2877,66 @@
         }
     
         protected function doRegisterHandlers() {
-            $detailPage = new anteile_transaktionen01Page('anteile_transaktionen01', $this, array('anteil'), array('depotname'), $this->GetForeignKeyFields(), $this->CreateMasterDetailRecordGrid(), $this->dataset, GetCurrentUserGrantForDataSource('anteile.transaktionen01'), 'UTF-8');
+            $detailPage = new anteile_transaktionen01Page('anteile_transaktionen01', $this, array('anteil'), array('depotname'), $this->GetForeignKeyFields(), $this->CreateMasterDetailRecordGrid(), $this->dataset, GetCurrentUserPermissionsForPage('anteile.transaktionen01'), 'UTF-8');
             $detailPage->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource('anteile.transaktionen01'));
-            $detailPage->SetTitle('Transaktionen');
-            $detailPage->SetMenuLabel('Transaktionen');
-            $detailPage->SetHeader(GetPagesHeader());
-            $detailPage->SetFooter(GetPagesFooter());
             $detailPage->SetHttpHandlerName('anteile_transaktionen01_handler');
             $handler = new PageHTTPHandler('anteile_transaktionen01_handler', $detailPage);
             GetApplication()->RegisterHTTPHandler($handler);
+            
             $lookupDataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`depots`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('owner');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wpperm');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('portf');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('start');
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('invest');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('wert');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dividende');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kosten');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('gewinn_prozent');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
-            $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_depotname_name_search', 'id', 'name', null);
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('owner'),
+                    new StringField('wpperm'),
+                    new StringField('f100id', true),
+                    new StringField('portf', true),
+                    new StringField('start', true),
+                    new IntegerField('invest'),
+                    new IntegerField('wert'),
+                    new IntegerField('dividende'),
+                    new IntegerField('kosten'),
+                    new IntegerField('gewinn'),
+                    new IntegerField('gewinn_prozent')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteile_depotname_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
                 '`aktien`');
-            $field = new IntegerField('id', null, null, true);
-            $field->SetIsNotNull(true);
-            $lookupDataset->AddField($field, true);
-            $field = new StringField('name');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('wkn');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('isin');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('branche');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('f100id');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par1');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par3');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par5');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par10');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('par20');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('kgv');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('div_rendite');
-            $lookupDataset->AddField($field, false);
-            $field = new IntegerField('dsr');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('bewertung');
-            $lookupDataset->AddField($field, false);
-            $field = new StringField('kommentar');
-            $lookupDataset->AddField($field, false);
-            $lookupDataset->setOrderByField('name', GetOrderTypeAsSQL(otAscending));
-            $lookupDataset->AddCustomCondition(EnvVariablesUtils::EvaluateVariableTemplate($this->GetColumnVariableContainer(), ''));
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_aktienname_name_search', 'id', 'name', null);
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('kgv'),
+                    new IntegerField('div_rendite'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteile_aktienname_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
         }
        
@@ -2721,22 +2970,27 @@
     
         }
     
+        protected function doCustomDefaultValues(&$values, &$handled) 
+        {
+    
+        }
+    
         protected function doCustomCompareColumn($columnName, $valueA, $valueB, &$result)
         {
     
         }
     
-        protected function doBeforeInsertRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeInsertRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeUpdateRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeUpdateRecord($page, $oldRowData, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
     
-        protected function doBeforeDeleteRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName)
+        protected function doBeforeDeleteRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime)
         {
     
         }
@@ -2746,7 +3000,7 @@
     
         }
     
-        protected function doAfterUpdateRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
+        protected function doAfterUpdateRecord($page, $oldRowData, $rowData, $tableName, &$success, &$message, &$messageDisplayTime)
         {
     
         }
@@ -2771,7 +3025,7 @@
     
         }
     
-        protected function doGetCustomUploadFileName($fieldName, $rowData, &$result, &$handled, $originalFileName, $originalFileExtension, $fileSize)
+        protected function doFileUpload($fieldName, $rowData, &$result, &$accept, $originalFileName, $originalFileExtension, $fileSize, $tempFileName)
         {
     
         }
@@ -2781,12 +3035,37 @@
     
         }
     
+        protected function doPrepareColumnFilter(ColumnFilter $columnFilter)
+        {
+    
+        }
+    
+        protected function doPrepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
+        {
+    
+        }
+    
+        protected function doGetSelectionFilters(FixedKeysArray $columns, &$result)
+        {
+    
+        }
+    
+        protected function doGetCustomFormLayout($mode, FixedKeysArray $columns, FormLayout $layout)
+        {
+    
+        }
+    
+        protected function doGetCustomColumnGroup(FixedKeysArray $columns, ViewColumnGroup $columnGroup)
+        {
+    
+        }
+    
         protected function doPageLoaded()
         {
     
         }
     
-        protected function doGetCustomPagePermissions(Page $page, PermissionSet &$permissions, &$handled)
+        protected function doCalculateFields($rowData, $fieldName, &$value)
         {
     
         }
@@ -2796,20 +3075,19 @@
     
         }
     
+        protected function doAddEnvironmentVariables(Page $page, &$variables)
+        {
+    
+        }
+    
     }
 
-
+    SetUpUserAuthorization();
 
     try
     {
-        $Page = new anteilePage("anteile", "anteile.php", GetCurrentUserGrantForDataSource("anteile"), 'UTF-8');
-        $Page->SetTitle('Anteile');
-        $Page->SetMenuLabel('Anteile');
-        $Page->SetHeader(GetPagesHeader());
-        $Page->SetFooter(GetPagesFooter());
+        $Page = new anteilePage("anteile", "anteile.php", GetCurrentUserPermissionsForPage("anteile"), 'UTF-8');
         $Page->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource("anteile"));
-        GetApplication()->SetCanUserChangeOwnPassword(
-            !function_exists('CanUserChangeOwnPassword') || CanUserChangeOwnPassword());
         GetApplication()->SetMainPage($Page);
         GetApplication()->Run();
     }

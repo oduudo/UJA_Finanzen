@@ -1,4 +1,10 @@
-define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
+define([
+    'pgui.form_collection',
+    'pgui.utils',
+    'pgui.field-embedded-video',
+    'pgui.image_popup',
+    'jquery.query'
+], function (FormCollection, utils, showFieldEmbeddedVideo, initImagePopup) {
 
     function createContainer(grid, cancelCallback) {
         return grid.getRowTemplate().on('click', '.js-cancel', function (e) {
@@ -43,9 +49,13 @@ define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
                         $container.after($newRow);
                         grid.integrateRows($newRow);
                         $container.remove();
+                        grid.updateEmptyGridMessage();
 
                         if (params && params.action == 'edit') {
                             $newRow.find('[data-inline-operation=edit]').first().click();
+                        }
+                        if (params.action === undefined && grid.getReloadPageAfterAjaxOperation()) {
+                            location.reload();
                         }
                     }
 
@@ -80,7 +90,7 @@ define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
                 var containers = [];
                 for (var i = 0; i < count; i++) {
                     var $container = createContainer(grid);
-                    grid.container.find('.pg-row-list').prepend($container);
+                    grid.container.find('.pg-row-list:first').prepend($container);
                     containers.push($container);
                 }
 
@@ -98,6 +108,12 @@ define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
 
             $link.on('click', function (e) {
                 e.preventDefault();
+
+                var $viewInlineLink = $row.find('[data-inline-operation=view]');
+                if ($viewInlineLink.length && $viewInlineLink.data('form-container')) {
+                    $viewInlineLink.data('form-container').remove();
+                    $viewInlineLink.data('form-container', null);
+                }
 
                 if ($link.data('form-container')) {
                     $link.data('form-container').remove();
@@ -126,15 +142,20 @@ define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
                             showMessage(grid, responses);
                             if (!hasErrors) {
                                 var $newRow = $(responses[0].row);
-                                $row.replaceWith($newRow);
+                                utils.replaceRow($row, $newRow);
                                 $row.show();
                                 grid.integrateRows($newRow);
 
                                 $link.data('form-container', null);
                                 $container.remove();
 
+                                grid.updateEmptyGridMessage();
+
                                 if (params && params.action == 'edit') {
                                     $newRow.find('[data-column-name=edit] > a').first().click();
+                                }
+                                if (params.action === undefined && grid.getReloadPageAfterAjaxOperation()) {
+                                    location.reload();
                                 }
                             }
 
@@ -143,7 +164,50 @@ define(['pgui.form_collection', 'jquery.query'], function (FormCollection) {
                     });
                 });
             });
+        },
 
+        createViewLink: function ($link, grid) {
+            var url = getUrl($link);
+
+            var $row = $link.closest('.pg-row');
+            $link.data('form-container', null);
+
+            $link.on('click', function (e) {
+                e.preventDefault();
+
+                var $editInlineLink = $row.find('[data-inline-operation=edit]');
+                if ($editInlineLink.length && $editInlineLink.data('form-container')) {
+                    $editInlineLink.data('form-container').remove();
+                    $editInlineLink.data('form-container', null);
+                }
+
+                if ($link.data('form-container')) {
+                    $link.data('form-container').remove();
+                    $link.data('form-container', null);
+                    return;
+                }
+
+                var $container = createContainer(grid, function () {
+                    $link.data('form-container', null);
+                    $row.show();
+                });
+
+                $link.data('form-container', $container);
+
+                if (grid.isCard()) {
+                    $row.hide();
+                }
+
+                $row.after($container);
+
+                $.get(url, function (content) {
+                    putContent($container, content);
+
+                    showFieldEmbeddedVideo($container, false, false);
+                    initImagePopup($container);
+                });
+
+            });
         }
     };
 });

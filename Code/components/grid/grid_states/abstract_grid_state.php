@@ -165,13 +165,15 @@ abstract class GridState
      * @param IDataset|Dataset $dataset dataset where changes between old and new values must be written
      */
     protected function WriteChangesToDataset($oldValues, $newValues, Dataset $dataset) {
-        foreach ($newValues as $fieldName => $fieldValue)
+        $editFieldValues = $dataset->GetCurrentFieldValues();
+        foreach ($newValues as $fieldName => $fieldValue) {
             if ($dataset->DoNotRewriteUnchangedValues()) {
-                if (!isset($oldValues[$fieldName]) || ($oldValues[$fieldName] != $fieldValue))
+                if (!array_key_exists($fieldName, $oldValues) || array_key_exists($fieldName, $editFieldValues) || ($oldValues[$fieldName] != $fieldValue))
                     $dataset->SetFieldValueByName($fieldName, $fieldValue);
             } else {
                 $dataset->SetFieldValueByName($fieldName, $fieldValue);
             }
+        }
     }
 
     /**
@@ -191,6 +193,15 @@ abstract class GridState
         $page->RaiseSecurityError(
             !$page->hasRLSEditGrant($this->GetDataset()),
             OPERATION_EDIT
+        );
+    }
+
+    protected function CheckRLSDeleteGrant()
+    {
+        $page = $this->grid->getPage();
+        $page->RaiseSecurityError(
+            !$page->hasRLSDeleteGrant($this->GetDataset()),
+            OPERATION_DELETE
         );
     }
 }

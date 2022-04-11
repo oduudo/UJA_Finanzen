@@ -16,13 +16,16 @@ include_once dirname(__FILE__) . '/../grid/edit_columns.php';
 include_once dirname(__FILE__) . '/../grid/vertical_grid.php';
 include_once dirname(__FILE__) . '/../dataset/dataset.php';
 include_once dirname(__FILE__) . '/../dataset/table_dataset.php';
+include_once dirname(__FILE__) . '/../dataset/view_based_dataset.php';
 include_once dirname(__FILE__) . '/../dataset/query_dataset.php';
 include_once dirname(__FILE__) . '/../renderers/renderer.php';
 include_once dirname(__FILE__) . '/../renderers/edit_renderer.php';
+include_once dirname(__FILE__) . '/../renderers/multi_edit_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/list_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/view_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/print_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/insert_renderer.php';
+include_once dirname(__FILE__) . '/../renderers/multi_upload_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/excel_list_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/word_list_renderer.php';
 include_once dirname(__FILE__) . '/../renderers/xml_list_renderer.php';
@@ -54,13 +57,17 @@ define('OPERATION_PARAMNAME', 'operation');
 
 define('OPERATION_VIEW', 'view');
 define('OPERATION_EDIT', 'edit');
+define('OPERATION_MULTI_EDIT', 'multi_edit');
 define('OPERATION_INSERT', 'insert');
 define('OPERATION_COPY', 'copy');
+define('OPERATION_MULTI_UPLOAD', 'multi_upload');
 define('OPERATION_DELETE', 'delete');
 define('OPERATION_VIEWALL', 'viewall');
 define('OPERATION_RETURN', 'return');
-define('OPERATION_COMMIT', 'commit');
+define('OPERATION_COMMIT_EDIT', 'commit_edit');
+define('OPERATION_COMMIT_MULTI_EDIT', 'commit_multi_edit');
 define('OPERATION_COMMIT_INSERT', 'commit_new');
+define('OPERATION_COMMIT_MULTI_UPLOAD', 'commit_multi_upload');
 define('OPERATION_COMMIT_DELETE', 'commit_delete');
 define('OPERATION_PRINT_ALL', 'printall');
 define('OPERATION_PRINT_PAGE', 'printpage');
@@ -79,6 +86,12 @@ define('OPERATION_WORD_EXPORT_RECORD', 'eword_record');
 define('OPERATION_XML_EXPORT_RECORD', 'exml_record');
 define('OPERATION_CSV_EXPORT_RECORD', 'ecsv_record');
 define('OPERATION_PDF_EXPORT_RECORD', 'epdf_record');
+
+define('OPERATION_EXCEL_EXPORT_SELECTED', 'eexcel_selected');
+define('OPERATION_WORD_EXPORT_SELECTED', 'eword_selected');
+define('OPERATION_XML_EXPORT_SELECTED', 'exml_selected');
+define('OPERATION_CSV_EXPORT_SELECTED', 'ecsv_selected');
+define('OPERATION_PDF_EXPORT_SELECTED', 'epdf_selected');
 
 define('OPERATION_ADVANCED_SEARCH', 'advsrch');
 
@@ -104,6 +117,7 @@ abstract class Page extends CommonPage implements IVariableContainer
     private $pageFileName;
     /** @var Renderer */
     protected $renderer;
+
     private $httpHandlerName;
     /** @var IPermissionSet */
     private $securityInfo;
@@ -141,7 +155,6 @@ abstract class Page extends CommonPage implements IVariableContainer
     private $showUserAuthBar = false;
     private $showTopPageNavigator = true;
     private $showBottomPageNavigator = false;
-    private $showPageList;
     private $showGrid = true;
     private $hidePageListByDefault;
     private $showNavigation;
@@ -151,10 +164,24 @@ abstract class Page extends CommonPage implements IVariableContainer
     private $printOneRecordAvailable = true;
     private $allowPrintSelectedRecords = true;
 
-    private $exportListAvailable = array('excel', 'pdf', 'csv', 'xml', 'word');
+    private $exportListAvailable = array('pdf', 'excel', 'word', 'xml', 'csv');
     private $exportListRecordAvailable = array();
-    private $exportOneRecordAvailable = array('excel', 'pdf', 'csv', 'xml', 'word');
+    private $exportOneRecordAvailable = array('pdf', 'excel', 'word', 'xml', 'csv');
+    private $exportSelectedRecordsAvailable = array('pdf', 'excel', 'word', 'xml', 'csv');
 
+    /** @var bool */
+    private $openPrintFormInNewTab = true;
+    /** @var bool */
+    private $openExportedPdfInNewTab = true;
+    /** @var bool */
+    private $displayChartsOnPrintForm = true;
+    /** @var bool */
+    private $showFormErrorsOnTop = false;
+    /** @var bool */
+    private $showFormErrorsAtBottom = true;
+
+    /** @var PageList */
+    private $pageList;
     private $visualEffectsEnabled;
     private $detailedDescription;
     private $description;
@@ -169,48 +196,37 @@ abstract class Page extends CommonPage implements IVariableContainer
 
     #region Events
     public $BeforePageRender;
-    public $OnCustomHTMLHeader;
-    public $OnGetCustomTemplate;
+    public $OnAddEnvironmentVariables;
     public $OnPrepareChart;
-    public $OnGetCustomUploadFilename;
-    public $OnGetCustomPagePermissions;
+    public $OnGetCustomColumnGroup;
+    public $OnFileUpload;
     public $OnGetCustomRecordPermissions;
     public $OnPageLoaded;
+    public $OnGetCalculatedFieldValue;
     #endregion
-
-    #region IVariableContainer implementation
-    private $variableFuncs = array(
-        'PAGE_SHORT_CAPTION'    => 'return $page->GetMenuLabel();',
-        'PAGE_CAPTION'          => 'return $page->GetTitle();',
-        'PAGE_CSV_EXPORT_LINK'  => 'return $page->GetExportToCsvLink();',
-        'PAGE_XLS_EXPORT_LINK'  => 'return $page->GetExportToExcelLink();',
-        'PAGE_PDF_EXPORT_LINK'  => 'return $page->GetExportToPdfLink();',
-        'PAGE_XML_EXPORT_LINK'  => 'return $page->GetExportToXmlLink();',
-        'PAGE_WORD_EXPORT_LINK' => 'return $page->GetExportToWordLink();'
-        );
 
     /**
      * @param string $id
      * @param string $pageFileName
-     * @param PermissionSet $dataSourceSecurityInfo
+     * @param IPermissionSet $dataSourceSecurityInfo
      * @param string $contentEncoding
      */
     public function __construct($id, $pageFileName, $dataSourceSecurityInfo = null, $contentEncoding=null)
     {
         parent::__construct($id, $contentEncoding);
         $this->BeforePageRender = new Event();
-        $this->OnCustomHTMLHeader = new Event();
-        $this->OnGetCustomTemplate = new Event();
+        $this->OnAddEnvironmentVariables = new Event();
         $this->OnPrepareChart = new Event();
+        $this->OnGetCustomColumnGroup = new Event();
         $this->OnGetCustomExportOptions = new Event();
-        $this->OnGetCustomUploadFilename = new Event();
-        $this->OnGetCustomPagePermissions = new Event();
+        $this->OnFileUpload = new Event();
         $this->OnGetCustomRecordPermissions = new Event();
         $this->OnPageLoaded = new Event();
+        $this->OnGetCalculatedFieldValue = new Event();
 
         $this->securityInfo = $dataSourceSecurityInfo;
         $this->pageFileName = $pageFileName;
-        $this->showPageList = true;
+        $this->SetShowPageList(true);
         $this->showNavigation = true;
         $this->visualEffectsEnabled = true;
         $this->rssGenerator = null;
@@ -225,14 +241,19 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->message = null;
         $this->pageNavigatorStack = array();
 
+        $this->attachAddEnvironmentVariablesHandler();
+
         $this->BeforeCreate();
 
         $this->CreateComponents();
         $this->setupCharts();
-        $this->setupGridLayouts();
         $this->setupGridColumnGroup($this->grid);
 
         $this->Prepare();
+    }
+
+    private function attachAddEnvironmentVariablesHandler() {
+        $this->OnAddEnvironmentVariables->AddListener('OnAddEnvironmentVariablesHandler', $this);
     }
 
     #region ViewData
@@ -265,14 +286,17 @@ abstract class Page extends CommonPage implements IVariableContainer
 
     #endregion
 
-    public function FillVariablesValues(&$values)
-    {
-        $values = array();
-        foreach($this->variableFuncs as $name => $code)
-        {
-            $function = create_function('$page', $code);
-            $values[$name] = $function($this);
-        }
+    public function FillVariablesValues(&$values) {
+        $values['PAGE_SHORT_CAPTION'] = $this->GetMenuLabel();
+        $values['PAGE_CAPTION'] = $this->GetTitle();
+        $values['PAGE_ID'] = $this->GetPageId();
+        $values['PAGE_CSV_EXPORT_LINK'] = $this->GetExportToCsvLink();
+        $values['PAGE_XLS_EXPORT_LINK'] = $this->GetExportToExcelLink();
+        $values['PAGE_PDF_EXPORT_LINK'] = $this->GetExportToPdfLink();
+        $values['PAGE_XML_EXPORT_LINK'] = $this->GetExportToXmlLink();
+        $values['PAGE_WORD_EXPORT_LINK'] = $this->GetExportToWordLink();
+
+        $this->OnAddEnvironmentVariables->Fire(array($this, &$values));
     }
 
     public function GetAuthenticationViewData() {
@@ -283,15 +307,9 @@ abstract class Page extends CommonPage implements IVariableContainer
                 'Name' => $this->GetCurrentUserName(),
                 'Id' => $this->GetCurrentUserId(),
             ),
-            'CanChangeOwnPassword' => GetApplication()->GetUserManager()->CanChangeUserPassword() &&
-                    GetApplication()->CanUserChangeOwnPassword(),
+            'CanChangeOwnPassword' => GetApplication()->GetUserAuthentication()->canUserChangeOwnPassword(),
             'isAdminPanelVisible' => GetApplication()->HasAdminPanelForCurrentUser(),
         );
-    }
-
-    public function FillAvailableVariables(&$variables)
-    {
-        return array_keys($this->variableFuncs);
     }
 
     protected function ApplyCommonColumnEditProperties(CustomEditColumn $editColumn)
@@ -352,13 +370,6 @@ abstract class Page extends CommonPage implements IVariableContainer
         return $vars[$name];
     }
 
-    public function GetCustomPageHeader()
-    {
-        $result = '';
-        $this->OnCustomHTMLHeader->Fire(array(&$this, &$result));
-        return $result;
-    }
-
     /**
      * @return Grid
      */
@@ -373,9 +384,6 @@ abstract class Page extends CommonPage implements IVariableContainer
     {
         $this->pageNavigatorStack[] = $pageNavigator;
     }
-
-    protected function FillPageNavigatorStack()
-    { }
 
     protected function DoBeforeCreate()
     { }
@@ -392,13 +400,10 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->setClientSideEvents($this->grid);
         $this->pageNavigator = $this->CreatePageNavigator();
         $this->httpHandlerName = null;
-        $this->FillPageNavigatorStack();
         $this->RegisterHandlers();
     }
 
     private function BeforeCreateGrid() {
-        $this->OnGetCustomPagePermissions->AddListener('Global_OnGetCustomPagePermissionsHandler');
-        $this->OnGetCustomPagePermissions->AddListener('OnGetCustomPagePermissionsHandler', $this);
         $this->OnGetCustomRecordPermissions->AddListener('OnGetCustomRecordPermissionsHandler', $this);
     }
 
@@ -417,6 +422,9 @@ abstract class Page extends CommonPage implements IVariableContainer
             $grid->AfterInsertRecord->AddListener('Grid_OnAfterInsertRecordHandler', $this);
             $grid->AfterUpdateRecord->AddListener('Grid_OnAfterUpdateRecordHandler', $this);
             $grid->AfterDeleteRecord->AddListener('Grid_OnAfterDeleteRecordHandler', $this);
+            $grid->OnCustomDefaultValues->AddListener('Grid_OnCustomDefaultValues', $this);
+            $grid->OnGetSelectionFilters->AddListener('Grid_OnGetSelectionFilters', $this);
+            $grid->OnGetCustomFormLayout->AddListener('Grid_OnGetCustomFormLayoutHandler', $this);
         }
     }
 
@@ -424,9 +432,11 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->OnCustomHTMLHeader->AddListener('OnCustomHTMLHeaderHandler', $this);
         $this->OnGetCustomTemplate->AddListener('OnGetCustomTemplateHandler', $this);
         $this->OnGetCustomExportOptions->AddListener('OnGetCustomExportOptionsHandler', $this);
-        $this->OnGetCustomUploadFilename->AddListener('OnGetCustomUploadFilenameHandler', $this);
+        $this->OnFileUpload->AddListener('OnFileUploadHandler', $this);
         $this->OnPrepareChart->AddListener('OnPrepareChartHandler', $this);
+        $this->OnGetCustomColumnGroup->AddListener('OnGetCustomColumnGroupHandler', $this);
         $this->OnPageLoaded->AddListener('OnPageLoadedHandler', $this);
+        $this->getDataset()->OnCalculateFields->AddListener('OnCalculateFieldsHandler', $this);
     }
 
     public function Grid_OnCustomRenderColumnHandler($fieldName, $fieldData, $rowData, &$customText, &$handled) {
@@ -457,28 +467,40 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->doCustomCompareColumn($columnName, $valueA, $valueB, $result);
     }
 
-    public function Grid_OnBeforeInsertRecordHandler($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
-        $this->doBeforeInsertRecord($page, $rowData, $cancel, $message, $messageDisplayTime, $tableName);
+    public function Grid_OnBeforeInsertRecordHandler($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
+        $this->doBeforeInsertRecord($page, $rowData, $tableName, $cancel, $message, $messageDisplayTime);
     }
 
-    public function Grid_OnBeforeUpdateRecordHandler($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
-        $this->doBeforeUpdateRecord($page, $rowData, $cancel, $message, $messageDisplayTime, $tableName);
+    public function Grid_OnBeforeUpdateRecordHandler($page, $oldRowData, $rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
+        $this->doBeforeUpdateRecord($page, $oldRowData, $rowData, $tableName, $cancel, $message, $messageDisplayTime);
     }
 
-    public function Grid_OnBeforeDeleteRecordHandler($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
-        $this->doBeforeDeleteRecord($page, $rowData, $cancel, $message, $messageDisplayTime, $tableName);
+    public function Grid_OnBeforeDeleteRecordHandler($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
+        $this->doBeforeDeleteRecord($page, $rowData, $tableName, $cancel, $message, $messageDisplayTime);
     }
 
     public function Grid_OnAfterInsertRecordHandler($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
         $this->doAfterInsertRecord($page, $rowData, $tableName, $success, $message, $messageDisplayTime);
     }
 
-    public function Grid_OnAfterUpdateRecordHandler($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
-        $this->doAfterUpdateRecord($page, $rowData, $tableName, $success, $message, $messageDisplayTime);
+    public function Grid_OnAfterUpdateRecordHandler($page, $oldRowData, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
+        $this->doAfterUpdateRecord($page, $oldRowData, $rowData, $tableName, $success, $message, $messageDisplayTime);
     }
 
     public function Grid_OnAfterDeleteRecordHandler($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
         $this->doAfterDeleteRecord($page, $rowData, $tableName, $success, $message, $messageDisplayTime);
+    }
+
+    public function Grid_OnCustomDefaultValues(&$values, &$handled) {
+        $this->doCustomDefaultValues($values, $handled);
+    }
+
+    public function Grid_OnGetSelectionFilters(FixedKeysArray $columns, &$result) {
+        $this->doGetSelectionFilters($columns, $result);
+    }
+
+    public function Grid_OnGetCustomFormLayoutHandler($mode, FixedKeysArray $columns, FormLayout $layout) {
+        $this->doGetCustomFormLayout($mode, $columns, $layout);
     }
 
     public function OnCustomHTMLHeaderHandler($page, &$customHtmlHeaderText) {
@@ -493,15 +515,16 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->doGetCustomExportOptions($page, $exportType, $rowData, $options);
     }
 
-    public function OnGetCustomUploadFilenameHandler($fieldName, &$result, &$handled, $originalFileName, $originalFileExtension, $fileSize) {
-        $this->doGetCustomUploadFileName(
+    public function OnFileUploadHandler($fieldName, &$result, &$accept, $originalFileName, $originalFileExtension, $fileSize, $tempFileName) {
+        $this->doFileUpload(
             $fieldName,
             $this->dataset->getCurrentFieldValues(),
             $result,
-            $handled,
+            $accept,
             $originalFileName,
             $originalFileExtension,
-            $fileSize
+            $fileSize,
+            $tempFileName
         );
     }
 
@@ -509,8 +532,8 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->doPrepareChart($chart);
     }
 
-    public function OnGetCustomPagePermissionsHandler(Page $page, PermissionSet &$permissions, &$handled) {
-        $this->doGetCustomPagePermissions($page, $permissions, $handled);
+    public function OnGetCustomColumnGroupHandler(FixedKeysArray $columns, ViewColumnGroup $columnGroup) {
+        $this->doGetCustomColumnGroup($columns, $columnGroup);
     }
 
     public function OnGetCustomRecordPermissionsHandler(Page $page, &$usingCondition, $rowData, &$allowEdit, &$allowDelete, &$mergeWithDefault, &$handled) {
@@ -519,6 +542,14 @@ abstract class Page extends CommonPage implements IVariableContainer
 
     public function OnPageLoadedHandler() {
         $this->doPageLoaded();
+    }
+
+    public function OnCalculateFieldsHandler($rowData, $fieldName, &$value) {
+        $this->doCalculateFields($rowData, $fieldName, $value);
+    }
+
+    public function OnAddEnvironmentVariablesHandler(Page $page, &$variables) {
+        $this->doAddEnvironmentVariables($page, $variables);
     }
 
     protected function doCustomRenderColumn($fieldName, $fieldData, $rowData, &$customText, &$handled) {
@@ -542,22 +573,28 @@ abstract class Page extends CommonPage implements IVariableContainer
     protected function doCustomCompareColumn($columnName, $valueA, $valueB, &$result) {
     }
 
-    protected function doBeforeInsertRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
+    protected function doBeforeInsertRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
     }
 
-    protected function doBeforeUpdateRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
+    protected function doBeforeUpdateRecord($page, $oldRowData, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
     }
 
-    protected function doBeforeDeleteRecord($page, &$rowData, &$cancel, &$message, &$messageDisplayTime, $tableName) {
+    protected function doBeforeDeleteRecord($page, &$rowData, $tableName, &$cancel, &$message, &$messageDisplayTime) {
     }
 
     protected function doAfterInsertRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
     }
 
-    protected function doAfterUpdateRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
+    protected function doAfterUpdateRecord($page, $oldRowData, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
     }
 
     protected function doAfterDeleteRecord($page, $rowData, $tableName, &$success, &$message, &$messageDisplayTime) {
+    }
+
+    protected function doCustomDefaultValues(&$values, &$handled) {
+    }
+
+    protected function doGetSelectionFilters(FixedKeysArray $columns, &$result) {
     }
 
     protected function doCustomHTMLHeader($page, &$customHtmlHeaderText) {
@@ -569,19 +606,42 @@ abstract class Page extends CommonPage implements IVariableContainer
     protected function doGetCustomExportOptions(Page $page, $exportType, $rowData, &$options) {
     }
 
-    protected function doGetCustomUploadFileName($fieldName, $rowData, &$result, &$handled, $originalFileName, $originalFileExtension, $fileSize) {
+    protected function doFileUpload($fieldName, $rowData, &$result, &$accept, $originalFileName, $originalFileExtension, $fileSize, $tempFileName) {
     }
 
     protected function doPrepareChart(Chart $chart) {
     }
 
-    protected function doGetCustomPagePermissions(Page $page, PermissionSet &$permissions, &$handled) {
+    protected function doGetCustomFormLayout($mode, FixedKeysArray $columns, FormLayout $layout) {
+    }
+
+    protected function doGetCustomColumnGroup(FixedKeysArray $columns, ViewColumnGroup $columnGroup) {
     }
 
     protected function doGetCustomRecordPermissions(Page $page, &$usingCondition, $rowData, &$allowEdit, &$allowDelete, &$mergeWithDefault, &$handled) {
     }
 
     protected function doPageLoaded() {
+    }
+
+    protected function doCalculateFields($rowData, $fieldName, &$value) {
+    }
+
+    protected function doAddEnvironmentVariables(Page $page, &$variables) {
+    }
+
+    public function prepareColumnFilter(ColumnFilter $columnFilter) {
+        $this->doPrepareColumnFilter($columnFilter);
+    }
+
+    protected function doPrepareColumnFilter(ColumnFilter $columnFilter) {
+    }
+
+    public function prepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns) {
+        $this->doPrepareFilterBuilder($filterBuilder, $columns);
+    }
+
+    protected function doPrepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns) {
     }
 
     protected function setClientSideEvents(Grid $grid) {
@@ -596,11 +656,17 @@ abstract class Page extends CommonPage implements IVariableContainer
         $handler = new GridEditHandler($this->GetGridEditHandler(), new VerticalGrid($this->GetGrid(), OPERATION_EDIT));
         GetApplication()->RegisterHTTPHandler($handler);
 
+        $handler = new GridEditHandler($this->GetGridMultiEditHandler(), new VerticalGrid($this->GetGrid(), OPERATION_MULTI_EDIT));
+        GetApplication()->RegisterHTTPHandler($handler);
+
         $handler = new GridEditHandler($this->GetGridInsertHandler(), new VerticalGrid($this->GetGrid(), OPERATION_INSERT));
         GetApplication()->RegisterHTTPHandler($handler);
 
+        $handler = new GridEditHandler($this->GetGridMultiUploadHandler(), new VerticalGrid($this->GetGrid(), OPERATION_MULTI_UPLOAD));
+        GetApplication()->RegisterHTTPHandler($handler);
+
         if ($this->GetEnableModalSingleRecordView()) {
-            $handler = new ModalGridViewHandler($this->GetModalGridViewHandler(), new RecordCardView($this->GetGrid()));
+            $handler = new RecordCardViewHandler($this->GetModalGridViewHandler(), new RecordCardView($this->GetGrid()));
             GetApplication()->RegisterHTTPHandler($handler);
         }
 
@@ -614,6 +680,14 @@ abstract class Page extends CommonPage implements IVariableContainer
             GetApplication()->RegisterHTTPHandler($handler);
         }
 
+        if ($this->GetEnableInlineSingleRecordView()) {
+            $handler = new RecordCardViewHandler($this->GetInlineGridViewHandler(), new RecordCardView($this->GetGrid()));
+            GetApplication()->RegisterHTTPHandler($handler);
+        }
+
+        $handler = new SelectionHandler($this->GetRecordsSelectionHandler(), $this->GetGrid());
+        GetApplication()->RegisterHTTPHandler($handler);
+
         $this->doRegisterHandlers();
     }
 
@@ -625,9 +699,19 @@ abstract class Page extends CommonPage implements IVariableContainer
         return get_class($this) . '_form_edit';
     }
 
+    public function GetGridMultiEditHandler()
+    {
+        return get_class($this) . '_form_multi_edit';
+    }
+
     public function GetGridInsertHandler()
     {
         return get_class($this) . '_form_insert';
+    }
+
+    public function GetGridMultiUploadHandler()
+    {
+        return get_class($this) . '_form_multi_upload';
     }
 
     public function GetModalGridViewHandler()
@@ -643,6 +727,16 @@ abstract class Page extends CommonPage implements IVariableContainer
     public function GetModalGridDeleteHandler()
     {
         return get_class($this) . '_modal_delete';
+    }
+
+    public function GetRecordsSelectionHandler()
+    {
+        return get_class($this) . '_select_records';
+    }
+
+    public function GetInlineGridViewHandler()
+    {
+        return get_class($this) . '_inline_view';
     }
 
     public function GetEnableModalSingleRecordView()
@@ -671,6 +765,11 @@ abstract class Page extends CommonPage implements IVariableContainer
     }
 
     protected function GetEnableModalGridDelete()
+    {
+        return false;
+    }
+
+    public function GetEnableInlineSingleRecordView()
     {
         return false;
     }
@@ -721,11 +820,12 @@ abstract class Page extends CommonPage implements IVariableContainer
         $this->setupQuickFilter($grid->getQuickFilter(), $columns);
 
         $this->setupFilterBuilder($grid->getFilterBuilder(), $columns);
-        $this->OnPrepareFilterBuilder($grid->getFilterBuilder(), $columns);
+        $this->prepareFilterBuilder($grid->getFilterBuilder(), $columns);
 
         $columnFilter = $grid->getColumnFilter()->setPossibleColumns($columns);
         $this->setupColumnFilter($columnFilter);
-        $this->OnPrepareColumnFilter($columnFilter);
+        $this->prepareColumnFilter($columnFilter);
+        $this->grid->prepareSelectionFilters($columns);
     }
 
     protected function getFiltersColumns()
@@ -745,63 +845,7 @@ abstract class Page extends CommonPage implements IVariableContainer
     {
     }
 
-    protected function OnPrepareColumnFilter(ColumnFilter $columnFilter)
-    {
-    }
-
-    protected function OnPrepareFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
-    {
-    }
-
     protected function setupCharts()
-    {
-    }
-
-    private function setupGridLayouts()
-    {
-        $this->grid->SetViewFormLayout($this->callFormLayoutEvent(
-            'view',
-            $this->grid->GetSingleRecordViewColumns(),
-            new FormLayout()
-        ));
-
-        $this->grid->SetInsertFormLayout($this->callFormLayoutEvent(
-            'insert',
-            $this->grid->GetInsertColumns(),
-            new FormLayout()
-        ));
-
-        $this->grid->SetEditFormLayout($this->callFormLayoutEvent(
-            'edit',
-            $this->grid->GetEditColumns(),
-            new FormLayout()
-        ));
-
-        $this->grid->SetInlineInsertFormLayout($this->callFormLayoutEvent(
-            'inline_insert',
-            $this->grid->GetInsertColumns(),
-            new FormLayout(FormLayoutMode::VERTICAL)
-        ));
-
-        $this->grid->SetInlineEditFormLayout($this->callFormLayoutEvent(
-            'inline_edit',
-            $this->grid->GetEditColumns(),
-            new FormLayout(FormLayoutMode::VERTICAL)
-        ));
-    }
-
-    private function callFormLayoutEvent($mode, $columns, FormLayout $layout)
-    {
-        $this->OnGetCustomFormLayout(
-            $mode,
-            new FixedKeysArray(Grid::getNamedColumns($columns)),
-            $layout
-        );
-
-        return $layout;
-    }
-
-    protected function OnGetCustomFormLayout($mode, FixedKeysArray $columns, FormLayout $layout)
     {
     }
 
@@ -809,12 +853,8 @@ abstract class Page extends CommonPage implements IVariableContainer
     {
         $columnGroup = new ViewColumnGroup(null, array());
         $columns = Grid::getNamedColumns($grid->getViewColumns());
-        $this->OnGetCustomColumnGroup(new FixedKeysArray($columns), $columnGroup);
+        $this->OnGetCustomColumnGroup->Fire(array(new FixedKeysArray($columns), $columnGroup));
         $grid->setViewColumnGroup($columnGroup);
-    }
-
-    protected function OnGetCustomColumnGroup(FixedKeysArray $columns, ViewColumnGroup $columnGroup)
-    {
     }
 
     protected function addChart(Chart $chart, $index = 0, $position = ChartPosition::BEFORE_GRID, $cols = 6)
@@ -825,9 +865,40 @@ abstract class Page extends CommonPage implements IVariableContainer
         );
     }
 
+    /**
+     * @param string $chartId
+     */
+    public function removeChart($chartId) {
+        foreach ($this->getCharts() as $position => $chartsInfo) {
+            foreach ($chartsInfo as $chartIndex => $chartInfo) {
+                $chart = $chartInfo['chart'];
+                if ($chart->getId() == $chartId) {
+                    unset($this->charts[$position][$chartIndex]);
+                    return;
+                }
+            }
+        }
+    }
+
     public function getCharts()
     {
         return $this->charts;
+    }
+
+    /**
+     * @param string $chartId
+     * @return Chart || null
+     */
+    public function getChartById($chartId) {
+        foreach ($this->getCharts() as $position => $chartsInfo) {
+            foreach ($chartsInfo as $chartInfo) {
+                $chart = $chartInfo['chart'];
+                if ($chart->getId() == $chartId) {
+                    return $chart;
+                }
+            }
+        }
+        return null;
     }
 
     public function hasCharts()
@@ -884,6 +955,7 @@ abstract class Page extends CommonPage implements IVariableContainer
                 'Caption' =>    $this->GetLocalizerCaptions()->GetMessageString('ExportTo' . ucfirst($export)),
                 'IconClass' => 'icon-export-' . $export,
                 'Href' =>       $this->getExportLink($export, $primaryKeyValues),
+                'Target' => ($export == 'pdf' ? $this->getExportToPdfLinkTarget() : '')
             );
         }
 
@@ -891,34 +963,43 @@ abstract class Page extends CommonPage implements IVariableContainer
             $result['print_page'] = array(
                 'Caption' =>   $this->GetLocalizerCaptions()->GetMessageString('PrintCurrentPage'),
                 'IconClass' => 'icon-print-page',
-                'Href' =>      $this->GetPrintCurrentPageLink()
+                'Href' =>      $this->GetPrintCurrentPageLink(),
+                'Target' => $this->getPrintLinkTarget(),
             );
 
             $result['print_all'] = array(
                 'Caption' =>   $this->GetLocalizerCaptions()->GetMessageString('PrintAllPages'),
                 'IconClass' => 'icon-print-page',
                 'Href' =>      $this->GetPrintAllLink(),
+                'Target' => $this->getPrintLinkTarget(),
                 'BeginNewGroup' => true
             );
         }
         return $result;
     }
 
-    private function GetPageList()
+    public function getAllowExportSelectedRecords()
     {
-        return PageList::createForPage($this);
+        return count($this->exportSelectedRecordsAvailable) > 0;
+    }
+
+    public function getExportSelectedRecordsViewData() {
+        $result = array();
+        foreach ($this->exportSelectedRecordsAvailable as $export) {
+            $result[$export] = array(
+                'Caption' =>    $this->GetLocalizerCaptions()->GetMessageString('ExportTo' . ucfirst($export)),
+                'Type' =>       $export,
+                'Target' => ($export == 'pdf' ? $this->getExportToPdfLinkTarget() : '')
+            );
+        }
+        return $result;
     }
 
     public function GetReadyPageList() {
-        $pageList = $this->GetPageList();
+        $result = parent::GetReadyPageList();
+        $result->AddRssLinkForCurrentPage($this->GetRssLink());
 
-        if (!$pageList) {
-            return null;
-        }
-
-        $pageList->AddRssLinkForCurrentPage($this->GetRssLink());
-
-        return $pageList;
+        return $result;
     }
 
     public function GetForeignKeyFields()
@@ -932,7 +1013,6 @@ abstract class Page extends CommonPage implements IVariableContainer
         {
             $this->DoBeforeCreate();
             $this->rssGenerator = $this->CreateRssGenerator();
-            // throw new Exception('abc');
         }
         catch(Exception $e)
         {
@@ -992,11 +1072,6 @@ abstract class Page extends CommonPage implements IVariableContainer
         return $this->dataset->GetConnection();
     }
 
-    public function PrepareTextForSQL($text)
-    {
-        return ConvertTextToEncoding($text, GetAnsiEncoding(), $this->GetContentEncoding());
-    }
-
     public function SetErrorMessage($value)
     { $this->errorMessage = $value; }
     public function GetErrorMessage()
@@ -1005,7 +1080,7 @@ abstract class Page extends CommonPage implements IVariableContainer
     public function SetMessage($value)
     { $this->message = $value; }
     public function GetMessage()
-    { return $this->RenderText($this->message); }
+    { return $this->message; }
 
     #region Options
 
@@ -1039,7 +1114,7 @@ abstract class Page extends CommonPage implements IVariableContainer
 
     public function GetMenuLabel()
     {
-        return $this->RenderText($this->menuLabel);
+        return $this->menuLabel;
     }
 
     public function SetMenuLabel($value)
@@ -1085,12 +1160,8 @@ abstract class Page extends CommonPage implements IVariableContainer
     { return $this->showBottomPageNavigator; }
     function SetShowBottomPageNavigator($value)
     { $this->showBottomPageNavigator = $value; }
-    function GetShowPageList()
-    { return $this->showPageList; }
     function GetHidePageListByDefault()
     { return $this->hidePageListByDefault; }
-    function SetShowPageList($value)
-    { $this->showPageList = $value; }
     function SetHidePageListByDefault($value)
     { $this->hidePageListByDefault = $value; }
 
@@ -1125,6 +1196,16 @@ abstract class Page extends CommonPage implements IVariableContainer
     public function getExportOneRecordAvailable()
     {
         return $this->exportOneRecordAvailable;
+    }
+
+    public function setExportSelectedRecordsAvailable(array $exportSelectedRecordsAvailable)
+    {
+        $this->exportSelectedRecordsAvailable = $exportSelectedRecordsAvailable;
+    }
+
+    public function geExportSelectedRecordsAvailable()
+    {
+        return $this->exportSelectedRecordsAvailable;
     }
 
     public function getPrintListAvailable()
@@ -1169,33 +1250,24 @@ abstract class Page extends CommonPage implements IVariableContainer
 
     #endregion
 
-    function IsCurrentUserLoggedIn()
-    {
+    function IsCurrentUserLoggedIn() {
         return GetApplication()->IsCurrentUserLoggedIn();
+    }
+
+    function IsLoggedInAsAdmin() {
+        return $this->GetSecurityInfo()->HasAdminGrant();
     }
 
     function GetCurrentUserId() {
         return GetApplication()->GetCurrentUserId();
     }
 
-    function GetCurrentUserName()
-    {
+    function GetCurrentUserName() {
         return GetApplication()->GetCurrentUser();
     }
 
     public function GetSecurityInfo() {
-        $handled = false;
-        $customSecurityInfo = new PermissionSet(
-            $this->securityInfo->HasViewGrant(),
-            $this->securityInfo->HasEditGrant(),
-            $this->securityInfo->HasAddGrant(),
-            $this->securityInfo->HasDeleteGrant(),
-            $this->securityInfo->HasAdminGrant()
-        );
-        $this->OnGetCustomPagePermissions->Fire(array($this, &$customSecurityInfo, &$handled));
-
-        $result = $handled ? $customSecurityInfo : $this->securityInfo;
-        return $result;
+        return $this->securityInfo;
     }
 
     /**
@@ -1234,6 +1306,7 @@ abstract class Page extends CommonPage implements IVariableContainer
         switch ($operation)
         {
             case OPERATION_EDIT:
+            case OPERATION_MULTI_EDIT:
                 $this->RaiseSecurityError(!$this->GetSecurityInfo()->HasEditGrant(), OPERATION_EDIT);
                 break;
             case OPERATION_VIEW:
@@ -1253,6 +1326,7 @@ abstract class Page extends CommonPage implements IVariableContainer
                 break;
             case OPERATION_INSERT:
             case OPERATION_COPY:
+            case OPERATION_MULTI_UPLOAD:
                 $this->RaiseSecurityError(!$this->GetSecurityInfo()->HasAddGrant(), OPERATION_INSERT);
                 break;
             default:
@@ -1269,6 +1343,9 @@ abstract class Page extends CommonPage implements IVariableContainer
             case OPERATION_EDIT:
                 $this->renderer = new EditRenderer($this->GetLocalizerCaptions());
                 break;
+            case OPERATION_MULTI_EDIT:
+                $this->renderer = new MultiEditRenderer($this->GetLocalizerCaptions());
+                break;
             case OPERATION_VIEW:
                 $this->renderer = new ViewRenderer($this->GetLocalizerCaptions());
                 break;
@@ -1284,40 +1361,46 @@ abstract class Page extends CommonPage implements IVariableContainer
             case OPERATION_COPY:
                 $this->renderer = new InsertRenderer($this->GetLocalizerCaptions());
                 break;
+            case OPERATION_MULTI_UPLOAD:
+                $this->renderer = new MultiUploadRenderer($this->GetLocalizerCaptions());
+                break;
             case OPERATION_PRINT_ALL:
                 $this->renderer = new PrintRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_PRINT_PAGE:
-                $this->renderer = new PrintRenderer($this->GetLocalizerCaptions());
-                break;
             case OPERATION_PRINT_SELECTED:
                 $this->renderer = new PrintRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_EXCEL_EXPORT:
+            case OPERATION_EXCEL_EXPORT_SELECTED:
                 $this->renderer = new ExcelListRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_EXCEL_EXPORT_RECORD:
                 $this->renderer = new ExcelRecordRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_WORD_EXPORT:
+            case OPERATION_WORD_EXPORT_SELECTED:
                 $this->renderer = new WordListRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_WORD_EXPORT_RECORD:
                 $this->renderer = new WordRecordRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_XML_EXPORT:
+            case OPERATION_XML_EXPORT_SELECTED:
                 $this->renderer = new XmlListRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_XML_EXPORT_RECORD:
                 $this->renderer = new XmlRecordRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_CSV_EXPORT:
+            case OPERATION_CSV_EXPORT_SELECTED:
                 $this->renderer = new CsvListRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_CSV_EXPORT_RECORD:
                 $this->renderer = new CsvRecordRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_PDF_EXPORT:
+            case OPERATION_PDF_EXPORT_SELECTED:
                 $this->renderer = new PdfListRenderer($this->GetLocalizerCaptions());
                 break;
             case OPERATION_PDF_EXPORT_RECORD:
@@ -1615,7 +1698,7 @@ abstract class Page extends CommonPage implements IVariableContainer
         return null;
     }
 
-    public function GetCustomTemplate($part, $mode, $defaultValue, &$params = null) {
+    public function GetCustomTemplate($part, $mode, $defaultValue, &$params = array()) {
         return parent::GetCustomTemplate(
             $part,
             $mode ? $mode : $this->GetCurrentPageMode(),
@@ -1703,9 +1786,10 @@ abstract class Page extends CommonPage implements IVariableContainer
     }
 
     /**
+     * @param array $fieldValues
      * @return Navigation
      */
-    public function getNavigation(array $fieldValues = array())
+    public function getNavigation($fieldValues = array())
     {
         $url = $this->CreateLinkBuilder()->getLink();
         $result = new Navigation($this);
@@ -1713,13 +1797,13 @@ abstract class Page extends CommonPage implements IVariableContainer
 
         $groupName = null;
         $siblings = new Navigation($this);
-        foreach ($this->getPageList()->GetPagesViewData() as $page) {
+        foreach ($this->GetReadyPageList()->GetPagesViewData() as $page) {
             if ($page['Href'] === $url && $page['GroupName'] !== 'Default') {
                 $groupName = $page['GroupName'];
             }
         }
 
-        foreach ($this->getPageList()->GetPagesViewData() as $page) {
+        foreach ($this->GetReadyPageList()->GetPagesViewData() as $page) {
             if ($page['Href'] !== $url && $page['GroupName'] === $groupName) {
                 $siblings->append($page['Caption'], $page['Href']);
             }
@@ -1794,6 +1878,66 @@ abstract class Page extends CommonPage implements IVariableContainer
         }
 
         return $result;
+    }
+
+    /** @return bool */
+    public function getShowFormErrorsOnTop() {
+        return $this->showFormErrorsOnTop;
+    }
+
+    /** @param bool $value */
+    public function setShowFormErrorsOnTop($value) {
+        $this->showFormErrorsOnTop = $value;
+    }
+
+    /** @return bool */
+    public function getShowFormErrorsAtBottom() {
+        return $this->showFormErrorsAtBottom;
+    }
+
+    /** @param bool $value */
+    public function setShowFormErrorsAtBottom($value) {
+        $this->showFormErrorsAtBottom = $value;
+    }
+
+    /** @return bool */
+    public function getOpenPrintFormInNewTab() {
+        return $this->openPrintFormInNewTab;
+    }
+
+    /** @param bool $value */
+    public function setOpenPrintFormInNewTab($value) {
+        $this->openPrintFormInNewTab = $value;
+    }
+
+    /** @return bool */
+    public function getOpenExportedPdfInNewTab() {
+        return $this->openExportedPdfInNewTab;
+    }
+
+    /** @param bool $value */
+    public function setOpenExportedPdfInNewTab($value) {
+        $this->openExportedPdfInNewTab = $value;
+    }
+
+    /** @return string */
+    public function getPrintLinkTarget() {
+        return ($this->openPrintFormInNewTab ? ' target="_blank"' : '');
+    }
+
+    /** @return string */
+    public function getExportToPdfLinkTarget() {
+        return ($this->openExportedPdfInNewTab ? ' target="_blank"' : '');
+    }
+
+    /** @return bool */
+    public function getDisplayChartsOnPrintForm() {
+        return $this->displayChartsOnPrintForm;
+    }
+
+    /** @param bool $value */
+    public function setDisplayChartsOnPrintForm($value) {
+        $this->displayChartsOnPrintForm = $value;
     }
 
 }

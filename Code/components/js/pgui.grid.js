@@ -69,13 +69,15 @@ define([
             this.filters = {};
             this.options = options ? options : {};
 
+            this.reloadPageAfterAjaxOperation = this.container.data('reload-page-after-ajax-operation');
+
             this.$header = this.container.find('thead').first();
             this.selectionActions = new SelectionHandler(
                 new Selection(this.getSelectionId()),
                 this.container.find('.js-selection-actions-container'),
-                this.$header.find('.row-selection input[type=checkbox]'),
+                this.$header.find('th.row-selection'),
                 this.container.find('.pg-row .row-selection input[type=checkbox]'),
-                true
+                true, self
             );
 
             this._initActions();
@@ -115,7 +117,9 @@ define([
         },
 
         getRowTemplate: function () {
-            return $(_.template($('#' + this.getId() + '_row_template').html())(this));
+            var $rowTemplate = $(_.template($('#' + this.getId() + '_row_template').html())(this));
+            $rowTemplate.find('td.pg-inline-edit-container').attr('colspan', this.getColumnCount());
+            return $rowTemplate;
         },
 
         getColumnCount: function() {
@@ -132,6 +136,10 @@ define([
 
         getColumnFilter: function () {
             return this.filters.columnFilter;
+        },
+
+        getReloadPageAfterAjaxOperation: function () {
+            return this.reloadPageAfterAjaxOperation;
         },
 
         getRows: function () {
@@ -159,7 +167,7 @@ define([
         },
 
         updateEmptyGridMessage: function() {
-            this.container.find('.pg-row-list:first .empty-grid').toggle(this.container.find('.pg-row') > 0);
+            this.container.find('.pg-row-list:first .empty-grid').toggle(this.container.find('.pg-row').length == 0);
         },
 
         insertRowAtBegin: function($row) {
@@ -169,8 +177,9 @@ define([
                 row = emptyGrid;
             }
             row.before($row);
-            emptyGrid.remove();
             this.integrateRows($row);
+
+            this.updateEmptyGridMessage();
 
             return $row;
         },
@@ -208,8 +217,11 @@ define([
                 initCellEdit($(el), function (response) {
                     self.showMessage(response.message, response.messageDisplayTime, !response.success);
                     var $row = $(response.row);
-                    $el.closest('.pg-row').replaceWith($row);
+                    utils.replaceRow($el.closest('.pg-row'), $row);
                     self.integrateRows($row);
+                    if (self.getReloadPageAfterAjaxOperation()) {
+                        location.reload();
+                    }
                 });
             });
 
@@ -228,13 +240,7 @@ define([
             });
 
             $rows.find('[data-modal-operation=view]').each(function (index, item) {
-                var $item = $(item);
-                if ($item.data('modal-view')) {
-                    return;
-                }
-
-                initModalView($item);
-                $item.data('modal-view', true);
+                initModalView($(item));
             });
 
             var modalDeleteLinks = $rows.find('[data-modal-operation=delete]');
@@ -253,6 +259,13 @@ define([
                 var $item = $(item);
                 if (!$item.data('inline-copy')) {
                     $item.data('inline-copy', inlineLink.createInsertLink($item, self));
+                }
+            });
+
+            $rows.find('[data-inline-operation=view]').each(function (index, item) {
+                var $item = $(item);
+                if (!$item.data('inline-view')) {
+                    $item.data('inline-view', inlineLink.createViewLink($item, self));
                 }
             });
 
@@ -300,6 +313,10 @@ define([
                 })
                 .on('click', '.js-reset-filter', function (e) {
                     getFilterByEvent(e).reset().submit();
+                    e.preventDefault();
+                })
+                .on('click', '.js-reset-selection-filter', function (e) {
+                    location.href = $.query.remove('keys').set('selection_filter', '');
                     e.preventDefault();
                 })
             ;
