@@ -12685,9 +12685,9 @@ a {
   color: #aa0000;
 }
 .pgui-cell-edit-button {
-  color: #aaaa00 0;
+  color: #aa0000;
 }
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: #fd0000;
+  color: #fd0000 !important;
 }

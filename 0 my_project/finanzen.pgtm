@@ -1808,7 +1808,7 @@ Detailed Description        </DetailedDescription>
   </Presentation>
   <UserCSS>
 a:hover, a:focus {
-  color: red;
+  color: #AA0000;
   text-decoration: underline;
 }
 
@@ -1841,6 +1841,14 @@ a:hover, a:focus {
 
 a {
   color: #AA0000;
+}
+
+.pgui-cell-edit-button {
+  color: #AA0000;
+}
+
+.navbar-default .navbar-nav &gt; li &gt; a:hover, .navbar-default .navbar-nav &gt; li &gt; a:focus {
+  color: #FD0000 !important;
 }  </UserCSS>
   <PdfUserStyles/>
   <PrintUserStyles/>
