@@ -1,0 +1,7 @@
+Aktien: Kurs, Kurszeit, Gewinn, Gew%
+
+
+Anteile: Anz*Preis + Kosten = Invest
+	Kurs, Wert, Steigerung
+	
+Transaktion: 
