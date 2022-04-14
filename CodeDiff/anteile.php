@@ -164,7 +164,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $main_editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             
             $filterBuilder->addColumn(
                 $columns['datum'],
@@ -377,9 +377,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -390,9 +390,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -403,9 +403,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -416,9 +416,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -467,9 +467,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -477,9 +477,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -487,9 +487,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -497,9 +497,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -521,10 +521,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -539,7 +540,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -612,10 +613,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -630,7 +632,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -703,10 +705,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -721,7 +724,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -824,9 +827,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -834,9 +837,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -844,9 +847,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -854,9 +857,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
         }
     
@@ -902,9 +905,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -912,9 +915,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -922,9 +925,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -932,9 +935,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
         }
     
@@ -970,9 +973,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -980,9 +983,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -990,9 +993,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -1000,9 +1003,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
         }
     
@@ -1084,7 +1087,7 @@
             $this->setAllowPrintSelectedRecords(true);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array());
+            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
@@ -1105,10 +1108,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -1128,10 +1132,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -1151,10 +1156,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -1174,10 +1180,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -1351,10 +1358,11 @@
                     new IntegerField('depotname', true),
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
+                    new IntegerField('wert'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
-                    new IntegerField('kurs'),
+                    new IntegerField('kauf_kurs'),
                     new IntegerField('steigerung'),
                     new IntegerField('gewinn'),
                     new IntegerField('rendite')
@@ -1399,10 +1407,11 @@
                 new FilterColumn($this->dataset, 'preis', 'preis', 'Preis'),
                 new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
                 new FilterColumn($this->dataset, 'invest', 'invest', 'Invest'),
-                new FilterColumn($this->dataset, 'kurs', 'kurs', 'Kurs'),
                 new FilterColumn($this->dataset, 'steigerung', 'steigerung', 'Steigerung'),
                 new FilterColumn($this->dataset, 'gewinn', 'gewinn', 'Gewinn'),
-                new FilterColumn($this->dataset, 'rendite', 'rendite', 'Rendite')
+                new FilterColumn($this->dataset, 'rendite', 'rendite', 'Rendite'),
+                new FilterColumn($this->dataset, 'kauf_kurs', 'kauf_kurs', 'Kauf Kurs'),
+                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert')
             );
         }
     
@@ -1416,10 +1425,11 @@
                 ->addColumn($columns['preis'])
                 ->addColumn($columns['kosten'])
                 ->addColumn($columns['invest'])
-                ->addColumn($columns['kurs'])
                 ->addColumn($columns['steigerung'])
                 ->addColumn($columns['gewinn'])
-                ->addColumn($columns['rendite']);
+                ->addColumn($columns['rendite'])
+                ->addColumn($columns['kauf_kurs'])
+                ->addColumn($columns['wert']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -1591,24 +1601,6 @@
                 )
             );
             
-            $main_editor = new TextEdit('kurs_edit');
-            
-            $filterBuilder->addColumn(
-                $columns['kurs'],
-                array(
-                    FilterConditionOperator::EQUALS => $main_editor,
-                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
-                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
-                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
-                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
-                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
-                    FilterConditionOperator::IS_BETWEEN => $main_editor,
-                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
-                    FilterConditionOperator::IS_BLANK => null,
-                    FilterConditionOperator::IS_NOT_BLANK => null
-                )
-            );
-            
             $main_editor = new TextEdit('steigerung_edit');
             
             $filterBuilder->addColumn(
@@ -1649,6 +1641,42 @@
             
             $filterBuilder->addColumn(
                 $columns['rendite'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('kauf_kurs_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['kauf_kurs'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('wert_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['wert'],
                 array(
                     FilterConditionOperator::EQUALS => $main_editor,
                     FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
@@ -1766,9 +1794,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1779,9 +1807,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1792,22 +1820,9 @@
             //
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
-            $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription('');
-            $column->SetFixedWidth(null);
-            $grid->AddViewColumn($column);
-            
-            //
-            // View column for kurs field
-            //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1818,9 +1833,9 @@
             //
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1831,9 +1846,9 @@
             //
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1844,9 +1859,35 @@
             //
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for kauf_kurs field
+            //
+            $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1894,9 +1935,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1904,9 +1945,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1914,19 +1955,9 @@
             //
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
-            $grid->AddSingleRecordViewColumn($column);
-            
-            //
-            // View column for kurs field
-            //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1934,9 +1965,9 @@
             //
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1944,9 +1975,9 @@
             //
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -1954,9 +1985,29 @@
             //
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for kauf_kurs field
+            //
+            $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -2026,6 +2077,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -2087,15 +2142,6 @@
             $grid->AddEditColumn($editColumn);
             
             //
-            // Edit column for kurs field
-            //
-            $editor = new TextEdit('kurs_edit');
-            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddEditColumn($editColumn);
-            
-            //
             // Edit column for steigerung field
             //
             $editor = new TextEdit('steigerung_edit');
@@ -2118,6 +2164,24 @@
             //
             $editor = new TextEdit('rendite_edit');
             $editColumn = new CustomEditColumn('Rendite', 'rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for kauf_kurs field
+            //
+            $editor = new TextEdit('kauf_kurs_edit');
+            $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -2179,6 +2243,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -2240,15 +2308,6 @@
             $grid->AddMultiEditColumn($editColumn);
             
             //
-            // Edit column for kurs field
-            //
-            $editor = new TextEdit('kurs_edit');
-            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddMultiEditColumn($editColumn);
-            
-            //
             // Edit column for steigerung field
             //
             $editor = new TextEdit('steigerung_edit');
@@ -2271,6 +2330,24 @@
             //
             $editor = new TextEdit('rendite_edit');
             $editColumn = new CustomEditColumn('Rendite', 'rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for kauf_kurs field
+            //
+            $editor = new TextEdit('kauf_kurs_edit');
+            $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -2342,6 +2419,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -2403,15 +2484,6 @@
             $grid->AddInsertColumn($editColumn);
             
             //
-            // Edit column for kurs field
-            //
-            $editor = new TextEdit('kurs_edit');
-            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddInsertColumn($editColumn);
-            
-            //
             // Edit column for steigerung field
             //
             $editor = new TextEdit('steigerung_edit');
@@ -2434,6 +2506,24 @@
             //
             $editor = new TextEdit('rendite_edit');
             $editColumn = new CustomEditColumn('Rendite', 'rendite', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for kauf_kurs field
+            //
+            $editor = new TextEdit('kauf_kurs_edit');
+            $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -2486,9 +2576,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -2496,9 +2586,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -2506,19 +2596,9 @@
             //
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
-            $grid->AddPrintColumn($column);
-            
-            //
-            // View column for kurs field
-            //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -2526,9 +2606,9 @@
             //
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -2536,9 +2616,9 @@
             //
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -2546,9 +2626,29 @@
             //
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for kauf_kurs field
+            //
+            $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
         }
     
@@ -2593,9 +2693,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -2603,9 +2703,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -2613,19 +2713,9 @@
             //
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
-            $grid->AddExportColumn($column);
-            
-            //
-            // View column for kurs field
-            //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -2633,9 +2723,9 @@
             //
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -2643,9 +2733,9 @@
             //
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -2653,9 +2743,29 @@
             //
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for kauf_kurs field
+            //
+            $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
         }
     
@@ -2700,9 +2810,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -2710,9 +2820,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -2720,19 +2830,9 @@
             //
             $column = new NumberViewColumn('invest', 'invest', 'Invest', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
-            $grid->AddCompareColumn($column);
-            
-            //
-            // View column for kurs field
-            //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -2740,9 +2840,9 @@
             //
             $column = new NumberViewColumn('steigerung', 'steigerung', 'Steigerung', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -2750,9 +2850,9 @@
             //
             $column = new NumberViewColumn('gewinn', 'gewinn', 'Gewinn', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -2760,9 +2860,29 @@
             //
             $column = new NumberViewColumn('rendite', 'rendite', 'Rendite', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for kauf_kurs field
+            //
+            $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
         }
     
@@ -2866,7 +2986,7 @@
             $this->setAllowPrintSelectedRecords(true);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array());
+            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
@@ -2922,6 +3042,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),

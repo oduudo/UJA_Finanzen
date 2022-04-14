@@ -159,7 +159,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datetime_edit', false, 'Y-m-d H:i:s');
+            $main_editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
             
             $filterBuilder->addColumn(
                 $columns['datetime'],
@@ -268,7 +268,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('Y-m-d H:i:s');
+            $column->SetDateTimeFormat('d.m.Y H:i:s');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -279,9 +279,9 @@
             //
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -312,7 +312,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('Y-m-d H:i:s');
+            $column->SetDateTimeFormat('d.m.Y H:i:s');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -320,9 +320,9 @@
             //
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
         }
     
@@ -358,6 +358,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -381,7 +385,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'Y-m-d H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -420,6 +424,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -443,7 +451,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'Y-m-d H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -492,6 +500,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -515,7 +527,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'Y-m-d H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -562,7 +574,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('Y-m-d H:i:s');
+            $column->SetDateTimeFormat('d.m.Y H:i:s');
             $grid->AddPrintColumn($column);
             
             //
@@ -570,9 +582,9 @@
             //
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
         }
     
@@ -600,7 +612,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('Y-m-d H:i:s');
+            $column->SetDateTimeFormat('d.m.Y H:i:s');
             $grid->AddExportColumn($column);
             
             //
@@ -608,9 +620,9 @@
             //
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
         }
     
@@ -638,7 +650,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('Y-m-d H:i:s');
+            $column->SetDateTimeFormat('d.m.Y H:i:s');
             $grid->AddCompareColumn($column);
             
             //
@@ -646,9 +658,9 @@
             //
             $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
         }
     
@@ -730,7 +742,7 @@
             $this->setAllowPrintSelectedRecords(true);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array());
+            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
@@ -755,6 +767,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -786,6 +802,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -817,6 +837,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
@@ -848,6 +872,10 @@
                     new StringField('f100id'),
                     new StringField('ariva_id'),
                     new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),

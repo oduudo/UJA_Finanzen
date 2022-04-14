@@ -161,12 +161,12 @@ function Global_AfterDeleteHandler($page, $rowData, $tableName, &$success, &$mes
 
 function GetDefaultDateFormat()
 {
-    return 'Y-m-d';
+    return 'd.m.Y';
 }
 
 function GetFirstDayOfWeek()
 {
-    return 0;
+    return 1;
 }
 
 function GetPageListType()

@@ -136,7 +136,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $main_editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             
             $filterBuilder->addColumn(
                 $columns['datum'],
@@ -363,9 +363,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -376,9 +376,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -389,9 +389,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -402,9 +402,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -453,9 +453,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -463,9 +463,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -473,9 +473,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -483,9 +483,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -501,7 +501,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -596,7 +596,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -691,7 +691,7 @@
             //
             // Edit column for datum field
             //
-            $editor = new DateTimeEdit('datum_edit', false, 'Y-m-d');
+            $editor = new DateTimeEdit('datum_edit', false, 'd.m.Y');
             $editColumn = new CustomEditColumn('Datum', 'datum', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -819,9 +819,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -829,9 +829,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -839,9 +839,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -849,9 +849,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
             
             //
@@ -894,9 +894,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -904,9 +904,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -914,9 +914,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -924,9 +924,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddExportColumn($column);
             
             //
@@ -959,9 +959,9 @@
             //
             $column = new NumberViewColumn('anzahl', 'anzahl', 'Anzahl', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -969,9 +969,9 @@
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -979,9 +979,9 @@
             //
             $column = new NumberViewColumn('kosten', 'kosten', 'Kosten', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -989,9 +989,9 @@
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(4);
-            $column->setThousandsSeparator(',');
-            $column->setDecimalSeparator('.');
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
             
             //
@@ -1080,7 +1080,7 @@
             $this->setAllowPrintSelectedRecords(true);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array());
+            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;

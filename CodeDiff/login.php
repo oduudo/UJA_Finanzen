@@ -490,7 +490,7 @@
             $this->setAllowPrintSelectedRecords(true);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array());
+            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
     
             return $result;
