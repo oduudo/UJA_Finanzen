@@ -50,6 +50,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -102,7 +103,8 @@
                 new FilterColumn($this->dataset, 'gewinn', 'gewinn', 'Gewinn'),
                 new FilterColumn($this->dataset, 'rendite', 'rendite', 'Rendite'),
                 new FilterColumn($this->dataset, 'kauf_kurs', 'kauf_kurs', 'Kauf Kurs'),
-                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert')
+                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert'),
+                new FilterColumn($this->dataset, 'aenderung_ant', 'aenderung_ant', 'Aenderung Ant')
             );
         }
     
@@ -120,7 +122,8 @@
                 ->addColumn($columns['gewinn'])
                 ->addColumn($columns['rendite'])
                 ->addColumn($columns['kauf_kurs'])
-                ->addColumn($columns['wert']);
+                ->addColumn($columns['wert'])
+                ->addColumn($columns['aenderung_ant']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -381,6 +384,24 @@
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
             );
+            
+            $main_editor = new TextEdit('aenderung_ant_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['aenderung_ant'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
         }
     
         protected function AddOperationsColumns(Grid $grid)
@@ -573,6 +594,19 @@
             $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
         }
     
         protected function AddSingleRecordViewColumns(Grid $grid)
@@ -690,6 +724,16 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
         }
     
         protected function AddEditColumns(Grid $grid)
@@ -724,7 +768,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -768,7 +818,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -862,6 +913,15 @@
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
         }
     
         protected function AddMultiEditColumns(Grid $grid)
@@ -886,7 +946,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -930,7 +996,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -1024,6 +1091,15 @@
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
         }
     
         protected function AddInsertColumns(Grid $grid)
@@ -1058,7 +1134,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1102,7 +1184,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -1193,6 +1276,15 @@
             //
             $editor = new TextEdit('wert_edit');
             $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -1319,6 +1411,16 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddPrintColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
         }
     
         protected function AddExportColumns(Grid $grid)
@@ -1431,6 +1533,16 @@
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -1553,6 +1665,16 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddCompareColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
         }
     
         private function AddCompareHeaderColumns(Grid $grid)
@@ -1611,7 +1733,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -1627,14 +1749,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }
@@ -1658,7 +1780,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1693,7 +1821,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -1718,7 +1847,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1753,7 +1888,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -1778,7 +1914,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1813,7 +1955,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -1838,7 +1981,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1873,7 +2022,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -2052,7 +2202,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -2097,11 +2253,17 @@
                 new FilterColumn($this->dataset, 'portf', 'portf', 'Portf'),
                 new FilterColumn($this->dataset, 'start', 'start', 'Start'),
                 new FilterColumn($this->dataset, 'invest', 'invest', 'Invest'),
+                new FilterColumn($this->dataset, 'akt_date', 'akt_date', 'Akt Date'),
                 new FilterColumn($this->dataset, 'wert', 'wert', 'Wert'),
+                new FilterColumn($this->dataset, 'aenderung_dep', 'aenderung_dep', 'Aenderung Dep'),
+                new FilterColumn($this->dataset, 'aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P'),
                 new FilterColumn($this->dataset, 'dividende', 'dividende', 'Dividende'),
                 new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
                 new FilterColumn($this->dataset, 'gewinn', 'gewinn', 'Gewinn'),
-                new FilterColumn($this->dataset, 'gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent')
+                new FilterColumn($this->dataset, 'gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent'),
+                new FilterColumn($this->dataset, 'last_date_t', 'last_date_t', 'Last Date T'),
+                new FilterColumn($this->dataset, 'last_date', 'last_date', 'Last Date'),
+                new FilterColumn($this->dataset, 'last_wert', 'last_wert', 'Last Wert')
             );
         }
     
@@ -2116,16 +2278,23 @@
                 ->addColumn($columns['portf'])
                 ->addColumn($columns['start'])
                 ->addColumn($columns['invest'])
+                ->addColumn($columns['akt_date'])
                 ->addColumn($columns['wert'])
+                ->addColumn($columns['aenderung_dep'])
+                ->addColumn($columns['aenderung_dep_p'])
                 ->addColumn($columns['dividende'])
                 ->addColumn($columns['kosten'])
                 ->addColumn($columns['gewinn'])
-                ->addColumn($columns['gewinn_prozent']);
+                ->addColumn($columns['gewinn_prozent'])
+                ->addColumn($columns['last_date_t'])
+                ->addColumn($columns['last_date'])
+                ->addColumn($columns['last_wert']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
         {
-    
+            $columnFilter
+                ->setOptionsFor('last_date_t');
         }
     
         protected function setupFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
@@ -2316,10 +2485,71 @@
                 )
             );
             
+            $main_editor = new TextEdit('akt_date_edit');
+            $main_editor->SetMaxLength(32);
+            
+            $filterBuilder->addColumn(
+                $columns['akt_date'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::CONTAINS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_CONTAIN => $main_editor,
+                    FilterConditionOperator::BEGINS_WITH => $main_editor,
+                    FilterConditionOperator::ENDS_WITH => $main_editor,
+                    FilterConditionOperator::IS_LIKE => $main_editor,
+                    FilterConditionOperator::IS_NOT_LIKE => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
             $main_editor = new TextEdit('wert_edit');
             
             $filterBuilder->addColumn(
                 $columns['wert'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('aenderung_dep_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['aenderung_dep'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('aenderung_dep_p_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['aenderung_dep_p'],
                 array(
                     FilterConditionOperator::EQUALS => $main_editor,
                     FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
@@ -2392,6 +2622,67 @@
             
             $filterBuilder->addColumn(
                 $columns['gewinn_prozent'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TimeEdit('last_date_t_edit', 'H:i:s');
+            
+            $filterBuilder->addColumn(
+                $columns['last_date_t'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('last_date_edit');
+            $main_editor->SetMaxLength(32);
+            
+            $filterBuilder->addColumn(
+                $columns['last_date'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::CONTAINS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_CONTAIN => $main_editor,
+                    FilterConditionOperator::BEGINS_WITH => $main_editor,
+                    FilterConditionOperator::ENDS_WITH => $main_editor,
+                    FilterConditionOperator::IS_LIKE => $main_editor,
+                    FilterConditionOperator::IS_NOT_LIKE => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('last_wert_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['last_wert'],
                 array(
                     FilterConditionOperator::EQUALS => $main_editor,
                     FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
@@ -2545,9 +2836,45 @@
             $grid->AddViewColumn($column);
             
             //
+            // View column for akt_date field
+            //
+            $column = new TextViewColumn('akt_date', 'akt_date', 'Akt Date', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for aenderung_dep field
+            //
+            $column = new NumberViewColumn('aenderung_dep', 'aenderung_dep', 'Aenderung Dep', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for aenderung_dep_p field
+            //
+            $column = new NumberViewColumn('aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2600,6 +2927,40 @@
             // View column for gewinn_prozent field
             //
             $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for last_date_t field
+            //
+            $column = new DateTimeViewColumn('last_date_t', 'last_date_t', 'Last Date T', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('H:i:s');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for last_date field
+            //
+            $column = new TextViewColumn('last_date', 'last_date', 'Last Date', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for last_wert field
+            //
+            $column = new NumberViewColumn('last_wert', 'last_wert', 'Last Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2675,9 +3036,36 @@
             $grid->AddSingleRecordViewColumn($column);
             
             //
+            // View column for akt_date field
+            //
+            $column = new TextViewColumn('akt_date', 'akt_date', 'Akt Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for aenderung_dep field
+            //
+            $column = new NumberViewColumn('aenderung_dep', 'aenderung_dep', 'Aenderung Dep', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for aenderung_dep_p field
+            //
+            $column = new NumberViewColumn('aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2718,6 +3106,31 @@
             // View column for gewinn_prozent field
             //
             $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for last_date_t field
+            //
+            $column = new DateTimeViewColumn('last_date_t', 'last_date_t', 'Last Date T', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('H:i:s');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for last_date field
+            //
+            $column = new TextViewColumn('last_date', 'last_date', 'Last Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for last_wert field
+            //
+            $column = new NumberViewColumn('last_wert', 'last_wert', 'Last Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2810,10 +3223,39 @@
             $grid->AddEditColumn($editColumn);
             
             //
+            // Edit column for akt_date field
+            //
+            $editor = new TextEdit('akt_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Akt Date', 'akt_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
             // Edit column for wert field
             //
             $editor = new TextEdit('wert_edit');
             $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep field
+            //
+            $editor = new TextEdit('aenderung_dep_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep', 'aenderung_dep', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep_p field
+            //
+            $editor = new TextEdit('aenderung_dep_p_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep P', 'aenderung_dep_p', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -2850,6 +3292,35 @@
             //
             $editor = new TextEdit('gewinn_prozent_edit');
             $editColumn = new CustomEditColumn('Gewinn Prozent', 'gewinn_prozent', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for last_date_t field
+            //
+            $editor = new TimeEdit('last_date_t_edit', 'H:i:s');
+            $editColumn = new CustomEditColumn('Last Date T', 'last_date_t', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for last_date field
+            //
+            $editor = new TextEdit('last_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Last Date', 'last_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for last_wert field
+            //
+            $editor = new TextEdit('last_wert_edit');
+            $editColumn = new CustomEditColumn('Last Wert', 'last_wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -2930,10 +3401,39 @@
             $grid->AddMultiEditColumn($editColumn);
             
             //
+            // Edit column for akt_date field
+            //
+            $editor = new TextEdit('akt_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Akt Date', 'akt_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
             // Edit column for wert field
             //
             $editor = new TextEdit('wert_edit');
             $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep field
+            //
+            $editor = new TextEdit('aenderung_dep_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep', 'aenderung_dep', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep_p field
+            //
+            $editor = new TextEdit('aenderung_dep_p_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep P', 'aenderung_dep_p', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -2970,6 +3470,35 @@
             //
             $editor = new TextEdit('gewinn_prozent_edit');
             $editColumn = new CustomEditColumn('Gewinn Prozent', 'gewinn_prozent', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for last_date_t field
+            //
+            $editor = new TimeEdit('last_date_t_edit', 'H:i:s');
+            $editColumn = new CustomEditColumn('Last Date T', 'last_date_t', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for last_date field
+            //
+            $editor = new TextEdit('last_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Last Date', 'last_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for last_wert field
+            //
+            $editor = new TextEdit('last_wert_edit');
+            $editColumn = new CustomEditColumn('Last Wert', 'last_wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -3060,10 +3589,39 @@
             $grid->AddInsertColumn($editColumn);
             
             //
+            // Edit column for akt_date field
+            //
+            $editor = new TextEdit('akt_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Akt Date', 'akt_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
             // Edit column for wert field
             //
             $editor = new TextEdit('wert_edit');
             $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep field
+            //
+            $editor = new TextEdit('aenderung_dep_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep', 'aenderung_dep', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_dep_p field
+            //
+            $editor = new TextEdit('aenderung_dep_p_edit');
+            $editColumn = new CustomEditColumn('Aenderung Dep P', 'aenderung_dep_p', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -3100,6 +3658,35 @@
             //
             $editor = new TextEdit('gewinn_prozent_edit');
             $editColumn = new CustomEditColumn('Gewinn Prozent', 'gewinn_prozent', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for last_date_t field
+            //
+            $editor = new TimeEdit('last_date_t_edit', 'H:i:s');
+            $editColumn = new CustomEditColumn('Last Date T', 'last_date_t', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for last_date field
+            //
+            $editor = new TextEdit('last_date_edit');
+            $editor->SetMaxLength(32);
+            $editColumn = new CustomEditColumn('Last Date', 'last_date', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for last_wert field
+            //
+            $editor = new TextEdit('last_wert_edit');
+            $editColumn = new CustomEditColumn('Last Wert', 'last_wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -3176,9 +3763,36 @@
             $grid->AddPrintColumn($column);
             
             //
+            // View column for akt_date field
+            //
+            $column = new TextViewColumn('akt_date', 'akt_date', 'Akt Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
+            
+            //
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for aenderung_dep field
+            //
+            $column = new NumberViewColumn('aenderung_dep', 'aenderung_dep', 'Aenderung Dep', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for aenderung_dep_p field
+            //
+            $column = new NumberViewColumn('aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3219,6 +3833,31 @@
             // View column for gewinn_prozent field
             //
             $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for last_date_t field
+            //
+            $column = new DateTimeViewColumn('last_date_t', 'last_date_t', 'Last Date T', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('H:i:s');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for last_date field
+            //
+            $column = new TextViewColumn('last_date', 'last_date', 'Last Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for last_wert field
+            //
+            $column = new NumberViewColumn('last_wert', 'last_wert', 'Last Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3291,9 +3930,36 @@
             $grid->AddExportColumn($column);
             
             //
+            // View column for akt_date field
+            //
+            $column = new TextViewColumn('akt_date', 'akt_date', 'Akt Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
+            
+            //
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for aenderung_dep field
+            //
+            $column = new NumberViewColumn('aenderung_dep', 'aenderung_dep', 'Aenderung Dep', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for aenderung_dep_p field
+            //
+            $column = new NumberViewColumn('aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3334,6 +4000,31 @@
             // View column for gewinn_prozent field
             //
             $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for last_date_t field
+            //
+            $column = new DateTimeViewColumn('last_date_t', 'last_date_t', 'Last Date T', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('H:i:s');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for last_date field
+            //
+            $column = new TextViewColumn('last_date', 'last_date', 'Last Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for last_wert field
+            //
+            $column = new NumberViewColumn('last_wert', 'last_wert', 'Last Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3406,9 +4097,36 @@
             $grid->AddCompareColumn($column);
             
             //
+            // View column for akt_date field
+            //
+            $column = new TextViewColumn('akt_date', 'akt_date', 'Akt Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
+            
+            //
             // View column for wert field
             //
             $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for aenderung_dep field
+            //
+            $column = new NumberViewColumn('aenderung_dep', 'aenderung_dep', 'Aenderung Dep', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for aenderung_dep_p field
+            //
+            $column = new NumberViewColumn('aenderung_dep_p', 'aenderung_dep_p', 'Aenderung Dep P', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3449,6 +4167,31 @@
             // View column for gewinn_prozent field
             //
             $column = new NumberViewColumn('gewinn_prozent', 'gewinn_prozent', 'Gewinn Prozent', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for last_date_t field
+            //
+            $column = new DateTimeViewColumn('last_date_t', 'last_date_t', 'Last Date T', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('H:i:s');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for last_date field
+            //
+            $column = new TextViewColumn('last_date', 'last_date', 'Last Date', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for last_wert field
+            //
+            $column = new NumberViewColumn('last_wert', 'last_wert', 'Last Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -3534,7 +4277,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('1200px');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -3550,14 +4293,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }

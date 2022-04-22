@@ -159,7 +159,7 @@
                 )
             );
             
-            $main_editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
+            $main_editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y, H:i:s');
             
             $filterBuilder->addColumn(
                 $columns['datetime'],
@@ -268,7 +268,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y H:i:s');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -312,7 +312,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y H:i:s');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $grid->AddSingleRecordViewColumn($column);
             
             //
@@ -368,7 +368,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -385,7 +386,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y, H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -434,7 +435,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -451,7 +453,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y, H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -510,7 +512,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -527,7 +530,7 @@
             //
             // Edit column for datetime field
             //
-            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y H:i:s');
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y, H:i:s');
             $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
@@ -574,7 +577,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y H:i:s');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $grid->AddPrintColumn($column);
             
             //
@@ -612,7 +615,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y H:i:s');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $grid->AddExportColumn($column);
             
             //
@@ -650,7 +653,7 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y H:i:s');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $grid->AddCompareColumn($column);
             
             //
@@ -720,7 +723,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('1200px');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -736,14 +739,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }
@@ -777,7 +780,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -812,7 +816,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -847,7 +852,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -882,7 +888,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),

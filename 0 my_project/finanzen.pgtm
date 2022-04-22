@@ -23,13 +23,13 @@
   </DataSources>
   <Presentation disableMagicQuotesRuntime="false" showEnvironmentVariables="false" showExecutedQueries="true" showPHPErrorsAndWarnings="false">
     <Pages>
-      <Page type="table" tableName="aktien" numberByDataSource="0" fileName="aktien" caption="Aktien" shortCaption="Aktien" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="aktien" numberByDataSource="0" fileName="aktien" caption="Aktien" shortCaption="Aktien" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText>
 Inline Description        </BeforeGridText>
         <DetailedDescription>
 Detailed Description        </DetailedDescription>
         <ColumnPresentations>
-          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
+          <ColumnPresentation fieldName="id" caption="Id" canSetNull="true" controlVisible="false" selectedFilterOperators="1573119">
             <ViewProperties type="text">
               <Format type="number" thousandSeparator="."/>
             </ViewProperties>
@@ -69,67 +69,73 @@ Detailed Description        </DetailedDescription>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="aenderung_p" caption="Aenderung P" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="aenderung" caption="Aenderung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par1" caption="Par1" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par3" caption="Par3" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par5" caption="Par5" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par10" caption="Par10" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par20" caption="Par20" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kgv" caption="Kgv" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
-          <ColumnPresentation fieldName="div_rendite" caption="Div Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+          <ColumnPresentation fieldName="dividende" caption="Dividende" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="dividende_p" caption="Dividende P" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="dsr" caption="Dsr" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
@@ -175,7 +181,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -200,7 +207,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -225,7 +233,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -250,7 +259,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -269,7 +279,6 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
             <Column fieldName="dsr"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
@@ -280,6 +289,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung"/>
             <Column fieldName="aenderung_p"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
           </QuickFilter>
           <FilterBuilder>
             <Column fieldName="id"/>
@@ -300,7 +311,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -325,7 +337,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -350,7 +363,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -375,7 +389,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -400,7 +415,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
             <Column fieldName="kgv"/>
-            <Column fieldName="div_rendite"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="dividende_p"/>
             <Column fieldName="dsr"/>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
@@ -409,7 +425,7 @@ Detailed Description        </DetailedDescription>
         </Columns>
         <Details>
           <Detail caption="Anteile">
-            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -437,43 +453,55 @@ Detailed Description        </DetailedDescription>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kauf_kurs" caption="Kauf Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aenderung_ant" caption="Aenderung Ant" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
@@ -491,6 +519,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </List>
                 <View>
                   <Column fieldName="id"/>
@@ -504,6 +534,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </View>
                 <Edit>
                   <Column fieldName="id"/>
@@ -517,6 +549,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Edit>
                 <Insert>
                   <Column fieldName="id"/>
@@ -530,6 +564,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Insert>
                 <QuickFilter>
                   <Column fieldName="id"/>
@@ -543,6 +579,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </QuickFilter>
                 <FilterBuilder>
                   <Column fieldName="id"/>
@@ -556,6 +594,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </FilterBuilder>
                 <Print>
                   <Column fieldName="id"/>
@@ -569,6 +609,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Print>
                 <Export>
                   <Column fieldName="id"/>
@@ -582,6 +624,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Export>
                 <Compare>
                   <Column fieldName="id"/>
@@ -595,6 +639,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Compare>
                 <MultiEdit>
                   <Column fieldName="id" visible="false"/>
@@ -608,6 +654,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </MultiEdit>
               </Columns>
               <Details/>
@@ -619,7 +667,7 @@ Detailed Description        </DetailedDescription>
             </MasterForeignKeyColumnMap>
           </Detail>
           <Detail caption="Kurse">
-            <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -635,12 +683,12 @@ Detailed Description        </DetailedDescription>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
-                  <ViewProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s"/>
-                  <EditProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s" firstDayOfWeek="0"/>
+                  <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+                  <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
@@ -719,7 +767,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -745,45 +793,57 @@ Detailed Description        </DetailedDescription>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
+          <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aenderung_ant" caption="Aenderung Ant" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
           <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kauf_kurs" caption="Kauf Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
@@ -794,6 +854,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -807,6 +869,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -820,6 +884,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -833,6 +899,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -853,12 +921,16 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="gewinn"/>
             <Column fieldName="rendite"/>
             <Column fieldName="kauf_kurs"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
           </QuickFilter>
           <FilterBuilder>
             <Column fieldName="id"/>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -872,6 +944,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -885,6 +959,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -898,6 +974,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -911,6 +989,8 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="depotname"/>
             <Column fieldName="aktienname"/>
             <Column fieldName="anzahl"/>
+            <Column fieldName="wert"/>
+            <Column fieldName="aenderung_ant"/>
             <Column fieldName="preis"/>
             <Column fieldName="kosten"/>
             <Column fieldName="invest"/>
@@ -922,7 +1002,7 @@ Detailed Description        </DetailedDescription>
         </Columns>
         <Details>
           <Detail caption="Transaktionen">
-            <Page type="table" tableName="transaktionen" numberByDataSource="1" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -941,7 +1021,7 @@ Detailed Description        </DetailedDescription>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="datum" caption="Datum" canSetNull="true" selectedFilterOperators="2031871">
                   <ViewProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1"/>
-                  <EditProperties type="dateTime" dateTimeFormat="Y-m-d" dateTimeKind="1" firstDayOfWeek="0"/>
+                  <EditProperties type="dateTime" dateTimeFormat="d.m.Y" dateTimeKind="1" firstDayOfWeek="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="typ" caption="Typ" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589055">
                   <ViewProperties type="text"/>
@@ -954,25 +1034,25 @@ Detailed Description        </DetailedDescription>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
@@ -1091,7 +1171,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="depots" numberByDataSource="0" fileName="depots" caption="Depots" shortCaption="Depots" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="depots" numberByDataSource="0" fileName="depots" caption="Depots" shortCaption="Depots" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1127,37 +1207,67 @@ Detailed Description        </DetailedDescription>
           </ColumnPresentation>
           <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
+          <ColumnPresentation fieldName="akt_date" caption="Akt Date" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
           <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aenderung_dep" caption="Aenderung Dep" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aenderung_dep_p" caption="Aenderung Dep P" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="dividende" caption="Dividende" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="gewinn_prozent" caption="Gewinn Prozent" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="last_date_t" caption="Last Date T" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="dateTime" dateTimeFormat="H:i:s" dateTimeKind="2"/>
+            <EditProperties type="time"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="last_date" caption="Last Date" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="32"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="last_wert" caption="Last Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
@@ -1172,11 +1282,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </List>
           <View>
             <Column fieldName="id"/>
@@ -1187,11 +1303,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </View>
           <Edit>
             <Column fieldName="id"/>
@@ -1202,11 +1324,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </Edit>
           <Insert>
             <Column fieldName="id"/>
@@ -1217,11 +1345,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </Insert>
           <QuickFilter>
             <Column fieldName="id"/>
@@ -1237,6 +1371,12 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="akt_date"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </QuickFilter>
           <FilterBuilder>
             <Column fieldName="id"/>
@@ -1247,11 +1387,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </FilterBuilder>
           <Print>
             <Column fieldName="id"/>
@@ -1262,11 +1408,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </Print>
           <Export>
             <Column fieldName="id"/>
@@ -1277,11 +1429,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </Export>
           <Compare>
             <Column fieldName="id"/>
@@ -1292,11 +1450,17 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </Compare>
           <MultiEdit>
             <Column fieldName="id" visible="false"/>
@@ -1307,16 +1471,22 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="portf"/>
             <Column fieldName="start"/>
             <Column fieldName="invest"/>
+            <Column fieldName="akt_date"/>
             <Column fieldName="wert"/>
+            <Column fieldName="aenderung_dep"/>
+            <Column fieldName="aenderung_dep_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="kosten"/>
             <Column fieldName="gewinn"/>
             <Column fieldName="gewinn_prozent"/>
+            <Column fieldName="last_date_t"/>
+            <Column fieldName="last_date"/>
+            <Column fieldName="last_wert"/>
           </MultiEdit>
         </Columns>
         <Details>
           <Detail caption="Anteile">
-            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -1344,43 +1514,55 @@ Detailed Description        </DetailedDescription>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="invest" caption="Invest" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="steigerung" caption="Steigerung" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="gewinn" caption="Gewinn" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="rendite" caption="Rendite" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
                 <ColumnPresentation fieldName="kauf_kurs" caption="Kauf Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
                   <ViewProperties type="text">
-                    <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aenderung_ant" caption="Aenderung Ant" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
                   </ViewProperties>
                   <EditProperties type="textBox" maxLength="0"/>
                 </ColumnPresentation>
@@ -1398,6 +1580,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </List>
                 <View>
                   <Column fieldName="id"/>
@@ -1411,6 +1595,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </View>
                 <Edit>
                   <Column fieldName="id"/>
@@ -1424,6 +1610,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Edit>
                 <Insert>
                   <Column fieldName="id"/>
@@ -1437,6 +1625,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Insert>
                 <QuickFilter>
                   <Column fieldName="id"/>
@@ -1450,6 +1640,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </QuickFilter>
                 <FilterBuilder>
                   <Column fieldName="id"/>
@@ -1463,6 +1655,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </FilterBuilder>
                 <Print>
                   <Column fieldName="id"/>
@@ -1476,6 +1670,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Print>
                 <Export>
                   <Column fieldName="id"/>
@@ -1489,6 +1685,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Export>
                 <Compare>
                   <Column fieldName="id"/>
@@ -1502,6 +1700,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </Compare>
                 <MultiEdit>
                   <Column fieldName="id" visible="false"/>
@@ -1515,6 +1715,8 @@ Detailed Description        </DetailedDescription>
                   <Column fieldName="gewinn"/>
                   <Column fieldName="rendite"/>
                   <Column fieldName="kauf_kurs"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="aenderung_ant"/>
                 </MultiEdit>
               </Columns>
               <Details/>
@@ -1529,7 +1731,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1545,12 +1747,12 @@ Detailed Description        </DetailedDescription>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
-            <ViewProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s"/>
-            <EditProperties type="dateTime" dateTimeFormat="Y-m-d H:i:s" firstDayOfWeek="0"/>
+            <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+            <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
@@ -1621,7 +1823,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+      <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1633,7 +1835,7 @@ Detailed Description        </DetailedDescription>
           </ColumnPresentation>
           <ColumnPresentation fieldName="datum" caption="Datum" canSetNull="true" selectedFilterOperators="2031871">
             <ViewProperties type="dateTime" dateTimeFormat="dd.mm.YY" dateTimeKind="1"/>
-            <EditProperties type="dateTime" dateTimeFormat="Y-m-d" dateTimeKind="1" firstDayOfWeek="0"/>
+            <EditProperties type="dateTime" dateTimeFormat="d.m.Y" dateTimeKind="1" firstDayOfWeek="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="typ" caption="Typ" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589055">
             <ViewProperties type="text"/>
@@ -1646,25 +1848,25 @@ Detailed Description        </DetailedDescription>
           </ColumnPresentation>
           <ColumnPresentation fieldName="anzahl" caption="Anzahl" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="preis" caption="Preis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kosten" caption="Kosten" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
-              <Format type="number" numberAfterDecimal="4" decimalSeparator="." thousandSeparator=","/>
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
@@ -1780,7 +1982,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="login" numberByDataSource="0" fileName="login" caption="Login" shortCaption="Login" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+      <Page type="table" tableName="login" numberByDataSource="0" fileName="login" caption="Login" shortCaption="Login" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1916,6 +2118,6 @@ a {
   <PrintUserStyles/>
   <UserJS/>
   <ExcludedPaths/>
-  <DefaultPageProperties recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="31" printAvailable="13" useActionImages="true" showKeyColumnsImagesInGridHeader="false"/>
-  <DefaultDataFormats numberAfterDecimal="4" DecimalSeparator="." ThousandSeparator="," DateTimeFormat="Y-m-d H:i:s" DateFormat="Y-m-d" firstDayOfWeek="0"/>
+  <DefaultPageProperties recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false"/>
+  <DefaultDataFormats numberAfterDecimal="2" DecimalSeparator="," ThousandSeparator="." DateTimeFormat="d.m.Y, H:i:s" DateFormat="d.m.Y" firstDayOfWeek="1"/>
 </Project>

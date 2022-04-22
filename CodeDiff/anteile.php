@@ -32,7 +32,7 @@
     
     
     
-    class anteile_transaktionen01Page extends DetailPage
+    class anteile_transaktionenPage extends DetailPage
     {
         protected function DoBeforeCreate()
         {
@@ -141,10 +141,10 @@
             $main_editor->setAllowClear(true);
             $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $main_editor->SetHandlerName('filter_builder_anteile_transaktionen01_anteil_search');
+            $main_editor->SetHandlerName('filter_builder_anteile_transaktionen_anteil_search');
             
             $multi_value_select_editor = new RemoteMultiValueSelect('anteil', $this->CreateLinkBuilder());
-            $multi_value_select_editor->SetHandlerName('filter_builder_anteile_transaktionen01_anteil_search');
+            $multi_value_select_editor->SetHandlerName('filter_builder_anteile_transaktionen_anteil_search');
             
             $filterBuilder->addColumn(
                 $columns['anteil'],
@@ -522,6 +522,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -532,7 +533,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'edit_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'edit_anteile_transaktionen_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -614,6 +615,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -624,7 +626,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'multi_edit_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'multi_edit_anteile_transaktionen_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -706,6 +708,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -716,7 +719,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'insert_anteile_transaktionen01_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
+            $editColumn = new DynamicLookupEditColumn('Anteil', 'anteil', 'anteil_depotname', 'insert_anteile_transaktionen_anteil_search', $editor, $this->dataset, $lookupDataset, 'id', 'depotname', '');
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -1065,7 +1068,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -1081,14 +1084,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }
@@ -1109,6 +1112,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -1119,7 +1123,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'insert_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'insert_anteile_transaktionen_anteil_search', 'id', 'depotname', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -1133,6 +1137,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -1143,7 +1148,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_anteile_transaktionen_anteil_search', 'id', 'depotname', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -1157,6 +1162,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -1167,7 +1173,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'edit_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'edit_anteile_transaktionen_anteil_search', 'id', 'depotname', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -1181,6 +1187,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -1191,7 +1198,7 @@
                 )
             );
             $lookupDataset->setOrderByField('depotname', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'multi_edit_anteile_transaktionen01_anteil_search', 'id', 'depotname', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'multi_edit_anteile_transaktionen_anteil_search', 'id', 'depotname', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
         }
        
@@ -1359,6 +1366,7 @@
                     new IntegerField('aktienname', true),
                     new IntegerField('anzahl'),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_ant'),
                     new IntegerField('preis'),
                     new IntegerField('kosten'),
                     new IntegerField('invest'),
@@ -1404,14 +1412,15 @@
                 new FilterColumn($this->dataset, 'depotname', 'depotname_name', 'Depotname'),
                 new FilterColumn($this->dataset, 'aktienname', 'aktienname_name', 'Aktienname'),
                 new FilterColumn($this->dataset, 'anzahl', 'anzahl', 'Anzahl'),
+                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert'),
+                new FilterColumn($this->dataset, 'aenderung_ant', 'aenderung_ant', 'Aenderung Ant'),
                 new FilterColumn($this->dataset, 'preis', 'preis', 'Preis'),
                 new FilterColumn($this->dataset, 'kosten', 'kosten', 'Kosten'),
                 new FilterColumn($this->dataset, 'invest', 'invest', 'Invest'),
                 new FilterColumn($this->dataset, 'steigerung', 'steigerung', 'Steigerung'),
                 new FilterColumn($this->dataset, 'gewinn', 'gewinn', 'Gewinn'),
                 new FilterColumn($this->dataset, 'rendite', 'rendite', 'Rendite'),
-                new FilterColumn($this->dataset, 'kauf_kurs', 'kauf_kurs', 'Kauf Kurs'),
-                new FilterColumn($this->dataset, 'wert', 'wert', 'Wert')
+                new FilterColumn($this->dataset, 'kauf_kurs', 'kauf_kurs', 'Kauf Kurs')
             );
         }
     
@@ -1422,14 +1431,15 @@
                 ->addColumn($columns['depotname'])
                 ->addColumn($columns['aktienname'])
                 ->addColumn($columns['anzahl'])
+                ->addColumn($columns['wert'])
+                ->addColumn($columns['aenderung_ant'])
                 ->addColumn($columns['preis'])
                 ->addColumn($columns['kosten'])
                 ->addColumn($columns['invest'])
                 ->addColumn($columns['steigerung'])
                 ->addColumn($columns['gewinn'])
                 ->addColumn($columns['rendite'])
-                ->addColumn($columns['kauf_kurs'])
-                ->addColumn($columns['wert']);
+                ->addColumn($columns['kauf_kurs']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -1533,6 +1543,42 @@
             
             $filterBuilder->addColumn(
                 $columns['anzahl'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('wert_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['wert'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
+            $main_editor = new TextEdit('aenderung_ant_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['aenderung_ant'],
                 array(
                     FilterConditionOperator::EQUALS => $main_editor,
                     FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
@@ -1672,24 +1718,6 @@
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
             );
-            
-            $main_editor = new TextEdit('wert_edit');
-            
-            $filterBuilder->addColumn(
-                $columns['wert'],
-                array(
-                    FilterConditionOperator::EQUALS => $main_editor,
-                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
-                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
-                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
-                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
-                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
-                    FilterConditionOperator::IS_BETWEEN => $main_editor,
-                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
-                    FilterConditionOperator::IS_BLANK => null,
-                    FilterConditionOperator::IS_NOT_BLANK => null
-                )
-            );
         }
     
         protected function AddOperationsColumns(Grid $grid)
@@ -1733,12 +1761,12 @@
     
         protected function AddFieldColumns(Grid $grid, $withDetails = true)
         {
-            if (GetCurrentUserPermissionsForPage('anteile.transaktionen01')->HasViewGrant() && $withDetails)
+            if (GetCurrentUserPermissionsForPage('anteile.transaktionen')->HasViewGrant() && $withDetails)
             {
             //
-            // View column for anteile_transaktionen01 detail
+            // View column for anteile_transaktionen detail
             //
-            $column = new DetailColumn(array('depotname'), 'anteile.transaktionen01', 'anteile_transaktionen01_handler', $this->dataset, 'Transaktionen');
+            $column = new DetailColumn(array('depotname'), 'anteile.transaktionen', 'anteile_transaktionen_handler', $this->dataset, 'Transaktionen');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $grid->AddViewColumn($column);
             }
@@ -1784,6 +1812,32 @@
             $column->setNumberAfterDecimal(0);
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator('');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
+            $column->SetDescription('');
+            $column->SetFixedWidth(null);
+            $grid->AddViewColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -1871,19 +1925,6 @@
             // View column for kauf_kurs field
             //
             $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
-            $column->setMinimalVisibility(ColumnVisibility::PHONE);
-            $column->SetDescription('');
-            $column->SetFixedWidth(null);
-            $grid->AddViewColumn($column);
-            
-            //
-            // View column for wert field
-            //
-            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -1931,6 +1972,26 @@
             $grid->AddSingleRecordViewColumn($column);
             
             //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddSingleRecordViewColumn($column);
+            
+            //
             // View column for preis field
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
@@ -1999,16 +2060,6 @@
             $column->setThousandsSeparator('.');
             $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
-            
-            //
-            // View column for wert field
-            //
-            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
-            $grid->AddSingleRecordViewColumn($column);
         }
     
         protected function AddEditColumns(Grid $grid)
@@ -2041,7 +2092,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -2087,7 +2144,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -2110,6 +2168,24 @@
             //
             $editor = new TextEdit('anzahl_edit');
             $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -2173,15 +2249,6 @@
             //
             $editor = new TextEdit('kauf_kurs_edit');
             $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddEditColumn($editColumn);
-            
-            //
-            // Edit column for wert field
-            //
-            $editor = new TextEdit('wert_edit');
-            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -2207,7 +2274,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -2253,7 +2326,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -2276,6 +2350,24 @@
             //
             $editor = new TextEdit('anzahl_edit');
             $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -2339,15 +2431,6 @@
             //
             $editor = new TextEdit('kauf_kurs_edit');
             $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddMultiEditColumn($editColumn);
-            
-            //
-            // Edit column for wert field
-            //
-            $editor = new TextEdit('wert_edit');
-            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddMultiEditColumn($editColumn);
@@ -2383,7 +2466,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -2429,7 +2518,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),
@@ -2452,6 +2542,24 @@
             //
             $editor = new TextEdit('anzahl_edit');
             $editColumn = new CustomEditColumn('Anzahl', 'anzahl', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for wert field
+            //
+            $editor = new TextEdit('wert_edit');
+            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddInsertColumn($editColumn);
+            
+            //
+            // Edit column for aenderung_ant field
+            //
+            $editor = new TextEdit('aenderung_ant_edit');
+            $editColumn = new CustomEditColumn('Aenderung Ant', 'aenderung_ant', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -2515,15 +2623,6 @@
             //
             $editor = new TextEdit('kauf_kurs_edit');
             $editColumn = new CustomEditColumn('Kauf Kurs', 'kauf_kurs', $editor, $this->dataset);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddInsertColumn($editColumn);
-            
-            //
-            // Edit column for wert field
-            //
-            $editor = new TextEdit('wert_edit');
-            $editColumn = new CustomEditColumn('Wert', 'wert', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -2572,6 +2671,26 @@
             $grid->AddPrintColumn($column);
             
             //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddPrintColumn($column);
+            
+            //
             // View column for preis field
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
@@ -2635,16 +2754,6 @@
             // View column for kauf_kurs field
             //
             $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
-            $grid->AddPrintColumn($column);
-            
-            //
-            // View column for wert field
-            //
-            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2689,6 +2798,26 @@
             $grid->AddExportColumn($column);
             
             //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddExportColumn($column);
+            
+            //
             // View column for preis field
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
@@ -2752,16 +2881,6 @@
             // View column for kauf_kurs field
             //
             $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
-            $grid->AddExportColumn($column);
-            
-            //
-            // View column for wert field
-            //
-            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2806,6 +2925,26 @@
             $grid->AddCompareColumn($column);
             
             //
+            // View column for wert field
+            //
+            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for aenderung_ant field
+            //
+            $column = new NumberViewColumn('aenderung_ant', 'aenderung_ant', 'Aenderung Ant', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(2);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator(',');
+            $grid->AddCompareColumn($column);
+            
+            //
             // View column for preis field
             //
             $column = new NumberViewColumn('preis', 'preis', 'Preis', $this->dataset);
@@ -2869,16 +3008,6 @@
             // View column for kauf_kurs field
             //
             $column = new NumberViewColumn('kauf_kurs', 'kauf_kurs', 'Kauf Kurs', $this->dataset);
-            $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
-            $grid->AddCompareColumn($column);
-            
-            //
-            // View column for wert field
-            //
-            $column = new NumberViewColumn('wert', 'wert', 'Wert', $this->dataset);
             $column->SetOrderable(true);
             $column->setNumberAfterDecimal(2);
             $column->setThousandsSeparator('.');
@@ -2964,7 +3093,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('1200px');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -2980,14 +3109,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }
@@ -2997,10 +3126,10 @@
         }
     
         protected function doRegisterHandlers() {
-            $detailPage = new anteile_transaktionen01Page('anteile_transaktionen01', $this, array('anteil'), array('depotname'), $this->GetForeignKeyFields(), $this->CreateMasterDetailRecordGrid(), $this->dataset, GetCurrentUserPermissionsForPage('anteile.transaktionen01'), 'UTF-8');
-            $detailPage->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource('anteile.transaktionen01'));
-            $detailPage->SetHttpHandlerName('anteile_transaktionen01_handler');
-            $handler = new PageHTTPHandler('anteile_transaktionen01_handler', $detailPage);
+            $detailPage = new anteile_transaktionenPage('anteile_transaktionen', $this, array('anteil'), array('depotname'), $this->GetForeignKeyFields(), $this->CreateMasterDetailRecordGrid(), $this->dataset, GetCurrentUserPermissionsForPage('anteile.transaktionen'), 'UTF-8');
+            $detailPage->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource('anteile.transaktionen'));
+            $detailPage->SetHttpHandlerName('anteile_transaktionen_handler');
+            $handler = new PageHTTPHandler('anteile_transaktionen_handler', $detailPage);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -3017,7 +3146,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -3052,7 +3187,8 @@
                     new IntegerField('par10'),
                     new IntegerField('par20'),
                     new IntegerField('kgv'),
-                    new IntegerField('div_rendite'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
                     new StringField('branche'),
                     new StringField('bewertung'),

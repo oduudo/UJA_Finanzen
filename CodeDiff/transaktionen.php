@@ -573,7 +573,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -668,7 +674,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -763,7 +775,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
@@ -1058,7 +1076,7 @@
             $result->setTableBordered(false);
             $result->setTableCondensed(false);
             
-            $result->SetHighlightRowAtHover(false);
+            $result->SetHighlightRowAtHover(true);
             $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
@@ -1074,14 +1092,14 @@
             $this->SetShowPageList(true);
             $this->SetShowTopPageNavigator(true);
             $this->SetShowBottomPageNavigator(true);
-            $this->setPrintListAvailable(true);
+            $this->setPrintListAvailable(false);
             $this->setPrintListRecordAvailable(false);
-            $this->setPrintOneRecordAvailable(true);
-            $this->setAllowPrintSelectedRecords(true);
+            $this->setPrintOneRecordAvailable(false);
+            $this->setAllowPrintSelectedRecords(false);
             $this->setExportListAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
             $this->setExportSelectedRecordsAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportListRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
-            $this->setExportOneRecordAvailable(array('pdf', 'excel', 'word', 'xml', 'csv'));
+            $this->setExportListRecordAvailable(array());
+            $this->setExportOneRecordAvailable(array());
     
             return $result;
         }
@@ -1107,7 +1125,13 @@
                     new StringField('portf', true),
                     new StringField('start', true),
                     new IntegerField('invest'),
+                    new TimeField('last_date_t'),
+                    new StringField('last_date', true),
+                    new IntegerField('last_wert'),
+                    new StringField('akt_date', true),
                     new IntegerField('wert'),
+                    new IntegerField('aenderung_dep'),
+                    new IntegerField('aenderung_dep_p'),
                     new IntegerField('dividende'),
                     new IntegerField('kosten'),
                     new IntegerField('gewinn'),
