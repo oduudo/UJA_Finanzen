@@ -31,23 +31,23 @@
     
     
     
-    class kursePage extends Page
+    class splitsPage extends Page
     {
         protected function DoBeforeCreate()
         {
-            $this->SetTitle('Kurse');
-            $this->SetMenuLabel('Kurse');
+            $this->SetTitle('Splits');
+            $this->SetMenuLabel('Splits');
     
             $this->dataset = new TableDataset(
                 MySqlIConnectionFactory::getInstance(),
                 GetConnectionOptions(),
-                '`kurse`');
+                '`splits`');
             $this->dataset->addFields(
                 array(
                     new IntegerField('id', true, true, true),
                     new IntegerField('aktienid', true),
                     new DateTimeField('datetime', true),
-                    new IntegerField('kurs')
+                    new StringField('verhaeltnis')
                 )
             );
             $this->dataset->AddLookupField('aktienid', 'aktien', new IntegerField('id'), new StringField('name', false, false, false, false, 'aktienid_name', 'aktienid_name_aktien'), 'aktienid_name_aktien');
@@ -62,7 +62,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(100);
+            $partitionNavigator->SetRowsPerPage(200);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -75,15 +75,7 @@
     
         protected function setupCharts()
         {
-            $sql = '%source%
-            order by datetime';
-            $chart = new Chart('Kurse', Chart::TYPE_LINE, $this->dataset, $sql);
-            $chart->setTitle('Aktien-Kurse');
-            $chart->setHeight(500);
-            $chart->setDomainColumn('datetime', '', 'datetime');
-            $chart->addDataColumn('kurs', 'Kurs', 'float')
-                ->setTooltipColumn('datetime');
-            $this->addChart($chart, 0, ChartPosition::BEFORE_GRID, 12);
+    
         }
     
         protected function getFiltersColumns()
@@ -92,16 +84,17 @@
                 new FilterColumn($this->dataset, 'id', 'id', 'Id'),
                 new FilterColumn($this->dataset, 'aktienid', 'aktienid_name', 'Aktienid'),
                 new FilterColumn($this->dataset, 'datetime', 'datetime', 'Datetime'),
-                new FilterColumn($this->dataset, 'kurs', 'kurs', 'Kurs')
+                new FilterColumn($this->dataset, 'verhaeltnis', 'verhaeltnis', 'Verhaeltnis')
             );
         }
     
         protected function setupQuickFilter(QuickFilter $quickFilter, FixedKeysArray $columns)
         {
             $quickFilter
+                ->addColumn($columns['id'])
                 ->addColumn($columns['aktienid'])
                 ->addColumn($columns['datetime'])
-                ->addColumn($columns['kurs']);
+                ->addColumn($columns['verhaeltnis']);
         }
     
         protected function setupColumnFilter(ColumnFilter $columnFilter)
@@ -109,21 +102,36 @@
             $columnFilter
                 ->setOptionsFor('aktienid')
                 ->setOptionsFor('datetime');
-            
-            $columnFilter
-                ->setNumberOfValuesToDisplayFor('aktienid', 200);
         }
     
         protected function setupFilterBuilder(FilterBuilder $filterBuilder, FixedKeysArray $columns)
         {
+            $main_editor = new TextEdit('id_edit');
+            
+            $filterBuilder->addColumn(
+                $columns['id'],
+                array(
+                    FilterConditionOperator::EQUALS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN => $main_editor,
+                    FilterConditionOperator::IS_GREATER_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN => $main_editor,
+                    FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
+                    FilterConditionOperator::IS_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::IS_BLANK => null,
+                    FilterConditionOperator::IS_NOT_BLANK => null
+                )
+            );
+            
             $main_editor = new DynamicCombobox('aktienid_edit', $this->CreateLinkBuilder());
             $main_editor->setAllowClear(true);
             $main_editor->setMinimumInputLength(0);
             $main_editor->SetAllowNullValue(false);
-            $main_editor->SetHandlerName('filter_builder_kurse_aktienid_search');
+            $main_editor->SetHandlerName('filter_builder_splits_aktienid_search');
             
             $multi_value_select_editor = new RemoteMultiValueSelect('aktienid', $this->CreateLinkBuilder());
-            $multi_value_select_editor->SetHandlerName('filter_builder_kurse_aktienid_search');
+            $multi_value_select_editor->SetHandlerName('filter_builder_splits_aktienid_search');
             
             $text_editor = new TextEdit('aktienid');
             
@@ -172,10 +180,11 @@
                 )
             );
             
-            $main_editor = new TextEdit('kurs_edit');
+            $main_editor = new TextEdit('verhaeltnis_edit');
+            $main_editor->SetMaxLength(16);
             
             $filterBuilder->addColumn(
-                $columns['kurs'],
+                $columns['verhaeltnis'],
                 array(
                     FilterConditionOperator::EQUALS => $main_editor,
                     FilterConditionOperator::DOES_NOT_EQUAL => $main_editor,
@@ -185,6 +194,12 @@
                     FilterConditionOperator::IS_LESS_THAN_OR_EQUAL_TO => $main_editor,
                     FilterConditionOperator::IS_BETWEEN => $main_editor,
                     FilterConditionOperator::IS_NOT_BETWEEN => $main_editor,
+                    FilterConditionOperator::CONTAINS => $main_editor,
+                    FilterConditionOperator::DOES_NOT_CONTAIN => $main_editor,
+                    FilterConditionOperator::BEGINS_WITH => $main_editor,
+                    FilterConditionOperator::ENDS_WITH => $main_editor,
+                    FilterConditionOperator::IS_LIKE => $main_editor,
+                    FilterConditionOperator::IS_NOT_LIKE => $main_editor,
                     FilterConditionOperator::IS_BLANK => null,
                     FilterConditionOperator::IS_NOT_BLANK => null
                 )
@@ -250,7 +265,7 @@
             //
             $column = new TextViewColumn('aktienid', 'aktienid_name', 'Aktienid', $this->dataset);
             $column->SetOrderable(true);
-            $column->setMinimalVisibility(ColumnVisibility::DESKTOP);
+            $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
@@ -260,20 +275,17 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
             $grid->AddViewColumn($column);
             
             //
-            // View column for kurs field
+            // View column for verhaeltnis field
             //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
+            $column = new TextViewColumn('verhaeltnis', 'verhaeltnis', 'Verhaeltnis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
             $column->setMinimalVisibility(ColumnVisibility::PHONE);
             $column->SetDescription('');
             $column->SetFixedWidth(null);
@@ -304,32 +316,19 @@
             //
             $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
             $column->SetOrderable(true);
-            $column->SetDateTimeFormat('d.m.Y');
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
             $grid->AddSingleRecordViewColumn($column);
             
             //
-            // View column for kurs field
+            // View column for verhaeltnis field
             //
-            $column = new NumberViewColumn('kurs', 'kurs', 'Kurs', $this->dataset);
+            $column = new TextViewColumn('verhaeltnis', 'verhaeltnis', 'Verhaeltnis', $this->dataset);
             $column->SetOrderable(true);
-            $column->setNumberAfterDecimal(2);
-            $column->setThousandsSeparator('.');
-            $column->setDecimalSeparator(',');
             $grid->AddSingleRecordViewColumn($column);
         }
     
         protected function AddEditColumns(Grid $grid)
         {
-            //
-            // Edit column for id field
-            //
-            $editor = new TextEdit('id_edit');
-            $editColumn = new CustomEditColumn('Id', 'id', $editor, $this->dataset);
-            $editColumn->setVisible(false);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddEditColumn($editColumn);
-            
             //
             // Edit column for aktienid field
             //
@@ -354,10 +353,6 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
-                    new StringField('kurs_dat_neu'),
-                    new IntegerField('kurs_neu'),
-                    new IntegerField('aenderung_neu'),
-                    new IntegerField('aenderung_p_neu'),
                     new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
@@ -366,22 +361,16 @@
                     new IntegerField('par20'),
                     new IntegerField('par30'),
                     new IntegerField('kgv'),
-                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
-                    new IntegerField('div_ba'),
-                    new IntegerField('div_ba_p'),
-                    new IntegerField('dsr_ba'),
-                    new StringField('diamanten_ba'),
                     new StringField('branche'),
-                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
             );
             $lookupDataset->setOrderByField('name', 'ASC');
-            $editColumn = new DynamicLookupEditColumn('Aktienid', 'aktienid', 'aktienid_name', 'edit_kurse_aktienid_search', $editor, $this->dataset, $lookupDataset, 'id', 'name', '');
+            $editColumn = new DynamicLookupEditColumn('Aktienid', 'aktienid', 'aktienid_name', 'edit_splits_aktienid_search', $editor, $this->dataset, $lookupDataset, 'id', 'name', '');
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -398,10 +387,11 @@
             $grid->AddEditColumn($editColumn);
             
             //
-            // Edit column for kurs field
+            // Edit column for verhaeltnis field
             //
-            $editor = new TextEdit('kurs_edit');
-            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
+            $editor = new TextEdit('verhaeltnis_edit');
+            $editor->SetMaxLength(16);
+            $editColumn = new CustomEditColumn('Verhaeltnis', 'verhaeltnis', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddEditColumn($editColumn);
@@ -409,21 +399,6 @@
     
         protected function AddMultiEditColumns(Grid $grid)
         {
-    
-        }
-    
-        protected function AddInsertColumns(Grid $grid)
-        {
-            //
-            // Edit column for id field
-            //
-            $editor = new TextEdit('id_edit');
-            $editColumn = new CustomEditColumn('Id', 'id', $editor, $this->dataset);
-            $editColumn->setVisible(false);
-            $editColumn->SetAllowSetToNull(true);
-            $this->ApplyCommonColumnEditProperties($editColumn);
-            $grid->AddInsertColumn($editColumn);
-            
             //
             // Edit column for aktienid field
             //
@@ -448,10 +423,6 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
-                    new StringField('kurs_dat_neu'),
-                    new IntegerField('kurs_neu'),
-                    new IntegerField('aenderung_neu'),
-                    new IntegerField('aenderung_p_neu'),
                     new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
@@ -460,22 +431,86 @@
                     new IntegerField('par20'),
                     new IntegerField('par30'),
                     new IntegerField('kgv'),
-                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
-                    new IntegerField('div_ba'),
-                    new IntegerField('div_ba_p'),
-                    new IntegerField('dsr_ba'),
-                    new StringField('diamanten_ba'),
                     new StringField('branche'),
-                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
             );
             $lookupDataset->setOrderByField('name', 'ASC');
-            $editColumn = new DynamicLookupEditColumn('Aktienid', 'aktienid', 'aktienid_name', 'insert_kurse_aktienid_search', $editor, $this->dataset, $lookupDataset, 'id', 'name', '');
+            $editColumn = new DynamicLookupEditColumn('Aktienid', 'aktienid', 'aktienid_name', 'multi_edit_splits_aktienid_search', $editor, $this->dataset, $lookupDataset, 'id', 'name', '');
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for datetime field
+            //
+            $editor = new DateTimeEdit('datetime_edit', false, 'd.m.Y, H:i:s');
+            $editColumn = new CustomEditColumn('Datetime', 'datetime', $editor, $this->dataset);
+            $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
+            $editor->GetValidatorCollection()->AddValidator($validator);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+            
+            //
+            // Edit column for verhaeltnis field
+            //
+            $editor = new TextEdit('verhaeltnis_edit');
+            $editor->SetMaxLength(16);
+            $editColumn = new CustomEditColumn('Verhaeltnis', 'verhaeltnis', $editor, $this->dataset);
+            $editColumn->SetAllowSetToNull(true);
+            $this->ApplyCommonColumnEditProperties($editColumn);
+            $grid->AddMultiEditColumn($editColumn);
+        }
+    
+        protected function AddInsertColumns(Grid $grid)
+        {
+            //
+            // Edit column for aktienid field
+            //
+            $editor = new DynamicCombobox('aktienid_edit', $this->CreateLinkBuilder());
+            $editor->setAllowClear(true);
+            $editor->setMinimumInputLength(0);
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`aktien`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
+                    new IntegerField('par3m'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('par30'),
+                    new IntegerField('kgv'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $editColumn = new DynamicLookupEditColumn('Aktienid', 'aktienid', 'aktienid_name', 'insert_splits_aktienid_search', $editor, $this->dataset, $lookupDataset, 'id', 'name', '');
             $validator = new RequiredValidator(StringUtils::Format($this->GetLocalizerCaptions()->GetMessageString('RequiredValidationMessage'), $editColumn->GetCaption()));
             $editor->GetValidatorCollection()->AddValidator($validator);
             $this->ApplyCommonColumnEditProperties($editColumn);
@@ -492,10 +527,11 @@
             $grid->AddInsertColumn($editColumn);
             
             //
-            // Edit column for kurs field
+            // Edit column for verhaeltnis field
             //
-            $editor = new TextEdit('kurs_edit');
-            $editColumn = new CustomEditColumn('Kurs', 'kurs', $editor, $this->dataset);
+            $editor = new TextEdit('verhaeltnis_edit');
+            $editor->SetMaxLength(16);
+            $editColumn = new CustomEditColumn('Verhaeltnis', 'verhaeltnis', $editor, $this->dataset);
             $editColumn->SetAllowSetToNull(true);
             $this->ApplyCommonColumnEditProperties($editColumn);
             $grid->AddInsertColumn($editColumn);
@@ -509,17 +545,97 @@
     
         protected function AddPrintColumns(Grid $grid)
         {
-    
+            //
+            // View column for id field
+            //
+            $column = new NumberViewColumn('id', 'id', 'Id', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(0);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator('');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('aktienid', 'aktienid_name', 'Aktienid', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for datetime field
+            //
+            $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
+            $grid->AddPrintColumn($column);
+            
+            //
+            // View column for verhaeltnis field
+            //
+            $column = new TextViewColumn('verhaeltnis', 'verhaeltnis', 'Verhaeltnis', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddPrintColumn($column);
         }
     
         protected function AddExportColumns(Grid $grid)
         {
-    
+            //
+            // View column for id field
+            //
+            $column = new NumberViewColumn('id', 'id', 'Id', $this->dataset);
+            $column->SetOrderable(true);
+            $column->setNumberAfterDecimal(0);
+            $column->setThousandsSeparator('.');
+            $column->setDecimalSeparator('');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('aktienid', 'aktienid_name', 'Aktienid', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for datetime field
+            //
+            $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
+            $grid->AddExportColumn($column);
+            
+            //
+            // View column for verhaeltnis field
+            //
+            $column = new TextViewColumn('verhaeltnis', 'verhaeltnis', 'Verhaeltnis', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddExportColumn($column);
         }
     
         private function AddCompareColumns(Grid $grid)
         {
-    
+            //
+            // View column for name field
+            //
+            $column = new TextViewColumn('aktienid', 'aktienid_name', 'Aktienid', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for datetime field
+            //
+            $column = new DateTimeViewColumn('datetime', 'datetime', 'Datetime', $this->dataset);
+            $column->SetOrderable(true);
+            $column->SetDateTimeFormat('d.m.Y, H:i:s');
+            $grid->AddCompareColumn($column);
+            
+            //
+            // View column for verhaeltnis field
+            //
+            $column = new TextViewColumn('verhaeltnis', 'verhaeltnis', 'Verhaeltnis', $this->dataset);
+            $column->SetOrderable(true);
+            $grid->AddCompareColumn($column);
         }
     
         private function AddCompareHeaderColumns(Grid $grid)
@@ -534,7 +650,7 @@
     
         public function isFilterConditionRequired()
         {
-            return true;
+            return false;
         }
     
         protected function ApplyCommonColumnEditProperties(CustomEditColumn $column)
@@ -566,7 +682,7 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(true);
+            $result->SetUseFixedHeader(false);
             $result->SetShowLineNumbers(false);
             $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
@@ -579,7 +695,7 @@
             $result->setTableCondensed(false);
             
             $result->SetHighlightRowAtHover(true);
-            $result->SetWidth('1200px');
+            $result->SetWidth('');
             $this->AddOperationsColumns($result);
             $this->AddFieldColumns($result);
             $this->AddSingleRecordViewColumns($result);
@@ -629,10 +745,6 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
-                    new StringField('kurs_dat_neu'),
-                    new IntegerField('kurs_neu'),
-                    new IntegerField('aenderung_neu'),
-                    new IntegerField('aenderung_p_neu'),
                     new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
@@ -641,22 +753,16 @@
                     new IntegerField('par20'),
                     new IntegerField('par30'),
                     new IntegerField('kgv'),
-                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
-                    new IntegerField('div_ba'),
-                    new IntegerField('div_ba_p'),
-                    new IntegerField('dsr_ba'),
-                    new StringField('diamanten_ba'),
                     new StringField('branche'),
-                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
             );
             $lookupDataset->setOrderByField('name', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'insert_kurse_aktienid_search', 'id', 'name', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'insert_splits_aktienid_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -677,10 +783,6 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
-                    new StringField('kurs_dat_neu'),
-                    new IntegerField('kurs_neu'),
-                    new IntegerField('aenderung_neu'),
-                    new IntegerField('aenderung_p_neu'),
                     new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
@@ -689,22 +791,16 @@
                     new IntegerField('par20'),
                     new IntegerField('par30'),
                     new IntegerField('kgv'),
-                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
-                    new IntegerField('div_ba'),
-                    new IntegerField('div_ba_p'),
-                    new IntegerField('dsr_ba'),
-                    new StringField('diamanten_ba'),
                     new StringField('branche'),
-                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
             );
             $lookupDataset->setOrderByField('name', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_kurse_aktienid_search', 'id', 'name', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'filter_builder_splits_aktienid_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
             
             $lookupDataset = new TableDataset(
@@ -725,10 +821,6 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
-                    new StringField('kurs_dat_neu'),
-                    new IntegerField('kurs_neu'),
-                    new IntegerField('aenderung_neu'),
-                    new IntegerField('aenderung_p_neu'),
                     new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
@@ -737,22 +829,54 @@
                     new IntegerField('par20'),
                     new IntegerField('par30'),
                     new IntegerField('kgv'),
-                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
-                    new IntegerField('div_ba'),
-                    new IntegerField('div_ba_p'),
-                    new IntegerField('dsr_ba'),
-                    new StringField('diamanten_ba'),
                     new StringField('branche'),
-                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
             );
             $lookupDataset->setOrderByField('name', 'ASC');
-            $handler = new DynamicSearchHandler($lookupDataset, $this, 'edit_kurse_aktienid_search', 'id', 'name', null, 20);
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'edit_splits_aktienid_search', 'id', 'name', null, 20);
+            GetApplication()->RegisterHTTPHandler($handler);
+            
+            $lookupDataset = new TableDataset(
+                MySqlIConnectionFactory::getInstance(),
+                GetConnectionOptions(),
+                '`aktien`');
+            $lookupDataset->addFields(
+                array(
+                    new IntegerField('id', true, true, true),
+                    new StringField('name'),
+                    new StringField('wkn'),
+                    new StringField('isin'),
+                    new StringField('ba_id'),
+                    new StringField('f100id'),
+                    new StringField('ariva_id'),
+                    new StringField('boerse_id'),
+                    new StringField('kurs_dat'),
+                    new IntegerField('kurs'),
+                    new IntegerField('aenderung'),
+                    new IntegerField('aenderung_p'),
+                    new IntegerField('par3m'),
+                    new IntegerField('par1'),
+                    new IntegerField('par3'),
+                    new IntegerField('par5'),
+                    new IntegerField('par10'),
+                    new IntegerField('par20'),
+                    new IntegerField('par30'),
+                    new IntegerField('kgv'),
+                    new IntegerField('dividende'),
+                    new IntegerField('dividende_p'),
+                    new IntegerField('dsr'),
+                    new StringField('branche'),
+                    new StringField('bewertung'),
+                    new StringField('kommentar')
+                )
+            );
+            $lookupDataset->setOrderByField('name', 'ASC');
+            $handler = new DynamicSearchHandler($lookupDataset, $this, 'multi_edit_splits_aktienid_search', 'id', 'name', null, 20);
             GetApplication()->RegisterHTTPHandler($handler);
         }
        
@@ -848,21 +972,7 @@
     
         protected function doPrepareChart(Chart $chart)
         {
-            if ($chart->getId() === 'Kurse') {
-               $chart->setOptions(array(
-                 'chartArea' => array( 'width' => '90%', 'height' => '90%' ),
-                 'curveType' => 'function',
-                 'interpolateNulls' => 'true',
-                 'crosshair' => array( 'trigger' => 'focus', 'color' => 'red' ),
-                 'explorer' => array( 'axis' => 'horizontal', 'keepInBounds' => 'true', 
-                   'maxZoomIn' => '0.1', 'maxZoomOut' => '1' ),
-                 'vAxis' => array( 'scaleType' => 'mirrorLog', 
-                   'gridlines' => array( 'color' => 'red', 'count' => '6' ),
-                   'minorGridlines' => array( 'count' => '0' )
-                   )
-                  ),
-               );
-            }
+    
         }
     
         protected function doPrepareColumnFilter(ColumnFilter $columnFilter)
@@ -916,8 +1026,8 @@
 
     try
     {
-        $Page = new kursePage("kurse", "kurse.php", GetCurrentUserPermissionsForPage("kurse"), 'UTF-8');
-        $Page->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource("kurse"));
+        $Page = new splitsPage("splits", "splits.php", GetCurrentUserPermissionsForPage("splits"), 'UTF-8');
+        $Page->SetRecordPermission(GetCurrentUserRecordPermissionsForDataSource("splits"));
         GetApplication()->SetMainPage($Page);
         GetApplication()->Run();
     }

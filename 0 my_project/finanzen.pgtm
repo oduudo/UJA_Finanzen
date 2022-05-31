@@ -20,10 +20,12 @@
     <DataSource name="kurse"/>
     <DataSource name="transaktionen"/>
     <DataSource name="login"/>
+    <DataSource name="dividenden"/>
+    <DataSource name="ereignisse"/>
   </DataSources>
   <Presentation disableMagicQuotesRuntime="false" showEnvironmentVariables="false" showExecutedQueries="true" showPHPErrorsAndWarnings="false">
     <Pages>
-      <Page type="table" tableName="aktien" numberByDataSource="0" fileName="aktien" caption="Aktien" shortCaption="Aktien" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+      <Page type="table" tableName="aktien" numberByDataSource="0" fileName="aktien" caption="Aktien" shortCaption="Aktien" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText>
 Inline Description        </BeforeGridText>
         <DetailedDescription>
@@ -85,6 +87,12 @@ Detailed Description        </DetailedDescription>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
+          <ColumnPresentation fieldName="par3m" caption="Par3m" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
           <ColumnPresentation fieldName="par1" caption="Par1" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
               <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
@@ -110,6 +118,12 @@ Detailed Description        </DetailedDescription>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="par20" caption="Par20" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="par30" caption="Par30" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
             <ViewProperties type="text">
               <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
             </ViewProperties>
@@ -160,6 +174,32 @@ Detailed Description        </DetailedDescription>
             <ViewProperties type="text" maxLength="75"/>
             <EditProperties type="textArea" columnCount="50" rowCount="8" placeholder=""/>
           </ColumnPresentation>
+          <ColumnPresentation fieldName="div_ba" caption="Div Ba" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="div_ba_p" caption="Div Ba P" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="dsr_ba" caption="Dsr Ba" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="diamanten_ba" caption="Diamanten Ba" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="16"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="land" caption="Land" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="16"/>
+          </ColumnPresentation>
         </ColumnPresentations>
         <Columns>
           <List>
@@ -175,11 +215,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -187,6 +229,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </List>
           <View>
             <Column fieldName="id"/>
@@ -201,11 +248,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -213,6 +262,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </View>
           <Edit>
             <Column fieldName="id"/>
@@ -227,11 +281,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -239,6 +295,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </Edit>
           <Insert>
             <Column fieldName="id"/>
@@ -253,11 +314,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -265,6 +328,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </Insert>
           <QuickFilter>
             <Column fieldName="id"/>
@@ -291,6 +359,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
+            <Column fieldName="par3m"/>
+            <Column fieldName="par30"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </QuickFilter>
           <FilterBuilder>
             <Column fieldName="id"/>
@@ -305,11 +380,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -317,6 +394,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </FilterBuilder>
           <Print>
             <Column fieldName="id"/>
@@ -331,11 +413,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -343,6 +427,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </Print>
           <Export>
             <Column fieldName="id"/>
@@ -357,11 +446,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -369,6 +460,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </Export>
           <Compare>
             <Column fieldName="id"/>
@@ -383,11 +479,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -395,6 +493,11 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </Compare>
           <MultiEdit>
             <Column fieldName="id" visible="false"/>
@@ -409,11 +512,13 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
             <Column fieldName="aenderung_p"/>
             <Column fieldName="aenderung"/>
+            <Column fieldName="par3m"/>
             <Column fieldName="par1"/>
             <Column fieldName="par3"/>
             <Column fieldName="par5"/>
             <Column fieldName="par10"/>
             <Column fieldName="par20"/>
+            <Column fieldName="par30"/>
             <Column fieldName="kgv"/>
             <Column fieldName="dividende"/>
             <Column fieldName="dividende_p"/>
@@ -421,11 +526,16 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="branche"/>
             <Column fieldName="bewertung"/>
             <Column fieldName="kommentar"/>
+            <Column fieldName="div_ba"/>
+            <Column fieldName="div_ba_p"/>
+            <Column fieldName="dsr_ba"/>
+            <Column fieldName="diamanten_ba"/>
+            <Column fieldName="land"/>
           </MultiEdit>
         </Columns>
         <Details>
           <Detail caption="Anteile">
-            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -667,7 +777,7 @@ Detailed Description        </DetailedDescription>
             </MasterForeignKeyColumnMap>
           </Detail>
           <Detail caption="Kurse">
-            <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -763,11 +873,233 @@ Detailed Description        </DetailedDescription>
               <FieldMap masterColumnName="id" foreginColumnName="aktienid"/>
             </MasterForeignKeyColumnMap>
           </Detail>
+          <Detail caption="Dividenden">
+            <Page type="table" tableName="dividenden" numberByDataSource="0" fileName="dividenden" caption="Dividenden" shortCaption="Dividenden" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+                  <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="dynamicCombobox"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="dividende" caption="Dividende" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="jahr" caption="Jahr" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+                  <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </Compare>
+                <MultiEdit>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="dividende"/>
+                  <Column fieldName="jahr"/>
+                </MultiEdit>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="id" foreginColumnName="aktienid"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
+          <Detail caption="Ereignisse">
+            <Page type="table" tableName="ereignisse" numberByDataSource="0" fileName="ereignisse" caption="Ereignisse" shortCaption="Ereignisse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
+              <BeforeGridText/>
+              <DetailedDescription/>
+              <ColumnPresentations>
+                <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+                  <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+                  <ViewProperties type="text"/>
+                  <EditProperties type="dynamicCombobox"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="type" caption="Type" showColumnFilter="false" selectedFilterOperators="1589247">
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="16"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
+                  <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+                  <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+                  <ViewProperties type="text">
+                    <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+                  </ViewProperties>
+                  <EditProperties type="textBox" maxLength="0"/>
+                </ColumnPresentation>
+                <ColumnPresentation fieldName="verhaeltnis" caption="Verhaeltnis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+                  <ViewProperties type="text"/>
+                  <EditProperties type="textBox" maxLength="16"/>
+                </ColumnPresentation>
+              </ColumnPresentations>
+              <Columns>
+                <List>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </List>
+                <View>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </View>
+                <Edit>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </Edit>
+                <Insert>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </Insert>
+                <QuickFilter>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </QuickFilter>
+                <FilterBuilder>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </FilterBuilder>
+                <Print>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </Print>
+                <Export>
+                  <Column fieldName="id"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </Export>
+                <Compare>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </Compare>
+                <MultiEdit>
+                  <Column fieldName="id" visible="false"/>
+                  <Column fieldName="aktienid"/>
+                  <Column fieldName="type"/>
+                  <Column fieldName="datetime"/>
+                  <Column fieldName="wert"/>
+                  <Column fieldName="verhaeltnis"/>
+                </MultiEdit>
+              </Columns>
+              <Details/>
+              <RecordPermissions useRecordPermissions="false"/>
+              <PartitionNavigators/>
+            </Page>
+            <MasterForeignKeyColumnMap>
+              <FieldMap masterColumnName="id" foreginColumnName="aktienid"/>
+            </MasterForeignKeyColumnMap>
+          </Detail>
         </Details>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1002,7 +1334,7 @@ Detailed Description        </DetailedDescription>
         </Columns>
         <Details>
           <Detail caption="Transaktionen">
-            <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -1171,7 +1503,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="depots" numberByDataSource="0" fileName="depots" caption="Depots" shortCaption="Depots" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="depots" numberByDataSource="0" fileName="depots" caption="Depots" shortCaption="Depots" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1486,7 +1818,7 @@ Detailed Description        </DetailedDescription>
         </Columns>
         <Details>
           <Detail caption="Anteile">
-            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+            <Page type="table" tableName="anteile" numberByDataSource="0" fileName="anteile" caption="Anteile" shortCaption="Anteile" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
               <BeforeGridText/>
               <DetailedDescription/>
               <ColumnPresentations>
@@ -1731,7 +2063,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
+      <Page type="table" tableName="kurse" numberByDataSource="0" fileName="kurse" caption="Kurse" shortCaption="Kurse" addSeparator="false" horizontalFilterCondition="" askForFilterConditionBeforeDisplayData="true" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false" gridWidth="1200" gridWidthUnits="px">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1741,13 +2073,13 @@ Detailed Description        </DetailedDescription>
             </ViewProperties>
             <EditProperties type="textBox" maxLength="0"/>
           </ColumnPresentation>
-          <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+          <ColumnPresentation fieldName="aktienid" caption="Aktienid" minimalVisibility="2" numberOfValuesToDisplayForColumnFilter="200" selectedFilterOperators="1589247">
             <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
             <ViewProperties type="text"/>
-            <EditProperties type="textBox" maxLength="0"/>
+            <EditProperties type="dynamicCombobox"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="2031871">
-            <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+            <ViewProperties type="dateTime" dateTimeFormat="d.m.Y"/>
             <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
           </ColumnPresentation>
           <ColumnPresentation fieldName="kurs" caption="Kurs" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
@@ -1783,47 +2115,75 @@ Detailed Description        </DetailedDescription>
             <Column fieldName="kurs"/>
           </Insert>
           <QuickFilter>
-            <Column fieldName="id"/>
+            <Column fieldName="id" visible="false"/>
             <Column fieldName="aktienid"/>
             <Column fieldName="datetime"/>
             <Column fieldName="kurs"/>
           </QuickFilter>
           <FilterBuilder>
-            <Column fieldName="id"/>
+            <Column fieldName="id" visible="false"/>
             <Column fieldName="aktienid"/>
             <Column fieldName="datetime"/>
             <Column fieldName="kurs"/>
           </FilterBuilder>
           <Print>
-            <Column fieldName="id"/>
-            <Column fieldName="aktienid"/>
-            <Column fieldName="datetime"/>
-            <Column fieldName="kurs"/>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid" visible="false"/>
+            <Column fieldName="datetime" visible="false"/>
+            <Column fieldName="kurs" visible="false"/>
           </Print>
           <Export>
-            <Column fieldName="id"/>
-            <Column fieldName="aktienid"/>
-            <Column fieldName="datetime"/>
-            <Column fieldName="kurs"/>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid" visible="false"/>
+            <Column fieldName="datetime" visible="false"/>
+            <Column fieldName="kurs" visible="false"/>
           </Export>
           <Compare>
-            <Column fieldName="id"/>
-            <Column fieldName="aktienid"/>
-            <Column fieldName="datetime"/>
-            <Column fieldName="kurs"/>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid" visible="false"/>
+            <Column fieldName="datetime" visible="false"/>
+            <Column fieldName="kurs" visible="false"/>
           </Compare>
           <MultiEdit>
             <Column fieldName="id" visible="false"/>
-            <Column fieldName="aktienid"/>
-            <Column fieldName="datetime"/>
-            <Column fieldName="kurs"/>
+            <Column fieldName="aktienid" visible="false"/>
+            <Column fieldName="datetime" visible="false"/>
+            <Column fieldName="kurs" visible="false"/>
           </MultiEdit>
         </Columns>
         <Details/>
+        <EventHandlers>
+          <OnPrepareChart enabled="true">
+if ($chart-&gt;getId() === 'Kurse') {
+   $chart-&gt;setOptions(array(
+     'chartArea' =&gt; array( 'width' =&gt; '90%', 'height' =&gt; '90%' ),
+     'curveType' =&gt; 'function',
+     'interpolateNulls' =&gt; 'true',
+     'crosshair' =&gt; array( 'trigger' =&gt; 'focus', 'color' =&gt; 'red' ),
+     'explorer' =&gt; array( 'axis' =&gt; 'horizontal', 'keepInBounds' =&gt; 'true', 
+       'maxZoomIn' =&gt; '0.1', 'maxZoomOut' =&gt; '1' ),
+     'vAxis' =&gt; array( 'scaleType' =&gt; 'mirrorLog', 
+       'gridlines' =&gt; array( 'color' =&gt; 'red', 'count' =&gt; '6' ),
+       'minorGridlines' =&gt; array( 'count' =&gt; '0' )
+       )
+      ),
+   );
+}          </OnPrepareChart>
+        </EventHandlers>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
+        <Charts>
+          <Chart name="Kurse" title="Aktien-Kurse" type="3" height="500" domainColumnName="datetime" domainColumnLabel="" domainColumnType="datetime">
+            <DataColumns>
+              <Column name="kurs" label="Kurs" type="float" tooltipColumnName="datetime"/>
+            </DataColumns>
+            <SelectStatement>
+%source%
+order by datetime            </SelectStatement>
+          </Chart>
+        </Charts>
       </Page>
-      <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+      <Page type="table" tableName="transaktionen" numberByDataSource="0" fileName="transaktionen" caption="Transaktionen" shortCaption="Transaktionen" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -1982,7 +2342,7 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
-      <Page type="table" tableName="login" numberByDataSource="0" fileName="login" caption="Login" shortCaption="Login" addSeparator="false" horizontalFilterCondition="" recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false">
+      <Page type="table" tableName="login" numberByDataSource="0" fileName="login" caption="Login" shortCaption="Login" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
         <BeforeGridText/>
         <DetailedDescription/>
         <ColumnPresentations>
@@ -2057,6 +2417,218 @@ Detailed Description        </DetailedDescription>
         <RecordPermissions useRecordPermissions="false"/>
         <PartitionNavigators/>
       </Page>
+      <Page type="table" tableName="dividenden" numberByDataSource="0" fileName="dividenden" caption="Dividenden" shortCaption="Dividenden" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+            <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="dynamicCombobox"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="dividende" caption="Dividende" showColumnFilter="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="jahr" caption="Jahr" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </View>
+          <Edit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </Compare>
+          <MultiEdit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="dividende"/>
+            <Column fieldName="jahr"/>
+          </MultiEdit>
+        </Columns>
+        <Details/>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
+      <Page type="table" tableName="ereignisse" numberByDataSource="0" fileName="ereignisse" caption="Ereignisse" shortCaption="Ereignisse" addSeparator="false" horizontalFilterCondition="" recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false">
+        <BeforeGridText/>
+        <DetailedDescription/>
+        <ColumnPresentations>
+          <ColumnPresentation fieldName="id" caption="Id" showColumnFilter="false" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="aktienid" caption="Aktienid" selectedFilterOperators="1589247">
+            <Lookup tableName="aktien" linkFieldName="id" displayFieldName="name" lookupFilter="" useLookupOrdering="true" lookupOrdering="0"/>
+            <ViewProperties type="text"/>
+            <EditProperties type="dynamicCombobox"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="datetime" caption="Datetime" selectedFilterOperators="1573119">
+            <ViewProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s"/>
+            <EditProperties type="dateTime" dateTimeFormat="d.m.Y, H:i:s" firstDayOfWeek="0"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="verhaeltnis" caption="Verhaeltnis" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="16"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="type" caption="Type" showColumnFilter="false" selectedFilterOperators="1589247">
+            <ViewProperties type="text"/>
+            <EditProperties type="textBox" maxLength="16"/>
+          </ColumnPresentation>
+          <ColumnPresentation fieldName="wert" caption="Wert" showColumnFilter="false" canSetNull="true" selectedFilterOperators="1573119">
+            <ViewProperties type="text">
+              <Format type="number" numberAfterDecimal="2" decimalSeparator="," thousandSeparator="."/>
+            </ViewProperties>
+            <EditProperties type="textBox" maxLength="0"/>
+          </ColumnPresentation>
+        </ColumnPresentations>
+        <Columns>
+          <List>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </List>
+          <View>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </View>
+          <Edit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </Edit>
+          <Insert>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </Insert>
+          <QuickFilter>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </QuickFilter>
+          <FilterBuilder>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </FilterBuilder>
+          <Print>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </Print>
+          <Export>
+            <Column fieldName="id"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </Export>
+          <Compare>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </Compare>
+          <MultiEdit>
+            <Column fieldName="id" visible="false"/>
+            <Column fieldName="aktienid"/>
+            <Column fieldName="datetime"/>
+            <Column fieldName="verhaeltnis"/>
+            <Column fieldName="type"/>
+            <Column fieldName="wert"/>
+          </MultiEdit>
+        </Columns>
+        <Details/>
+        <RecordPermissions useRecordPermissions="false"/>
+        <PartitionNavigators/>
+      </Page>
     </Pages>
     <UserAuthorization/>
     <UserGrants enableGuestAccess="false">
@@ -2118,6 +2690,6 @@ a {
   <PrintUserStyles/>
   <UserJS/>
   <ExcludedPaths/>
-  <DefaultPageProperties recordsPerPage="20" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" showKeyColumnsImagesInGridHeader="false"/>
+  <DefaultPageProperties recordsPerPage="100" NavigatorPosition="3" insertAbilityMode="1" deleteAbilityMode="3" deleteSelectedAbilityMode="3" contentEncoding="UTF-8" exportAllRecordsAvailable="31" exportSelectedRecordsAvailable="31" exportSingleRecordFromGridAvailable="0" exportRecordFromViewFormAvailable="0" printAvailable="0" highlightRowOnMouseHover="true" useActionImages="true" useFixedGridHeader="true" showKeyColumnsImagesInGridHeader="false"/>
   <DefaultDataFormats numberAfterDecimal="2" DecimalSeparator="," ThousandSeparator="." DateTimeFormat="d.m.Y, H:i:s" DateFormat="d.m.Y" firstDayOfWeek="1"/>
 </Project>

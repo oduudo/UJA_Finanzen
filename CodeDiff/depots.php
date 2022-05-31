@@ -73,7 +73,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(20);
+            $partitionNavigator->SetRowsPerPage(100);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -812,16 +812,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -990,16 +1002,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -1178,16 +1202,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -1721,7 +1757,7 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(false);
+            $result->SetUseFixedHeader(true);
             $result->SetShowLineNumbers(false);
             $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
@@ -1815,16 +1851,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -1882,16 +1930,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -1949,16 +2009,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -2016,16 +2088,28 @@
                     new IntegerField('kurs'),
                     new IntegerField('aenderung'),
                     new IntegerField('aenderung_p'),
+                    new StringField('kurs_dat_neu'),
+                    new IntegerField('kurs_neu'),
+                    new IntegerField('aenderung_neu'),
+                    new IntegerField('aenderung_p_neu'),
+                    new IntegerField('par3m'),
                     new IntegerField('par1'),
                     new IntegerField('par3'),
                     new IntegerField('par5'),
                     new IntegerField('par10'),
                     new IntegerField('par20'),
+                    new IntegerField('par30'),
                     new IntegerField('kgv'),
+                    new IntegerField('ausschuettung'),
                     new IntegerField('dividende'),
                     new IntegerField('dividende_p'),
                     new IntegerField('dsr'),
+                    new IntegerField('div_ba'),
+                    new IntegerField('div_ba_p'),
+                    new IntegerField('dsr_ba'),
+                    new StringField('diamanten_ba'),
                     new StringField('branche'),
+                    new StringField('land'),
                     new StringField('bewertung'),
                     new StringField('kommentar')
                 )
@@ -2226,7 +2310,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(20);
+            $partitionNavigator->SetRowsPerPage(100);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -4265,7 +4349,7 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(false);
+            $result->SetUseFixedHeader(true);
             $result->SetShowLineNumbers(false);
             $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);

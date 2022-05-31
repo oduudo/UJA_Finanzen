@@ -67,6 +67,8 @@ function GetPageInfos()
     $result[] = array('caption' => 'Kurse', 'short_caption' => 'Kurse', 'filename' => 'kurse.php', 'name' => 'kurse', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     $result[] = array('caption' => 'Transaktionen', 'short_caption' => 'Transaktionen', 'filename' => 'transaktionen.php', 'name' => 'transaktionen', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     $result[] = array('caption' => 'Login', 'short_caption' => 'Login', 'filename' => 'login.php', 'name' => 'login', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
+    $result[] = array('caption' => 'Dividenden', 'short_caption' => 'Dividenden', 'filename' => 'dividenden.php', 'name' => 'dividenden', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
+    $result[] = array('caption' => 'Ereignisse', 'short_caption' => 'Ereignisse', 'filename' => 'ereignisse.php', 'name' => 'ereignisse', 'group_name' => 'Default', 'add_separator' => false, 'description' => '');
     return $result;
 }
 

@@ -60,7 +60,7 @@
             $result = new CompositePageNavigator($this);
             
             $partitionNavigator = new PageNavigator('pnav', $this, $this->dataset);
-            $partitionNavigator->SetRowsPerPage(20);
+            $partitionNavigator->SetRowsPerPage(100);
             $result->AddPageNavigator($partitionNavigator);
             
             return $result;
@@ -456,7 +456,7 @@
             ApplyCommonPageSettings($this, $result);
             
             $result->SetUseImagesForActions(true);
-            $result->SetUseFixedHeader(false);
+            $result->SetUseFixedHeader(true);
             $result->SetShowLineNumbers(false);
             $result->SetShowKeyColumnsImagesInHeader(false);
             $result->SetViewMode(ViewMode::TABLE);
